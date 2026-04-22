@@ -20,7 +20,7 @@ CQRS-URL Platform - Commands and Queries as URL-addressable resources
 ## Metadata
 
 - **name**: `codot`
-- **version**: `0.1.1`
+- **version**: `0.1.2`
 - **python_requires**: `>=3.8`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/qwen/qwen3-coder-next`
@@ -41,7 +41,7 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: codot;
-  version: 0.1.1;
+  version: 0.1.2;
 }
 
 interface[type="cli"] {
@@ -104,7 +104,7 @@ environment[name="local"] {
 ```yaml
 project:
   name: codot
-  version: 0.1.1
+  version: 0.1.2
   env: local
 ```
 
@@ -173,7 +173,7 @@ pip install -e .[dev]
 - **commits**: `conventional` scope=`codot`
 - **changelog**: `keep-a-changelog`
 - **build strategies**: `python`, `nodejs`, `rust`
-- **version files**: `pyproject.toml:version`, `.venv/lib/python3.13/site-packages/httpcore/__init__.py:__version__`
+- **version files**: `VERSION`, `pyproject.toml:version`, `venv/lib/python3.13/site-packages/matplotlib/__init__.py:__version__`
 
 ## Makefile Targets
 
@@ -193,47 +193,51 @@ pip install -e .[dev]
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# codot | 42f 3290L | python:27,shell:8,javascript:4,less:1,typescript:1,css:1 | 2026-04-22
-# stats: 63 func | 43 cls | 42 mod | CC̄=2.5 | critical:1 | cycles:0
-# alerts[5]: CC execute_node=18; CC _substitute=8; CC run_workflow=8; CC _mcp_execute=7; CC validate_against_schema_uri=7
+# codot | 46f 3577L | python:27,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-22
+# stats: 69 func | 43 cls | 46 mod | CC̄=2.3 | critical:0 | cycles:0
+# alerts[5]: CC _substitute=8; CC run_workflow=8; CC _mcp_execute=7; CC validate_against_schema_uri=7; CC _websocket_execute=6
 # hotspots[5]: _mcp_execute fan=16; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _litellm_execute fan=10
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[42]:
+M[46]:
   api/agent.py,374
+  api/app.doql.less,60
   api/auth/__init__.py,103
-  api/commands/__init__.py,78
+  api/commands/__init__.py,81
   api/commands/converttobase64.py,35
   api/commands/converttocsv.py,61
-  api/commands/converttojson.py,80
+  api/commands/converttojson.py,81
   api/commands/converttoxml.py,52
   api/commands/fetch.py,28
   api/commands/pipeline.py,79
   api/commands/render.py,98
   api/config.py,35
-  api/main.py,240
+  api/main.py,235
   api/models.py,125
   api/policy/__init__.py,150
-  api/protocols/__init__.py,67
+  api/protocols/__init__.py,70
   api/protocols/data_protocol.py,41
   api/protocols/file_protocol.py,52
   api/protocols/http_protocol.py,34
-  api/queries/__init__.py,54
+  api/queries/__init__.py,57
   api/queries/from_url.py,46
   api/queries/introspect.py,23
   api/tests/test_api.py,12
   api/validators/__init__.py,49
   app.doql.less,60
-  cqrs-backend-workflows/server.py,354
+  cqrs-backend-workflows/app.doql.less,60
+  cqrs-backend-workflows/server.py,376
   cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py,16
+  cqrs-workflow-editor/app.doql.less,65
   cqrs-workflow-editor/test/cqrs-workflow-editor.test.js,8
-  cqrs-workflow-editor/vite.config.ts,21
+  cqrs-workflow-editor/vite.config.ts,36
   examples/01-fetch.sh,49
   examples/02-convert-to-json.sh,49
   examples/03-render-html.sh,41
   examples/04-pipeline.sh,125
   examples/05-query.sh,52
   examples/06-rbac.sh,67
+  frontend/app.doql.less,60
   frontend/html/css/style.css,35
   frontend/html/js/api.js,62
   frontend/html/js/app.js,188
@@ -272,7 +276,7 @@ D:
     ConvertToCsvCommand: execute(1)
   api/commands/converttojson.py:
     e: ConvertToJsonCommand
-    ConvertToJsonCommand: execute(1)
+    ConvertToJsonCommand: _detect_mode(3),_convert(2),execute(1)
   api/commands/converttoxml.py:
     e: ConvertToXmlCommand
     ConvertToXmlCommand: execute(1)
@@ -367,13 +371,19 @@ D:
     SchemaValidationError: __init__(2)
     validate_against_schema_uri(instance;schema_uri)
   cqrs-backend-workflows/server.py:
-    e: validate_workflow,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
     WorkflowNode:
     WorkflowOutput:
     Workflow:
     WorkflowExecutionRequest:
     WorkflowExecutionResponse:
     validate_workflow(workflow)
+    _result_to_data_uri(prev_result)
+    _handle_fetch(node;_node_results;headers;client)
+    _handle_http(node;_node_results;headers;client)
+    _handle_command(node;node_results;headers;client)
+    _handle_render(node;node_results;headers;client)
+    _handle_agent(node;_node_results;_headers;_client)
     execute_node(node;node_results;client;token)
     root()
     health()
@@ -407,67 +417,67 @@ D:
 
 ## Call Graph
 
-*55 nodes · 44 edges · 16 modules · CC̄=2.8*
+*60 nodes · 46 edges · 18 modules · CC̄=1.1*
 
 ### Hubs (by degree)
 
 | Function | CC | in | out | total |
 |----------|----|----|-----|-------|
+| `fetchPreview` *(in cqrs-workflow-editor.src.App)* | 13 ⚠ | 1 | 14 | **15** |
 | `register_default_commands` *(in api.commands)* | 1 | 0 | 15 | **15** |
+| `API` *(in frontend.html.js.api)* | 9 | 0 | 14 | **14** |
 | `validate_against_schema_uri` *(in api.validators)* | 7 | 1 | 13 | **14** |
 | `request` *(in frontend.html.js.api)* | 9 | 6 | 8 | **14** |
-| `API` *(in frontend.html.js.api)* | 9 | 0 | 14 | **14** |
-| `execute` *(in api.queries.from_url.FromUrlQuery)* | 9 | 0 | 13 | **13** |
 | `execute` *(in api.commands.pipeline.PipelineCommand)* | 8 | 0 | 13 | **13** |
-| `fetchPreview` *(in cqrs-workflow-editor.src.App)* | 10 ⚠ | 1 | 11 | **12** |
+| `execute` *(in api.queries.from_url.FromUrlQuery)* | 9 | 0 | 13 | **13** |
 | `execute_command` *(in api.main)* | 3 | 0 | 11 | **11** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/codot
-# nodes: 55 | edges: 44 | modules: 16
-# CC̄=2.8
+# nodes: 60 | edges: 46 | modules: 18
+# CC̄=1.1
 
 HUBS[20]:
+  cqrs-workflow-editor.src.App.fetchPreview
+    CC=13  in:1  out:14  total:15
   api.commands.register_default_commands
     CC=1  in:0  out:15  total:15
+  frontend.html.js.api.API
+    CC=9  in:0  out:14  total:14
   api.validators.validate_against_schema_uri
     CC=7  in:1  out:13  total:14
   frontend.html.js.api.request
     CC=9  in:6  out:8  total:14
-  frontend.html.js.api.API
-    CC=9  in:0  out:14  total:14
-  api.queries.from_url.FromUrlQuery.execute
-    CC=9  in:0  out:13  total:13
   api.commands.pipeline.PipelineCommand.execute
     CC=8  in:0  out:13  total:13
-  cqrs-workflow-editor.src.App.fetchPreview
-    CC=10  in:1  out:11  total:12
+  api.queries.from_url.FromUrlQuery.execute
+    CC=9  in:0  out:13  total:13
   api.main.execute_command
     CC=3  in:0  out:11  total:11
   api.commands.converttobase64.ConvertToBase64Command.execute
     CC=2  in:0  out:10  total:10
   api.commands.pipeline._substitute
     CC=8  in:3  out:7  total:10
-  frontend.html.js.app.renderDecoded
-    CC=9  in:0  out:10  total:10
   api.main.execute_query
     CC=3  in:1  out:9  total:10
-  api.queries.get_registry
-    CC=1  in:10  out:0  total:10
+  frontend.html.js.app.renderDecoded
+    CC=9  in:0  out:10  total:10
+  project.map.toon.get_registry
+    CC=0  in:9  out:0  total:9
   api.protocols.register_default_protocols
     CC=1  in:0  out:9  total:9
+  api.commands.converttojson.ConvertToJsonCommand._convert
+    CC=8  in:0  out:8  total:8
   cqrs-workflow-editor.src.App.onUploadWorkflow
     CC=4  in:0  out:8  total:8
   cqrs-workflow-editor.src.App.workflow
     CC=5  in:0  out:7  total:7
-  api.main.run_agent
-    CC=2  in:0  out:7  total:7
   api.commands.fetch.FetchCommand.execute
     CC=2  in:0  out:7  total:7
-  api.main.issue_token
+  api.main.run_agent
+    CC=2  in:0  out:7  total:7
+  cqrs-workflow-editor.src.App.reader
     CC=2  in:0  out:6  total:6
-  api.queries.QueryRegistry.list
-    CC=2  in:5  out:1  total:6
 
 MODULES:
   api.agent  [1 funcs]
@@ -480,6 +490,8 @@ MODULES:
     register_default_commands  CC=1  out:15
   api.commands.converttobase64  [1 funcs]
     execute  CC=2  out:10
+  api.commands.converttojson  [1 funcs]
+    _convert  CC=8  out:8
   api.commands.fetch  [1 funcs]
     execute  CC=2  out:7
   api.commands.pipeline  [3 funcs]
@@ -505,7 +517,10 @@ MODULES:
     execute  CC=9  out:13
   api.validators  [1 funcs]
     validate_against_schema_uri  CC=7  out:13
-  cqrs-backend-workflows.server  [4 funcs]
+  cqrs-backend-workflows.server  [7 funcs]
+    _handle_command  CC=5  out:3
+    _handle_render  CC=3  out:3
+    _result_to_data_uri  CC=2  out:2
     create_workflow  CC=2  out:5
     list_workflows  CC=1  out:3
     update_workflow  CC=2  out:4
@@ -513,13 +528,13 @@ MODULES:
   cqrs-workflow-editor.src.App  [16 funcs]
     blob  CC=1  out:2
     exportWorkflow  CC=1  out:4
-    fetchPreview  CC=10  out:11
+    fetchPreview  CC=13  out:14
     file  CC=2  out:6
     json  CC=2  out:0
     loadPredefinedWorkflow  CC=2  out:5
     mapToEdges  CC=4  out:2
     mapToNodes  CC=1  out:1
-    mime  CC=4  out:2
+    mime  CC=3  out:2
     onDownloadWorkflow  CC=1  out:6
   frontend.html.js.api  [10 funcs]
     API  CC=9  out:14
@@ -535,6 +550,8 @@ MODULES:
   frontend.html.js.app  [2 funcs]
     decodeB64  CC=3  out:3
     renderDecoded  CC=9  out:10
+  project.map.toon  [1 funcs]
+    get_registry  CC=0  out:0
 
 EDGES:
   frontend.html.js.api.API → frontend.html.js.api.getToken
@@ -547,10 +564,16 @@ EDGES:
   frontend.html.js.api.runCommand → frontend.html.js.api.request
   frontend.html.js.api.runQuery → frontend.html.js.api.request
   frontend.html.js.app.renderDecoded → frontend.html.js.app.decodeB64
+  api.commands.fetch.FetchCommand.execute → project.map.toon.get_registry
+  api.commands.converttojson.ConvertToJsonCommand._convert → api.queries.QueryRegistry.list
+  api.commands.converttobase64.ConvertToBase64Command.execute → project.map.toon.get_registry
+  api.commands.pipeline._substitute → api.commands.pipeline._to_data_uri
+  api.commands.pipeline.PipelineCommand.execute → api.commands.pipeline._substitute
+  api.validators.validate_against_schema_uri → api.queries.QueryRegistry.list
+  api.queries.from_url.FromUrlQuery.execute → project.map.toon.get_registry
   cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToNodes
   cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToEdges
   cqrs-workflow-editor.src.App.fetchPreview → cqrs-workflow-editor.src.App.blob
-  cqrs-workflow-editor.src.App.fetchPreview → cqrs-workflow-editor.src.App.text
   cqrs-workflow-editor.src.App.sizeKB → cqrs-workflow-editor.src.App.text
   cqrs-workflow-editor.src.App.mime → cqrs-workflow-editor.src.App.text
   cqrs-workflow-editor.src.App.timer → cqrs-workflow-editor.src.App.fetchPreview
@@ -562,8 +585,6 @@ EDGES:
   cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToEdges
   cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToNodes
   cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToEdges
-  api.commands.converttobase64.ConvertToBase64Command.execute → api.queries.get_registry
-  api.commands.fetch.FetchCommand.execute → api.queries.get_registry
   api.main.issue_token → api.auth.authenticate
   api.main.issue_token → api.auth.get_jwt_manager
   api.main.execute_command → api.policy.get_engine
@@ -571,13 +592,11 @@ EDGES:
   api.main.execute_query_get → api.main.execute_query
   api.main.run_agent → api.agent.execute_agent
   api.main.run_agent → api.policy.get_engine
-  api.queries.from_url.FromUrlQuery.execute → api.queries.get_registry
   api.queries.register_default_queries → api.queries.get_registry
   api.commands.register_default_commands → api.commands.get_registry
-  api.commands.pipeline._substitute → api.commands.pipeline._to_data_uri
-  api.commands.pipeline.PipelineCommand.execute → api.commands.pipeline._substitute
-  api.validators.validate_against_schema_uri → api.queries.QueryRegistry.list
   api.protocols.register_default_protocols → api.protocols.get_registry
+  cqrs-backend-workflows.server._handle_command → cqrs-backend-workflows.server._result_to_data_uri
+  cqrs-backend-workflows.server._handle_render → cqrs-backend-workflows.server._result_to_data_uri
   cqrs-backend-workflows.server.list_workflows → api.queries.QueryRegistry.list
   cqrs-backend-workflows.server.create_workflow → cqrs-backend-workflows.server.validate_workflow
   cqrs-backend-workflows.server.update_workflow → cqrs-backend-workflows.server.validate_workflow

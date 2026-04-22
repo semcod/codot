@@ -7,10 +7,25 @@ export default defineConfig({
     port: 3000,
     open: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
+      '/api/v1/workflows': {
+        target: 'http://localhost:18001',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      '/api': {
+        target: 'http://localhost:18080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      '/data': {
+        target: 'http://localhost:18091',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/data/, ''),
+      },
+      '/schemas': {
+        target: 'http://localhost:18090',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/schemas/, ''),
       },
     },
   },

@@ -1,22 +1,14 @@
-# code2llm/evolution | 154 func | 27f | 2026-04-22
+# code2llm/evolution | 402 func | 33f | 2026-04-22
 
-NEXT[2] (ranked by impact):
-  [1] !  SPLIT-FUNC      ConvertToJsonCommand.execute  CC=20  fan=23
-      WHY: CC=20 exceeds 15
-      EFFORT: ~1h  IMPACT: 460
-
-  [2] !  SPLIT-FUNC      execute_node  CC=18  fan=4
-      WHY: CC=18 exceeds 15
-      EFFORT: ~1h  IMPACT: 72
-
+NEXT[0]: no refactoring needed
 
 RISKS[0]: none
 
 METRICS-TARGET:
-  CC̄:          2.8 → ≤2.0
-  max-CC:      20 → ≤10
+  CC̄:          1.1 → ≤0.8
+  max-CC:      13 → ≤6
   god-modules: 0 → 0
-  high-CC(≥15): 2 → ≤1
+  high-CC(≥15): 0 → ≤0
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -44,4 +36,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  (first run — no previous data)
+  prev CC̄=1.2 → now CC̄=1.1

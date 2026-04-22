@@ -31,9 +31,8 @@ from models import (
 )
 from auth import authenticate, current_user, get_jwt_manager
 from policy import get_engine, User
-from commands import get_registry as cmd_registry, register_default_commands
-from queries import get_registry as qry_registry, register_default_queries
-from protocols import register_default_protocols
+from commands import get_registry as cmd_registry
+from queries import get_registry as qry_registry
 from agent import execute_agent
 
 logging.basicConfig(
@@ -41,10 +40,6 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 log = logging.getLogger("api")
-
-register_default_protocols()
-register_default_commands()
-register_default_queries()
 
 app = FastAPI(
     title="CQRS-URL Platform",

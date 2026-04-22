@@ -60,7 +60,7 @@ const defaultWorkflow: Workflow = {
       id: "fetch1",
       label: "Fetch CSV",
       type: "fetch",
-      uri: "https://example.com/table.csv",
+      uri: "http://localhost:18091/products.csv",
       mime_type: "text/csv",
     },
   ],
@@ -187,26 +187,41 @@ export default function App() {
     if (!uri) return;
     setPreviewLoading(true);
     setPreviewError(null);
-    
+
     try {
-      const response = await fetch(uri);
+      // Rewrite local docker-compose URLs to use Vite proxy (avoids CORS)
+      let previewUri = uri;
+      if (uri.startsWith("http://localhost:18091/")) {
+        previewUri = uri.replace("http://localhost:18091/", "/data/");
+      } else if (uri.startsWith("http://localhost:18090/")) {
+        previewUri = uri.replace("http://localhost:18090/", "/schemas/");
+      }
+
+      const response = await fetch(previewUri);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
+
       const blob = await response.blob();
       const sizeKB = (blob.size / 1024).toFixed(2);
-      const mime = blob.type || response.headers.get('content-type') || 'unknown';
-      
-      let content = '';
-      if (blob.size < 10000) { // Only preview if < 10KB
+      const mime = blob.type || response.headers.get("content-type") || "unknown";
+
+      let content = "";
+      if (blob.size < 10000) {
         const text = await blob.text();
-        content = text.length > 500 ? text.substring(0, 500) + '...' : text;
+        content = text.length > 500 ? text.substring(0, 500) + "..." : text;
       } else {
         content = `(Preview skipped - file too large: ${sizeKB} KB)`;
       }
-      
+
       setPreview({ content, mime, size: parseFloat(sizeKB) });
     } catch (err) {
-      setPreviewError(err instanceof Error ? err.message : 'Failed to fetch');
+      const msg = err instanceof Error ? err.message : "Failed to fetch";
+      if (msg === "Failed to fetch") {
+        setPreviewError(
+          "CORS blocked or network error. Preview unavailable for cross-origin URLs, but workflow execution will work via backend."
+        );
+      } else {
+        setPreviewError(msg);
+      }
     } finally {
       setPreviewLoading(false);
     }

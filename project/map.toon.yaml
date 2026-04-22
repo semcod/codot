@@ -1,44 +1,48 @@
-# codot | 42f 3290L | python:27,shell:8,javascript:4,less:1,typescript:1,css:1 | 2026-04-22
-# stats: 63 func | 43 cls | 42 mod | CC̄=2.5 | critical:1 | cycles:0
-# alerts[5]: CC execute_node=18; CC _substitute=8; CC run_workflow=8; CC _mcp_execute=7; CC validate_against_schema_uri=7
+# codot | 46f 3577L | python:27,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-22
+# stats: 69 func | 43 cls | 46 mod | CC̄=2.3 | critical:0 | cycles:0
+# alerts[5]: CC _substitute=8; CC run_workflow=8; CC _mcp_execute=7; CC validate_against_schema_uri=7; CC _websocket_execute=6
 # hotspots[5]: _mcp_execute fan=16; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _litellm_execute fan=10
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[42]:
+M[46]:
   api/agent.py,374
+  api/app.doql.less,60
   api/auth/__init__.py,103
-  api/commands/__init__.py,78
+  api/commands/__init__.py,81
   api/commands/converttobase64.py,35
   api/commands/converttocsv.py,61
-  api/commands/converttojson.py,80
+  api/commands/converttojson.py,81
   api/commands/converttoxml.py,52
   api/commands/fetch.py,28
   api/commands/pipeline.py,79
   api/commands/render.py,98
   api/config.py,35
-  api/main.py,240
+  api/main.py,235
   api/models.py,125
   api/policy/__init__.py,150
-  api/protocols/__init__.py,67
+  api/protocols/__init__.py,70
   api/protocols/data_protocol.py,41
   api/protocols/file_protocol.py,52
   api/protocols/http_protocol.py,34
-  api/queries/__init__.py,54
+  api/queries/__init__.py,57
   api/queries/from_url.py,46
   api/queries/introspect.py,23
   api/tests/test_api.py,12
   api/validators/__init__.py,49
   app.doql.less,60
-  cqrs-backend-workflows/server.py,354
+  cqrs-backend-workflows/app.doql.less,60
+  cqrs-backend-workflows/server.py,376
   cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py,16
+  cqrs-workflow-editor/app.doql.less,65
   cqrs-workflow-editor/test/cqrs-workflow-editor.test.js,8
-  cqrs-workflow-editor/vite.config.ts,21
+  cqrs-workflow-editor/vite.config.ts,36
   examples/01-fetch.sh,49
   examples/02-convert-to-json.sh,49
   examples/03-render-html.sh,41
   examples/04-pipeline.sh,125
   examples/05-query.sh,52
   examples/06-rbac.sh,67
+  frontend/app.doql.less,60
   frontend/html/css/style.css,35
   frontend/html/js/api.js,62
   frontend/html/js/app.js,188
@@ -77,7 +81,7 @@ D:
     ConvertToCsvCommand: execute(1)
   api/commands/converttojson.py:
     e: ConvertToJsonCommand
-    ConvertToJsonCommand: execute(1)
+    ConvertToJsonCommand: _detect_mode(3),_convert(2),execute(1)
   api/commands/converttoxml.py:
     e: ConvertToXmlCommand
     ConvertToXmlCommand: execute(1)
@@ -172,13 +176,19 @@ D:
     SchemaValidationError: __init__(2)
     validate_against_schema_uri(instance;schema_uri)
   cqrs-backend-workflows/server.py:
-    e: validate_workflow,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
     WorkflowNode:
     WorkflowOutput:
     Workflow:
     WorkflowExecutionRequest:
     WorkflowExecutionResponse:
     validate_workflow(workflow)
+    _result_to_data_uri(prev_result)
+    _handle_fetch(node;_node_results;headers;client)
+    _handle_http(node;_node_results;headers;client)
+    _handle_command(node;node_results;headers;client)
+    _handle_render(node;node_results;headers;client)
+    _handle_agent(node;_node_results;_headers;_client)
     execute_node(node;node_results;client;token)
     root()
     health()

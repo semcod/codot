@@ -51,3 +51,6 @@ def register_default_queries() -> None:
     reg = get_registry()
     reg.register(FromUrlQuery())
     reg.register(IntrospectQuery())
+
+
+register_default_queries()

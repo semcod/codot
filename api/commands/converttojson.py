@@ -24,42 +24,43 @@ class ConvertToJsonCommand(Command):
         "meta.mode": "'lines' | 'csv' | 'xml' | 'json' | 'auto' (default: auto)",
     }
 
+    @staticmethod
+    def _detect_mode(mime: str, uri: str, mode: str) -> str:
+        if mode != "auto":
+            return mode
+        if "csv" in mime or uri.endswith(".csv"):
+            return "csv"
+        if "json" in mime or uri.endswith(".json"):
+            return "json"
+        if "xml" in mime or uri.endswith(".xml"):
+            return "xml"
+        return "lines"
+
+    @staticmethod
+    def _convert(text: str, mode: str) -> dict | list:
+        if mode == "lines":
+            return {"lines": [ln for ln in text.splitlines() if ln.strip()]}
+        if mode == "csv":
+            reader = csv.DictReader(io.StringIO(text))
+            return {"rows": list(reader), "fields": reader.fieldnames or []}
+        if mode == "json":
+            return json.loads(text)
+        if mode == "xml":
+            import xmltodict
+            return xmltodict.parse(text)
+        raise ValueError(f"Unknown mode: {mode}")
+
     async def execute(self, request: CommandRequest) -> CommandResponse:
         if not request.input_uri:
             raise ValueError("converttojson requires input_uri")
 
         fetched = await get_registry().fetch(request.input_uri)
-        mode = (request.meta or {}).get("mode", "auto")
         mime = (fetched.mime or "").split(";")[0].strip().lower()
         text = fetched.content.decode("utf-8", errors="replace")
 
-        if mode == "auto":
-            if "csv" in mime or request.input_uri.endswith(".csv"):
-                mode = "csv"
-            elif "json" in mime or request.input_uri.endswith(".json"):
-                mode = "json"
-            elif "xml" in mime or request.input_uri.endswith(".xml"):
-                mode = "xml"
-            else:
-                mode = "lines"
+        mode = self._detect_mode(mime, request.input_uri, (request.meta or {}).get("mode", "auto"))
+        result = self._convert(text, mode)
 
-        result: dict | list
-        if mode == "lines":
-            result = {
-                "lines": [ln for ln in text.splitlines() if ln.strip()],
-            }
-        elif mode == "csv":
-            reader = csv.DictReader(io.StringIO(text))
-            result = {"rows": list(reader), "fields": reader.fieldnames or []}
-        elif mode == "json":
-            result = json.loads(text)
-        elif mode == "xml":
-            import xmltodict
-            result = xmltodict.parse(text)
-        else:
-            raise ValueError(f"Unknown mode: {mode}")
-
-        # optional schema validation on the produced JSON
         if request.schema_uri:
             try:
                 await validate_against_schema_uri(result, request.schema_uri)

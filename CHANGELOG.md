@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-04-22
+
+### Docs
+- Update README.md
+- Update SUMD.md
+- Update api/SUMD.md
+- Update cqrs-backend-workflows/SUMD.md
+- Update cqrs-workflow-editor/SUMD.md
+- Update cqrs-workflow-editor/node_modules/@rollup/rollup-linux-x64-musl/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update api/project/map.toon.yaml
+- Update api/sumd.json
+- Update app.doql.less
+- Update cqrs-backend-workflows/project/map.toon.yaml
+- Update cqrs-backend-workflows/server.py
+- Update cqrs-backend-workflows/sumd.json
+- Update cqrs-workflow-editor/node_modules/.package-lock.json
+- Update cqrs-workflow-editor/node_modules/@rollup/rollup-linux-x64-musl/package.json
+- Update cqrs-workflow-editor/node_modules/@rollup/rollup-linux-x64-musl/rollup.linux-x64-musl.node
+- Update cqrs-workflow-editor/project/map.toon.yaml
+- ... and 21 more files
+
 ## [0.1.2] - 2026-04-22
 
 ### Docs

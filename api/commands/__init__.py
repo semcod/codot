@@ -75,3 +75,6 @@ def register_default_commands() -> None:
     reg.register(ConvertToCsvCommand())
     reg.register(RenderCommand())
     reg.register(PipelineCommand())
+
+
+register_default_commands()

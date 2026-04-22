@@ -64,3 +64,6 @@ def register_default_protocols() -> None:
     reg.register(HttpProtocol("https"))
     reg.register(FileProtocol())
     reg.register(DataProtocol())
+
+
+register_default_protocols()

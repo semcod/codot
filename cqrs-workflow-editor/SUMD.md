@@ -159,7 +159,7 @@ npm install cqrs-workflow-editor
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# cqrs-workflow-editor | 3f 94L | less:1,javascript:1,typescript:1 | 2026-04-22
+# cqrs-workflow-editor | 3f 109L | less:1,javascript:1,typescript:1 | 2026-04-22
 # stats: 0 func | 0 cls | 3 mod | CC̄=1.0 | critical:0 | cycles:0
 # alerts[5]: none
 # hotspots[5]: none
@@ -168,7 +168,7 @@ npm install cqrs-workflow-editor
 M[3]:
   app.doql.less,65
   test/cqrs-workflow-editor.test.js,8
-  vite.config.ts,21
+  vite.config.ts,36
 D:
 ```
 

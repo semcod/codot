@@ -1,22 +1,28 @@
-# cqrs-backend-workflows | 3f 430L | python:2,less:1 | 2026-04-22
-# stats: 12 func | 5 cls | 3 mod | CC̄=3.5 | critical:1 | cycles:0
-# alerts[5]: CC execute_node=18; CC run_workflow=8; CC validate_workflow=2; CC get_workflow=2; CC create_workflow=2
-# hotspots[5]: run_workflow fan=9; create_workflow fan=5; execute_node fan=4; update_workflow fan=4; list_workflows fan=3
+# cqrs-backend-workflows | 3f 452L | python:2,less:1 | 2026-04-22
+# stats: 18 func | 5 cls | 3 mod | CC̄=2.4 | critical:0 | cycles:0
+# alerts[5]: CC run_workflow=8; CC _handle_command=5; CC _handle_http=3; CC _handle_render=3; CC execute_node=3
+# hotspots[5]: run_workflow fan=9; create_workflow fan=5; update_workflow fan=4; _handle_command fan=3; _handle_render fan=3
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[3]:
   app.doql.less,60
-  server.py,354
+  server.py,376
   tests/test_cqrs_backend_workflows.py,16
 D:
   server.py:
-    e: validate_workflow,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
     WorkflowNode:
     WorkflowOutput:
     Workflow:
     WorkflowExecutionRequest:
     WorkflowExecutionResponse:
     validate_workflow(workflow)
+    _result_to_data_uri(prev_result)
+    _handle_fetch(node;_node_results;headers;client)
+    _handle_http(node;_node_results;headers;client)
+    _handle_command(node;node_results;headers;client)
+    _handle_render(node;node_results;headers;client)
+    _handle_agent(node;_node_results;_headers;_client)
     execute_node(node;node_results;client;token)
     root()
     health()

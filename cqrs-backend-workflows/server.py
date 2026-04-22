@@ -8,12 +8,21 @@ from dataclasses import dataclass
 import json
 import httpx
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import jsonschema
 from pathlib import Path
 import os
 
 app = FastAPI(title="codot Workflow API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load JSON Schema for validation
 SCHEMA_PATH = Path(__file__).parent / "workflow.schema.json"
@@ -118,112 +127,124 @@ def validate_workflow(workflow: Dict[str, Any]) -> bool:
         raise HTTPException(status_code=400, detail=f"Invalid workflow schema: {e.message}")
 
 
+def _result_to_data_uri(prev_result: Dict[str, Any]) -> str | None:
+    """Convert a previous node result payload into a data: URI."""
+    if prev_result.get("payload_b64"):
+        mime = prev_result.get("mime", "application/octet-stream")
+        return f"data:{mime};base64,{prev_result['payload_b64']}"
+    return None
+
+
+async def _handle_fetch(
+    node: WorkflowNode,
+    _node_results: Dict[str, Any],
+    headers: Dict[str, str],
+    client: httpx.AsyncClient,
+) -> Dict[str, Any]:
+    body = {"input_uri": node.uri or node.url, "meta": {}}
+    response = await client.put(
+        f"{CODOT_API_URL}/commands/fetch", json=body, headers=headers
+    )
+    return response.json()
+
+
+async def _handle_http(
+    node: WorkflowNode,
+    _node_results: Dict[str, Any],
+    headers: Dict[str, str],
+    client: httpx.AsyncClient,
+) -> Dict[str, Any]:
+    body = {"input_uri": node.url, "meta": {"method": node.method or "GET"}}
+    if node.headers:
+        body["meta"]["headers"] = node.headers
+    response = await client.put(
+        f"{CODOT_API_URL}/commands/fetch", json=body, headers=headers
+    )
+    return response.json()
+
+
+async def _handle_command(
+    node: WorkflowNode,
+    node_results: Dict[str, Any],
+    headers: Dict[str, str],
+    client: httpx.AsyncClient,
+) -> Dict[str, Any]:
+    command_type = node.command_type or "fetch"
+    input_uri = None
+    if node.input and node.input in node_results:
+        input_uri = _result_to_data_uri(node_results[node.input])
+
+    body = {"input_uri": input_uri, "schema_uri": node.schema_uri, "meta": {}}
+    if command_type == "converttojson":
+        body["meta"]["mode"] = "csv"
+
+    response = await client.put(
+        f"{CODOT_API_URL}/commands/{command_type}", json=body, headers=headers
+    )
+    return response.json()
+
+
+async def _handle_render(
+    node: WorkflowNode,
+    node_results: Dict[str, Any],
+    headers: Dict[str, str],
+    client: httpx.AsyncClient,
+) -> Dict[str, Any]:
+    input_uri = None
+    if node.input and node.input in node_results:
+        input_uri = _result_to_data_uri(node_results[node.input])
+
+    body = {"input_uri": input_uri, "meta": {"title": "Rendered Output"}}
+    response = await client.put(
+        f"{CODOT_API_URL}/commands/render", json=body, headers=headers
+    )
+    return response.json()
+
+
+async def _handle_agent(
+    node: WorkflowNode,
+    _node_results: Dict[str, Any],
+    _headers: Dict[str, str],
+    _client: httpx.AsyncClient,
+) -> Dict[str, Any]:
+    return {
+        "ok": True,
+        "payload_b64": "",
+        "mime": "text/plain",
+        "meta": {
+            "agent_role": node.role,
+            "agent_goal": node.goal,
+            "agent_tools": node.tools,
+            "message": "Agent execution not yet fully implemented",
+        },
+    }
+
+
+_NODE_HANDLERS: Dict[str, Any] = {
+    "fetch": _handle_fetch,
+    "http": _handle_http,
+    "command": _handle_command,
+    "render": _handle_render,
+    "agent": _handle_agent,
+}
+
+
 async def execute_node(
     node: WorkflowNode,
     node_results: Dict[str, Any],
     client: httpx.AsyncClient,
-    token: Optional[str] = None
+    token: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Execute a single workflow node by calling codot API"""
-    
-    headers = {}
+    headers: Dict[str, str] = {}
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    
-    if node.type == "fetch":
-        # Use fetch command
-        body = {
-            "input_uri": node.uri or node.url,
-            "meta": {}
-        }
-        response = await client.put(
-            f"{CODOT_API_URL}/commands/fetch",
-            json=body,
-            headers=headers
-        )
-        return response.json()
-    
-    elif node.type == "http":
-        # Use fetch command with HTTP URL
-        body = {
-            "input_uri": node.url,
-            "meta": {"method": node.method or "GET"}
-        }
-        if node.headers:
-            body["meta"]["headers"] = node.headers
-        response = await client.put(
-            f"{CODOT_API_URL}/commands/fetch",
-            json=body,
-            headers=headers
-        )
-        return response.json()
-    
-    elif node.type == "command":
-        # Execute command via pipeline or direct command
-        command_type = node.command_type or "fetch"
-        
-        # Build input_uri from previous node results
-        input_uri = None
-        if node.input and node.input in node_results:
-            # Convert previous result to data: URI
-            prev_result = node_results[node.input]
-            if prev_result.get("payload_b64"):
-                mime = prev_result.get("mime", "application/octet-stream")
-                input_uri = f"data:{mime};base64,{prev_result['payload_b64']}"
-        
-        body = {
-            "input_uri": input_uri,
-            "schema_uri": node.schema_uri,
-            "meta": {}
-        }
-        
-        if command_type == "converttojson":
-            body["meta"]["mode"] = "csv"
-        
-        response = await client.put(
-            f"{CODOT_API_URL}/commands/{command_type}",
-            json=body,
-            headers=headers
-        )
-        return response.json()
-    
-    elif node.type == "render":
-        # Render command
-        input_uri = None
-        if node.input and node.input in node_results:
-            prev_result = node_results[node.input]
-            if prev_result.get("payload_b64"):
-                mime = prev_result.get("mime", "application/octet-stream")
-                input_uri = f"data:{mime};base64,{prev_result['payload_b64']}"
-        
-        body = {
-            "input_uri": input_uri,
-            "meta": {"title": "Rendered Output"}
-        }
-        
-        response = await client.put(
-            f"{CODOT_API_URL}/commands/render",
-            json=body,
-            headers=headers
-        )
-        return response.json()
-    
-    elif node.type == "agent":
-        # Agent node - for multi-agent orchestration
-        return {
-            "ok": True,
-            "payload_b64": "",
-            "mime": "text/plain",
-            "meta": {
-                "agent_role": node.role,
-                "agent_goal": node.goal,
-                "agent_tools": node.tools,
-                "message": "Agent execution not yet fully implemented"
-            }
-        }
-    
-    else:
+
+    handler = _NODE_HANDLERS.get(node.type)
+    if handler is None:
         raise HTTPException(status_code=400, detail=f"Unknown node type: {node.type}")
+
+    return await handler(node, node_results, headers, client)
 
 
 # API Endpoints

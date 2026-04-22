@@ -1,4 +1,105 @@
 flowchart TD
+    subgraph SUMD
+        SUMD__register_backend["register_backend"]
+        SUMD___mcp_execute["_mcp_execute"]
+        SUMD___litellm_execute["_litellm_execute"]
+        SUMD___bash_cli_execute["_bash_cli_execute"]
+        SUMD___http_api_execute["_http_api_execute"]
+        SUMD___websocket_execute["_websocket_execute"]
+        SUMD__execute_agent["execute_agent"]
+        SUMD__get_jwt_manager["get_jwt_manager"]
+        SUMD__authenticate["authenticate"]
+        SUMD__current_user["current_user"]
+        SUMD__get_registry["get_registry"]
+        SUMD__register_default_commands["register_default_commands"]
+        SUMD___to_data_uri["_to_data_uri"]
+        SUMD___substitute["_substitute"]
+        SUMD__load_settings["load_settings"]
+        SUMD___value_error["_value_error"]
+        SUMD___perm_error["_perm_error"]
+        SUMD___nf_error["_nf_error"]
+        SUMD___key_error["_key_error"]
+        SUMD__health["health"]
+        SUMD__issue_token["issue_token"]
+        SUMD__me["me"]
+        SUMD__list_commands["list_commands"]
+        SUMD__execute_command["execute_command"]
+        SUMD__list_queries["list_queries"]
+        SUMD__execute_query["execute_query"]
+        SUMD__execute_query_get["execute_query_get"]
+        SUMD__catalog["catalog"]
+        SUMD__run_agent["run_agent"]
+        SUMD__list_agent_backends["list_agent_backends"]
+        SUMD__get_engine["get_engine"]
+        SUMD__reload_engine["reload_engine"]
+        SUMD__register_default_protocols["register_default_protocols"]
+        SUMD__register_default_queries["register_default_queries"]
+        SUMD__test_placeholder["test_placeholder"]
+        SUMD__test_import["test_import"]
+        SUMD__validate_against_schema_uri["validate_against_schema_uri"]
+        SUMD__validate_workflow["validate_workflow"]
+        SUMD___result_to_data_uri["_result_to_data_uri"]
+        SUMD___handle_fetch["_handle_fetch"]
+        SUMD___handle_http["_handle_http"]
+        SUMD___handle_command["_handle_command"]
+        SUMD___handle_render["_handle_render"]
+        SUMD___handle_agent["_handle_agent"]
+        SUMD__execute_node["execute_node"]
+        SUMD__root["root"]
+        SUMD__list_workflows["list_workflows"]
+        SUMD__get_workflow["get_workflow"]
+        SUMD__create_workflow["create_workflow"]
+        SUMD__update_workflow["update_workflow"]
+        SUMD__delete_workflow["delete_workflow"]
+        SUMD__run_workflow["run_workflow"]
+        SUMD___engine["_engine"]
+        SUMD___user["_user"]
+        SUMD__test_admin_can_do_anything["test_admin_can_do_anything"]
+        SUMD__test_user_denied_internal_path["test_user_denied_internal_path"]
+        SUMD__test_user_allowed_public_path["test_user_allowed_public_path"]
+        SUMD__test_unknown_role_denied["test_unknown_role_denied"]
+        SUMD__test_analyst_can_run_pipeline["test_analyst_can_run_pipeline"]
+        SUMD__test_query_access_respects_uris["test_query_access_respects_uris"]
+    end
+    subgraph api__SUMD
+        api__SUMD__register_backend["register_backend"]
+        api__SUMD___mcp_execute["_mcp_execute"]
+        api__SUMD___litellm_execute["_litellm_execute"]
+        api__SUMD___bash_cli_execute["_bash_cli_execute"]
+        api__SUMD___http_api_execute["_http_api_execute"]
+        api__SUMD___websocket_execute["_websocket_execute"]
+        api__SUMD__execute_agent["execute_agent"]
+        api__SUMD__get_jwt_manager["get_jwt_manager"]
+        api__SUMD__authenticate["authenticate"]
+        api__SUMD__current_user["current_user"]
+        api__SUMD__get_registry["get_registry"]
+        api__SUMD__register_default_commands["register_default_commands"]
+        api__SUMD___to_data_uri["_to_data_uri"]
+        api__SUMD___substitute["_substitute"]
+        api__SUMD__load_settings["load_settings"]
+        api__SUMD___value_error["_value_error"]
+        api__SUMD___perm_error["_perm_error"]
+        api__SUMD___nf_error["_nf_error"]
+        api__SUMD___key_error["_key_error"]
+        api__SUMD__health["health"]
+        api__SUMD__issue_token["issue_token"]
+        api__SUMD__me["me"]
+        api__SUMD__list_commands["list_commands"]
+        api__SUMD__execute_command["execute_command"]
+        api__SUMD__list_queries["list_queries"]
+        api__SUMD__execute_query["execute_query"]
+        api__SUMD__execute_query_get["execute_query_get"]
+        api__SUMD__catalog["catalog"]
+        api__SUMD__run_agent["run_agent"]
+        api__SUMD__list_agent_backends["list_agent_backends"]
+        api__SUMD__get_engine["get_engine"]
+        api__SUMD__reload_engine["reload_engine"]
+        api__SUMD__register_default_protocols["register_default_protocols"]
+        api__SUMD__register_default_queries["register_default_queries"]
+        api__SUMD__test_placeholder["test_placeholder"]
+        api__SUMD__test_import["test_import"]
+        api__SUMD__validate_against_schema_uri["validate_against_schema_uri"]
+    end
     subgraph api__agent
         api__agent__register_backend["register_backend"]
         api__agent___mcp_execute["_mcp_execute"]
@@ -17,10 +118,17 @@ flowchart TD
         api__auth__current_user["current_user"]
     end
     subgraph api__commands
-        api__commands__converttobase64__ConvertToBase64Command__execute["execute"]
         api__commands__fetch__FetchCommand__execute["execute"]
-        api__commands__converttojson__ConvertToJsonCommand__execute{{execute CC=20}}
+        api__commands__render__RenderCommand__execute["execute"]
         api__commands__converttocsv__ConvertToCsvCommand__execute("execute CC=13")
+        api__commands__converttojson__ConvertToJsonCommand___detect_mode("_detect_mode CC=8")
+        api__commands__converttojson__ConvertToJsonCommand___convert("_convert CC=8")
+        api__commands__converttojson__ConvertToJsonCommand__execute["execute"]
+        api__commands__converttobase64__ConvertToBase64Command__execute["execute"]
+        api__commands__pipeline___to_data_uri["_to_data_uri"]
+        api__commands__pipeline___substitute("_substitute CC=8")
+        api__commands__pipeline__PipelineCommand__execute("execute CC=8")
+        api__commands__converttoxml__ConvertToXmlCommand__execute("execute CC=9")
         api__commands__Command__execute["execute"]
         api__commands__CommandRegistry____init__["__init__"]
         api__commands__CommandRegistry__register["register"]
@@ -28,11 +136,6 @@ flowchart TD
         api__commands__CommandRegistry__list["list"]
         api__commands__get_registry["get_registry"]
         api__commands__register_default_commands["register_default_commands"]
-        api__commands__pipeline___to_data_uri["_to_data_uri"]
-        api__commands__pipeline___substitute("_substitute CC=8")
-        api__commands__pipeline__PipelineCommand__execute("execute CC=8")
-        api__commands__render__RenderCommand__execute["execute"]
-        api__commands__converttoxml__ConvertToXmlCommand__execute("execute CC=9")
     end
     subgraph api__config
         api__config__load_settings["load_settings"]
@@ -67,6 +170,45 @@ flowchart TD
         api__policy__get_engine["get_engine"]
         api__policy__reload_engine["reload_engine"]
     end
+    subgraph api__project
+        api__project__map__toon__register_backend["register_backend"]
+        api__project__map__toon___mcp_execute["_mcp_execute"]
+        api__project__map__toon___litellm_execute["_litellm_execute"]
+        api__project__map__toon___bash_cli_execute["_bash_cli_execute"]
+        api__project__map__toon___http_api_execute["_http_api_execute"]
+        api__project__map__toon___websocket_execute["_websocket_execute"]
+        api__project__map__toon__execute_agent["execute_agent"]
+        api__project__map__toon__get_jwt_manager["get_jwt_manager"]
+        api__project__map__toon__authenticate["authenticate"]
+        api__project__map__toon__current_user["current_user"]
+        api__project__map__toon__get_registry["get_registry"]
+        api__project__map__toon__register_default_commands["register_default_commands"]
+        api__project__map__toon___to_data_uri["_to_data_uri"]
+        api__project__map__toon___substitute["_substitute"]
+        api__project__map__toon__load_settings["load_settings"]
+        api__project__map__toon___value_error["_value_error"]
+        api__project__map__toon___perm_error["_perm_error"]
+        api__project__map__toon___nf_error["_nf_error"]
+        api__project__map__toon___key_error["_key_error"]
+        api__project__map__toon__health["health"]
+        api__project__map__toon__issue_token["issue_token"]
+        api__project__map__toon__me["me"]
+        api__project__map__toon__list_commands["list_commands"]
+        api__project__map__toon__execute_command["execute_command"]
+        api__project__map__toon__list_queries["list_queries"]
+        api__project__map__toon__execute_query["execute_query"]
+        api__project__map__toon__execute_query_get["execute_query_get"]
+        api__project__map__toon__catalog["catalog"]
+        api__project__map__toon__run_agent["run_agent"]
+        api__project__map__toon__list_agent_backends["list_agent_backends"]
+        api__project__map__toon__get_engine["get_engine"]
+        api__project__map__toon__reload_engine["reload_engine"]
+        api__project__map__toon__register_default_protocols["register_default_protocols"]
+        api__project__map__toon__register_default_queries["register_default_queries"]
+        api__project__map__toon__test_placeholder["test_placeholder"]
+        api__project__map__toon__test_import["test_import"]
+        api__project__map__toon__validate_against_schema_uri["validate_against_schema_uri"]
+    end
     subgraph api__protocols
         api__protocols__http_protocol__HttpProtocol____init__["__init__"]
         api__protocols__http_protocol__HttpProtocol__fetch["fetch"]
@@ -82,8 +224,8 @@ flowchart TD
         api__protocols__register_default_protocols["register_default_protocols"]
     end
     subgraph api__queries
-        api__queries__introspect__IntrospectQuery__execute["execute"]
         api__queries__from_url__FromUrlQuery__execute("execute CC=9")
+        api__queries__introspect__IntrospectQuery__execute["execute"]
         api__queries__Query__execute["execute"]
         api__queries__QueryRegistry____init__["__init__"]
         api__queries__QueryRegistry__register["register"]
@@ -96,9 +238,55 @@ flowchart TD
         api__validators__SchemaValidationError____init__["__init__"]
         api__validators__validate_against_schema_uri["validate_against_schema_uri"]
     end
+    subgraph cqrs_backend_workflows__SUMD
+        cqrs_backend_workflows__SUMD__validate_workflow["validate_workflow"]
+        cqrs_backend_workflows__SUMD___result_to_data_uri["_result_to_data_uri"]
+        cqrs_backend_workflows__SUMD___handle_fetch["_handle_fetch"]
+        cqrs_backend_workflows__SUMD___handle_http["_handle_http"]
+        cqrs_backend_workflows__SUMD___handle_command["_handle_command"]
+        cqrs_backend_workflows__SUMD___handle_render["_handle_render"]
+        cqrs_backend_workflows__SUMD___handle_agent["_handle_agent"]
+        cqrs_backend_workflows__SUMD__execute_node["execute_node"]
+        cqrs_backend_workflows__SUMD__root["root"]
+        cqrs_backend_workflows__SUMD__health["health"]
+        cqrs_backend_workflows__SUMD__list_workflows["list_workflows"]
+        cqrs_backend_workflows__SUMD__get_workflow["get_workflow"]
+        cqrs_backend_workflows__SUMD__create_workflow["create_workflow"]
+        cqrs_backend_workflows__SUMD__update_workflow["update_workflow"]
+        cqrs_backend_workflows__SUMD__delete_workflow["delete_workflow"]
+        cqrs_backend_workflows__SUMD__run_workflow["run_workflow"]
+        cqrs_backend_workflows__SUMD__test_placeholder["test_placeholder"]
+        cqrs_backend_workflows__SUMD__test_import["test_import"]
+    end
+    subgraph cqrs_backend_workflows__project
+        cqrs_backend_workflows__project__map__toon__validate_workflow["validate_workflow"]
+        cqrs_backend_workflows__project__map__toon___result_to_data_uri["_result_to_data_uri"]
+        cqrs_backend_workflows__project__map__toon___handle_fetch["_handle_fetch"]
+        cqrs_backend_workflows__project__map__toon___handle_http["_handle_http"]
+        cqrs_backend_workflows__project__map__toon___handle_command["_handle_command"]
+        cqrs_backend_workflows__project__map__toon___handle_render["_handle_render"]
+        cqrs_backend_workflows__project__map__toon___handle_agent["_handle_agent"]
+        cqrs_backend_workflows__project__map__toon__execute_node["execute_node"]
+        cqrs_backend_workflows__project__map__toon__root["root"]
+        cqrs_backend_workflows__project__map__toon__health["health"]
+        cqrs_backend_workflows__project__map__toon__list_workflows["list_workflows"]
+        cqrs_backend_workflows__project__map__toon__get_workflow["get_workflow"]
+        cqrs_backend_workflows__project__map__toon__create_workflow["create_workflow"]
+        cqrs_backend_workflows__project__map__toon__update_workflow["update_workflow"]
+        cqrs_backend_workflows__project__map__toon__delete_workflow["delete_workflow"]
+        cqrs_backend_workflows__project__map__toon__run_workflow["run_workflow"]
+        cqrs_backend_workflows__project__map__toon__test_placeholder["test_placeholder"]
+        cqrs_backend_workflows__project__map__toon__test_import["test_import"]
+    end
     subgraph cqrs_backend_workflows__server
         cqrs_backend_workflows__server__validate_workflow["validate_workflow"]
-        cqrs_backend_workflows__server__execute_node{{execute_node CC=18}}
+        cqrs_backend_workflows__server___result_to_data_uri["_result_to_data_uri"]
+        cqrs_backend_workflows__server___handle_fetch["_handle_fetch"]
+        cqrs_backend_workflows__server___handle_http["_handle_http"]
+        cqrs_backend_workflows__server___handle_command["_handle_command"]
+        cqrs_backend_workflows__server___handle_render["_handle_render"]
+        cqrs_backend_workflows__server___handle_agent["_handle_agent"]
+        cqrs_backend_workflows__server__execute_node["execute_node"]
         cqrs_backend_workflows__server__root["root"]
         cqrs_backend_workflows__server__health["health"]
         cqrs_backend_workflows__server__list_workflows["list_workflows"]
@@ -118,12 +306,14 @@ flowchart TD
         cqrs_workflow_editor__src__App__onConnect["onConnect"]
         cqrs_workflow_editor__src__App__onEdgeClick["onEdgeClick"]
         cqrs_workflow_editor__src__App__updateNodeData["updateNodeData"]
-        cqrs_workflow_editor__src__App__fetchPreview("fetchPreview CC=10")
+        cqrs_workflow_editor__src__App__fetchPreview("fetchPreview CC=13")
+        cqrs_workflow_editor__src__App__previewUri["previewUri"]
         cqrs_workflow_editor__src__App__response["response"]
         cqrs_workflow_editor__src__App__blob["blob"]
         cqrs_workflow_editor__src__App__sizeKB["sizeKB"]
         cqrs_workflow_editor__src__App__mime["mime"]
         cqrs_workflow_editor__src__App__text["text"]
+        cqrs_workflow_editor__src__App__msg["msg"]
         cqrs_workflow_editor__src__App__timer["timer"]
         cqrs_workflow_editor__src__App__exportWorkflow["exportWorkflow"]
         cqrs_workflow_editor__src__App__outputs["outputs"]
@@ -179,6 +369,68 @@ flowchart TD
         frontend__html__js__app__img["img"]
         frontend__html__js__app__pre["pre"]
     end
+    subgraph project__map
+        project__map__toon__register_backend["register_backend"]
+        project__map__toon___mcp_execute["_mcp_execute"]
+        project__map__toon___litellm_execute["_litellm_execute"]
+        project__map__toon___bash_cli_execute["_bash_cli_execute"]
+        project__map__toon___http_api_execute["_http_api_execute"]
+        project__map__toon___websocket_execute["_websocket_execute"]
+        project__map__toon__execute_agent["execute_agent"]
+        project__map__toon__get_jwt_manager["get_jwt_manager"]
+        project__map__toon__authenticate["authenticate"]
+        project__map__toon__current_user["current_user"]
+        project__map__toon__get_registry["get_registry"]
+        project__map__toon__register_default_commands["register_default_commands"]
+        project__map__toon___to_data_uri["_to_data_uri"]
+        project__map__toon___substitute["_substitute"]
+        project__map__toon__load_settings["load_settings"]
+        project__map__toon___value_error["_value_error"]
+        project__map__toon___perm_error["_perm_error"]
+        project__map__toon___nf_error["_nf_error"]
+        project__map__toon___key_error["_key_error"]
+        project__map__toon__health["health"]
+        project__map__toon__issue_token["issue_token"]
+        project__map__toon__me["me"]
+        project__map__toon__list_commands["list_commands"]
+        project__map__toon__execute_command["execute_command"]
+        project__map__toon__list_queries["list_queries"]
+        project__map__toon__execute_query["execute_query"]
+        project__map__toon__execute_query_get["execute_query_get"]
+        project__map__toon__catalog["catalog"]
+        project__map__toon__run_agent["run_agent"]
+        project__map__toon__list_agent_backends["list_agent_backends"]
+        project__map__toon__get_engine["get_engine"]
+        project__map__toon__reload_engine["reload_engine"]
+        project__map__toon__register_default_protocols["register_default_protocols"]
+        project__map__toon__register_default_queries["register_default_queries"]
+        project__map__toon__test_placeholder["test_placeholder"]
+        project__map__toon__test_import["test_import"]
+        project__map__toon__validate_against_schema_uri["validate_against_schema_uri"]
+        project__map__toon__validate_workflow["validate_workflow"]
+        project__map__toon___result_to_data_uri["_result_to_data_uri"]
+        project__map__toon___handle_fetch["_handle_fetch"]
+        project__map__toon___handle_http["_handle_http"]
+        project__map__toon___handle_command["_handle_command"]
+        project__map__toon___handle_render["_handle_render"]
+        project__map__toon___handle_agent["_handle_agent"]
+        project__map__toon__execute_node["execute_node"]
+        project__map__toon__root["root"]
+        project__map__toon__list_workflows["list_workflows"]
+        project__map__toon__get_workflow["get_workflow"]
+        project__map__toon__create_workflow["create_workflow"]
+        project__map__toon__update_workflow["update_workflow"]
+        project__map__toon__delete_workflow["delete_workflow"]
+        project__map__toon__run_workflow["run_workflow"]
+        project__map__toon___engine["_engine"]
+        project__map__toon___user["_user"]
+        project__map__toon__test_admin_can_do_anything["test_admin_can_do_anything"]
+        project__map__toon__test_user_denied_internal_path["test_user_denied_internal_path"]
+        project__map__toon__test_user_allowed_public_path["test_user_allowed_public_path"]
+        project__map__toon__test_unknown_role_denied["test_unknown_role_denied"]
+        project__map__toon__test_analyst_can_run_pipeline["test_analyst_can_run_pipeline"]
+        project__map__toon__test_query_access_respects_uris["test_query_access_respects_uris"]
+    end
     frontend__html__js__api__API --> frontend__html__js__api__getToken
     frontend__html__js__api__API --> frontend__html__js__api__request
     frontend__html__js__api__API --> frontend__html__js__api__setToken
@@ -192,6 +444,17 @@ flowchart TD
     frontend__html__js__api__runCommand --> frontend__html__js__api__request
     frontend__html__js__api__runQuery --> frontend__html__js__api__request
     frontend__html__js__app__renderDecoded --> frontend__html__js__app__decodeB64
+    api__commands__fetch__FetchCommand__execute --> project__map__toon__get_registry
+    api__commands__converttocsv__ConvertToCsvCommand__execute --> api__queries__QueryRegistry__list
+    api__commands__converttojson__ConvertToJsonCommand___convert --> api__queries__QueryRegistry__list
+    api__commands__converttojson__ConvertToJsonCommand__execute --> project__map__toon__get_registry
+    api__commands__converttojson__ConvertToJsonCommand__execute --> api__validators__validate_against_schema_uri
+    api__commands__converttobase64__ConvertToBase64Command__execute --> project__map__toon__get_registry
+    api__commands__pipeline___substitute --> api__commands__pipeline___to_data_uri
+    api__commands__pipeline__PipelineCommand__execute --> api__commands__pipeline___substitute
+    api__validators__validate_against_schema_uri --> api__queries__QueryRegistry__list
+    api__validators__validate_against_schema_uri --> project__map__toon__get_registry
+    api__queries__from_url__FromUrlQuery__execute --> project__map__toon__get_registry
     cqrs_workflow_editor__src__App__loadPredefinedWorkflow --> cqrs_workflow_editor__src__App__mapToNodes
     cqrs_workflow_editor__src__App__loadPredefinedWorkflow --> cqrs_workflow_editor__src__App__mapToEdges
     cqrs_workflow_editor__src__App__fetchPreview --> cqrs_workflow_editor__src__App__blob
@@ -207,8 +470,6 @@ flowchart TD
     cqrs_workflow_editor__src__App__file --> cqrs_workflow_editor__src__App__mapToEdges
     cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToNodes
     cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToEdges
-    api__commands__converttobase64__ConvertToBase64Command__execute --> api__queries__get_registry
-    api__commands__fetch__FetchCommand__execute --> api__queries__get_registry
     api__main__issue_token --> api__auth__authenticate
     api__main__issue_token --> api__auth__get_jwt_manager
     api__main__execute_command --> api__policy__get_engine
@@ -216,16 +477,11 @@ flowchart TD
     api__main__execute_query_get --> api__main__execute_query
     api__main__run_agent --> api__agent__execute_agent
     api__main__run_agent --> api__policy__get_engine
-    api__queries__from_url__FromUrlQuery__execute --> api__queries__get_registry
-    api__commands__converttojson__ConvertToJsonCommand__execute --> api__queries__get_registry
     api__queries__register_default_queries --> api__queries__get_registry
-    api__commands__converttocsv__ConvertToCsvCommand__execute --> api__queries__QueryRegistry__list
     api__commands__register_default_commands --> api__commands__get_registry
-    api__commands__pipeline___substitute --> api__commands__pipeline___to_data_uri
-    api__commands__pipeline__PipelineCommand__execute --> api__commands__pipeline___substitute
-    api__validators__validate_against_schema_uri --> api__queries__QueryRegistry__list
-    api__validators__validate_against_schema_uri --> api__queries__get_registry
     api__protocols__register_default_protocols --> api__protocols__get_registry
+    cqrs_backend_workflows__server___handle_command --> cqrs_backend_workflows__server___result_to_data_uri
+    cqrs_backend_workflows__server___handle_render --> cqrs_backend_workflows__server___result_to_data_uri
     cqrs_backend_workflows__server__list_workflows --> api__queries__QueryRegistry__list
     cqrs_backend_workflows__server__create_workflow --> cqrs_backend_workflows__server__validate_workflow
     cqrs_backend_workflows__server__update_workflow --> cqrs_backend_workflows__server__validate_workflow
@@ -233,5 +489,4 @@ flowchart TD
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class api__commands__converttojson__ConvertToJsonCommand__execute,cqrs_backend_workflows__server__execute_node highCC
-    class frontend__html__js__api__API,frontend__html__js__api__request,frontend__html__js__app__renderDecoded,cqrs_workflow_editor__src__App__fetchPreview,api__protocols__data_protocol__DataProtocol__fetch,api__protocols__file_protocol__FileProtocol___resolve,api__queries__from_url__FromUrlQuery__execute,api__commands__converttocsv__ConvertToCsvCommand__execute,api__policy__PolicyEngine__can_execute_command,api__policy__PolicyEngine__can_execute_query,api__commands__pipeline___substitute,api__commands__pipeline__PipelineCommand__execute,api__commands__converttoxml__ConvertToXmlCommand__execute,cqrs_backend_workflows__server__run_workflow medCC
+    class frontend__html__js__api__API,frontend__html__js__api__request,frontend__html__js__app__renderDecoded,api__commands__converttocsv__ConvertToCsvCommand__execute,api__commands__converttojson__ConvertToJsonCommand___detect_mode,api__commands__converttojson__ConvertToJsonCommand___convert,api__commands__pipeline___substitute,api__commands__pipeline__PipelineCommand__execute,api__commands__converttoxml__ConvertToXmlCommand__execute,api__policy__PolicyEngine__can_execute_command,api__policy__PolicyEngine__can_execute_query,api__protocols__data_protocol__DataProtocol__fetch,api__protocols__file_protocol__FileProtocol___resolve,api__queries__from_url__FromUrlQuery__execute,cqrs_workflow_editor__src__App__fetchPreview,cqrs_backend_workflows__server__run_workflow medCC
