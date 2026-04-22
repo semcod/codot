@@ -1,0 +1,210 @@
+# codot | 42f 3290L | python:27,shell:8,javascript:4,less:1,typescript:1,css:1 | 2026-04-22
+# stats: 63 func | 43 cls | 42 mod | CC̄=2.5 | critical:1 | cycles:0
+# alerts[5]: CC execute_node=18; CC _substitute=8; CC run_workflow=8; CC _mcp_execute=7; CC validate_against_schema_uri=7
+# hotspots[5]: _mcp_execute fan=16; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _litellm_execute fan=10
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[42]:
+  api/agent.py,374
+  api/auth/__init__.py,103
+  api/commands/__init__.py,78
+  api/commands/converttobase64.py,35
+  api/commands/converttocsv.py,61
+  api/commands/converttojson.py,80
+  api/commands/converttoxml.py,52
+  api/commands/fetch.py,28
+  api/commands/pipeline.py,79
+  api/commands/render.py,98
+  api/config.py,35
+  api/main.py,240
+  api/models.py,125
+  api/policy/__init__.py,150
+  api/protocols/__init__.py,67
+  api/protocols/data_protocol.py,41
+  api/protocols/file_protocol.py,52
+  api/protocols/http_protocol.py,34
+  api/queries/__init__.py,54
+  api/queries/from_url.py,46
+  api/queries/introspect.py,23
+  api/tests/test_api.py,12
+  api/validators/__init__.py,49
+  app.doql.less,60
+  cqrs-backend-workflows/server.py,354
+  cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py,16
+  cqrs-workflow-editor/test/cqrs-workflow-editor.test.js,8
+  cqrs-workflow-editor/vite.config.ts,21
+  examples/01-fetch.sh,49
+  examples/02-convert-to-json.sh,49
+  examples/03-render-html.sh,41
+  examples/04-pipeline.sh,125
+  examples/05-query.sh,52
+  examples/06-rbac.sh,67
+  frontend/html/css/style.css,35
+  frontend/html/js/api.js,62
+  frontend/html/js/app.js,188
+  frontend/test/codot.test.js,8
+  project.sh,36
+  tests/smoke.sh,79
+  tests/test_policy.py,63
+  tests/test_protocols.py,61
+D:
+  api/agent.py:
+    e: register_backend,_mcp_execute,_litellm_execute,_bash_cli_execute,_http_api_execute,_websocket_execute,execute_agent
+    register_backend(backend;executor)
+    _mcp_execute(node;request)
+    _litellm_execute(node;request)
+    _bash_cli_execute(node;request)
+    _http_api_execute(node;request)
+    _websocket_execute(node;request)
+    execute_agent(request)
+  api/auth/__init__.py:
+    e: get_jwt_manager,authenticate,current_user,JWTManager
+    JWTManager: __init__(3),issue(3),verify(1)
+    get_jwt_manager()
+    authenticate(username;password)
+    current_user(creds)
+  api/commands/__init__.py:
+    e: get_registry,register_default_commands,Command,CommandRegistry
+    Command: execute(1)
+    CommandRegistry: __init__(0),register(1),get(1),list(0)
+    get_registry()
+    register_default_commands()
+  api/commands/converttobase64.py:
+    e: ConvertToBase64Command
+    ConvertToBase64Command: execute(1)
+  api/commands/converttocsv.py:
+    e: ConvertToCsvCommand
+    ConvertToCsvCommand: execute(1)
+  api/commands/converttojson.py:
+    e: ConvertToJsonCommand
+    ConvertToJsonCommand: execute(1)
+  api/commands/converttoxml.py:
+    e: ConvertToXmlCommand
+    ConvertToXmlCommand: execute(1)
+  api/commands/fetch.py:
+    e: FetchCommand
+    FetchCommand: execute(1)
+  api/commands/pipeline.py:
+    e: _to_data_uri,_substitute,PipelineCommand
+    PipelineCommand: execute(1)
+    _to_data_uri(resp)
+    _substitute(value;previous)
+  api/commands/render.py:
+    e: RenderCommand
+    RenderCommand: execute(1)
+  api/config.py:
+    e: load_settings,Settings
+    Settings:
+    load_settings()
+  api/main.py:
+    e: _value_error,_perm_error,_nf_error,_key_error,health,issue_token,me,list_commands,execute_command,list_queries,execute_query,execute_query_get,catalog,run_agent,list_agent_backends
+    _value_error(_;exc)
+    _perm_error(_;exc)
+    _nf_error(_;exc)
+    _key_error(_;exc)
+    health()
+    issue_token(req)
+    me(user)
+    list_commands(user)
+    execute_command(name;body;user)
+    list_queries(user)
+    execute_query(name;body;user)
+    execute_query_get(name;source_uris;user)
+    catalog()
+    run_agent(agent_id;body;user)
+    list_agent_backends()
+  api/models.py:
+    e: CommandRequest,CommandResponse,QueryRequest,QueryResponse,TokenRequest,TokenResponse,PipelineStep,PipelineRequest,ErrorResponse,AgentCommunicationBackend,AgentNode,AgentRequest,AgentResponse
+    CommandRequest:  # Envelope for every command invocation.
+    CommandResponse:
+    QueryRequest:
+    QueryResponse:
+    TokenRequest:
+    TokenResponse:
+    PipelineStep:
+    PipelineRequest:
+    ErrorResponse:
+    AgentCommunicationBackend:  # Supported communication backends for Agent formula.
+    AgentNode:  # Agent node definition for DAG / orchestration.
+    AgentRequest:  # Request to execute an Agent node.
+    AgentResponse:
+  api/policy/__init__.py:
+    e: get_engine,reload_engine,User,PolicyDecision,PolicyEngine
+    User: has_role(1)
+    PolicyDecision: allow(2),deny(2)
+    PolicyEngine: __init__(1),from_file(2),_rules_for(1),_match_any(2),can_execute_command(4),can_execute_query(4)
+    get_engine()
+    reload_engine()
+  api/protocols/__init__.py:
+    e: get_registry,register_default_protocols,FetchResult,Protocol,ProtocolRegistry
+    FetchResult:
+    Protocol: fetch(1)
+    ProtocolRegistry: __init__(0),register(1),supported(0),fetch(1)
+    get_registry()
+    register_default_protocols()
+  api/protocols/data_protocol.py:
+    e: DataProtocol
+    DataProtocol: fetch(1)  # Implements RFC 2397 data URIs: data:[<mime>][;base64],<data>
+  api/protocols/file_protocol.py:
+    e: FileProtocol
+    FileProtocol: _resolve(1),fetch(1)  # Access local files. Only paths under ALLOWED_LOCAL_ROOTS are
+  api/protocols/http_protocol.py:
+    e: HttpProtocol
+    HttpProtocol: __init__(1),fetch(1)
+  api/queries/__init__.py:
+    e: get_registry,register_default_queries,Query,QueryRegistry
+    Query: execute(1)
+    QueryRegistry: __init__(0),register(1),get(1),list(0)
+    get_registry()
+    register_default_queries()
+  api/queries/from_url.py:
+    e: FromUrlQuery
+    FromUrlQuery: execute(1)
+  api/queries/introspect.py:
+    e: IntrospectQuery
+    IntrospectQuery: execute(1)
+  api/tests/test_api.py:
+    e: test_placeholder,test_import
+    test_placeholder()
+    test_import()
+  api/validators/__init__.py:
+    e: validate_against_schema_uri,SchemaValidationError
+    SchemaValidationError: __init__(2)
+    validate_against_schema_uri(instance;schema_uri)
+  cqrs-backend-workflows/server.py:
+    e: validate_workflow,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    WorkflowNode:
+    WorkflowOutput:
+    Workflow:
+    WorkflowExecutionRequest:
+    WorkflowExecutionResponse:
+    validate_workflow(workflow)
+    execute_node(node;node_results;client;token)
+    root()
+    health()
+    list_workflows()
+    get_workflow(workflow_id)
+    create_workflow(workflow)
+    update_workflow(workflow_id;workflow)
+    delete_workflow(workflow_id)
+    run_workflow(workflow_id;request)
+  cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py:
+    e: test_placeholder,test_import
+    test_placeholder()
+    test_import()
+  tests/test_policy.py:
+    e: _engine,_user,test_admin_can_do_anything,test_user_denied_internal_path,test_user_allowed_public_path,test_unknown_role_denied,test_analyst_can_run_pipeline,test_query_access_respects_uris
+    _engine()
+    _user(role)
+    test_admin_can_do_anything()
+    test_user_denied_internal_path()
+    test_user_allowed_public_path()
+    test_unknown_role_denied()
+    test_analyst_can_run_pipeline()
+    test_query_access_respects_uris()
+  tests/test_protocols.py:
+    e: test_data_uri_plain,test_data_uri_base64,test_file_protocol_rejects_outside_root,test_file_protocol_reads_inside_root
+    test_data_uri_plain()
+    test_data_uri_base64()
+    test_file_protocol_rejects_outside_root()
+    test_file_protocol_reads_inside_root()

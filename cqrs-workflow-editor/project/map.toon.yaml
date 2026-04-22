@@ -1,0 +1,11 @@
+# cqrs-workflow-editor | 3f 94L | less:1,javascript:1,typescript:1 | 2026-04-22
+# stats: 0 func | 0 cls | 3 mod | CC̄=1.0 | critical:0 | cycles:0
+# alerts[5]: none
+# hotspots[5]: none
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[3]:
+  app.doql.less,65
+  test/cqrs-workflow-editor.test.js,8
+  vite.config.ts,21
+D:

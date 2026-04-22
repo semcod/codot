@@ -1,0 +1,28 @@
+flowchart TD
+
+    %% Entry points (blue)
+    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
+
+    subgraph Core
+        frontend__html__js__api__API["API"]
+        frontend__html__js__api__getToken["getToken"]
+        frontend__html__js__api__clearToken["clearToken"]
+        frontend__html__js__api__getRole["getRole"]
+        frontend__html__js__api__request("request CC=9")
+        frontend__html__js__api__resp["resp"]
+        frontend__html__js__api__ct["ct"]
+        frontend__html__js__api__err["err"]
+        frontend__html__js__api__login["login"]
+        frontend__html__js__api__data["data"]
+        frontend__html__js__api__catalog["catalog"]
+        frontend__html__js__api__runCommand["runCommand"]
+        frontend__html__js__api__runQuery["runQuery"]
+        docs__04_workflow_editor_spec__mapToNodes["mapToNodes"]
+        frontend__html__js__app__showAuthed["showAuthed"]
+        ...["+109 more"]
+    end
+
+    subgraph Exporters
+    end
+
+    class frontend__html__js__api__API,frontend__html__js__api__clearToken,frontend__html__js__api__getRole,frontend__html__js__api__resp,frontend__html__js__api__ct,frontend__html__js__api__err,frontend__html__js__api__login,frontend__html__js__api__data,frontend__html__js__api__catalog,frontend__html__js__api__runCommand entry

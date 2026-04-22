@@ -1,0 +1,140 @@
+# code2llm | 75f 6733L | python:23,md:13,json:9,shell:7,txt:4,typescript:3,yaml:2,yml:2,conf:2,javascript:2,toml:1,cfg:1 | 2026-04-22
+# CC̄=2.8 | critical:2/154 | dups:0 | cycles:1
+
+HEALTH[2]:
+  🟡 CC    execute CC=20 (limit:15)
+  🟡 CC    execute_node CC=18 (limit:15)
+
+REFACTOR[2]:
+  1. split 2 high-CC methods  (CC>15)
+  2. break 1 circular dependencies
+
+PIPELINES[103]:
+  [1] Src [API]: API → getToken
+      PURITY: 100% pure
+  [2] Src [clearToken]: clearToken
+      PURITY: 100% pure
+  [3] Src [getRole]: getRole
+      PURITY: 100% pure
+  [4] Src [resp]: resp
+      PURITY: 100% pure
+  [5] Src [ct]: ct
+      PURITY: 100% pure
+
+LAYERS:
+  cqrs-backend-workflows/         CC̄=3.9    ←in:0  →out:1
+  │ !! server                     354L  5C   10m  CC=18     ←0
+  │ README.md                  135L  0C    0m  CC=0.0    ←0
+  │ workflow.schema.json        69L  0C    0m  CC=0.0    ←0
+  │ example-workflow.json       35L  0C    0m  CC=0.0    ←0
+  │ requirements.txt             5L  0C    0m  CC=0.0    ←0
+  │ Makefile                     0L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
+  │
+  api/                            CC̄=3.1    ←in:13  →out:0
+  │ agent                      373L  0C    7m  CC=7      ←1
+  │ main                       239L  0C   15m  CC=3      ←0
+  │ __init__                   149L  3C   11m  CC=8      ←1
+  │ models                     124L  13C    0m  CC=0.0    ←0
+  │ __init__                   102L  1C    6m  CC=3      ←1
+  │ render                      97L  1C    1m  CC=6      ←0
+  │ !! converttojson               79L  1C    1m  CC=20     ←0
+  │ pipeline                    78L  1C    3m  CC=8      ←0
+  │ __init__                    77L  2C    7m  CC=2      ←0
+  │ __init__                    66L  3C    7m  CC=3      ←0
+  │ rules.yaml                  66L  0C    0m  CC=0.0    ←0
+  │ converttocsv                60L  1C    1m  CC=13     ←0
+  │ __init__                    53L  2C    7m  CC=2      ←9
+  │ file_protocol               51L  1C    2m  CC=10     ←0
+  │ converttoxml                51L  1C    1m  CC=9      ←0
+  │ __init__                    48L  1C    2m  CC=7      ←1
+  │ from_url                    45L  1C    1m  CC=9      ←0
+  │ data_protocol               40L  1C    1m  CC=9      ←0
+  │ converttobase64             34L  1C    1m  CC=2      ←0
+  │ config                      34L  1C    1m  CC=3      ←0
+  │ http_protocol               33L  1C    2m  CC=2      ←0
+  │ fetch                       27L  1C    1m  CC=2      ←0
+  │ introspect                  22L  1C    1m  CC=1      ←0
+  │ requirements.txt            11L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
+  │
+  frontend/                       CC̄=2.5    ←in:0  →out:0
+  │ app.js                     187L  0C   15m  CC=9      ←0
+  │ api.js                      61L  0C   15m  CC=9      ←0
+  │ package.json                28L  0C    0m  CC=0.0    ←0
+  │ nginx.conf                  17L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
+  │
+  cqrs-workflow-editor/           CC̄=2.1    ←in:0  →out:0
+  │ !! App.tsx                    622L  0C   33m  CC=10     ←0
+  │ README.md                   92L  0C    0m  CC=0.0    ←0
+  │ tsconfig.json               26L  0C    0m  CC=0.0    ←0
+  │ package.json                23L  0C    0m  CC=0.0    ←0
+  │ vite.config.ts              21L  0C    0m  CC=0.0    ←0
+  │ main.tsx                    11L  0C    1m  CC=1      ←0
+  │ nginx.conf                  10L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
+  │
+  docs/                           CC̄=0.0    ←in:0  →out:0
+  │ 04-workflow-editor-spec.md   497L  3C    1m  CC=0.0    ←0
+  │ 03-multi-agent-architecture.md   295L  0C    0m  CC=0.0    ←0
+  │ 02-market-comparison.md    276L  0C    0m  CC=0.0    ←0
+  │ 01-cqrs-url-platform-status.md    66L  0C    0m  CC=0.0    ←0
+  │ 05-pipeline-composition-status.md    60L  0C    0m  CC=0.0    ←0
+  │ 03-policy-engine-status.md    58L  0C    0m  CC=0.0    ←0
+  │ 02-protocol-registry-status.md    55L  1C    0m  CC=0.0    ←0
+  │ 04-frontend-playground-status.md    45L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ !! goal.yaml                  511L  0C    0m  CC=0.0    ←0
+  │ README.md                  161L  1C    0m  CC=0.0    ←0
+  │ pyproject.toml              94L  0C    0m  CC=0.0    ←0
+  │ docker-compose.yml          89L  0C    0m  CC=0.0    ←0
+  │ CHANGELOG.md                42L  0C    0m  CC=0.0    ←0
+  │ project.sh                  36L  0C    0m  CC=0.0    ←0
+  │ Makefile                     0L  0C    0m  CC=0.0    ←0
+  │
+  schemas/                        CC̄=0.0    ←in:0  →out:0
+  │ public-products.json        23L  0C    0m  CC=0.0    ←0
+  │ public-posts.json           16L  0C    0m  CC=0.0    ←0
+  │
+  examples/                       CC̄=0.0    ←in:0  →out:0
+  │ 04-pipeline.sh             124L  0C    0m  CC=0.0    ←0
+  │ README.md                  122L  0C    0m  CC=0.0    ←0
+  │ 06-rbac.sh                  66L  0C    0m  CC=0.0    ←0
+  │ 05-query.sh                 51L  0C    0m  CC=0.0    ←0
+  │ 01-fetch.sh                 48L  0C    0m  CC=0.0    ←0
+  │ 02-convert-to-json.sh       48L  0C    0m  CC=0.0    ←0
+  │ 03-render-html.sh           40L  0C    0m  CC=0.0    ←0
+  │
+  sample-data/                    CC̄=0.0    ←in:0  →out:0
+  │ doc.txt                      6L  0C    0m  CC=0.0    ←0
+  │ doc.txt                      6L  0C    0m  CC=0.0    ←0
+  │ posts.json                   5L  0C    0m  CC=0.0    ←0
+  │ posts.json                   5L  0C    0m  CC=0.0    ←0
+  │
+  ansible/                        CC̄=0.0    ←in:0  →out:0
+  │ test-services.yml          229L  0C    0m  CC=0.0    ←0
+  │ ansible.cfg                  4L  0C    0m  CC=0.0    ←0
+  │
+  ── zero ──
+     Makefile                                  0L
+     api/Dockerfile                            0L
+     cqrs-backend-workflows/Dockerfile         0L
+     cqrs-backend-workflows/Makefile           0L
+     cqrs-workflow-editor/Dockerfile           0L
+     frontend/Dockerfile                       0L
+
+COUPLING:
+                                             api            api.commands             api.queries  cqrs-backend-workflows
+                     api                      ──                     ←11                      ←1                      ←1  hub
+            api.commands                      11                      ──                                                  !! fan-out
+             api.queries                       1                                              ──                        
+  cqrs-backend-workflows                       1                                                                      ──
+  CYCLES: 1
+  HUB: api/ (fan-in=13)
+  SMELL: api.commands/ fan-out=11 → split needed
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

@@ -121,6 +121,36 @@ export default function App() {
   const [preview, setPreview] = useState<{ content: string; mime: string; size: number } | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const [workflowId, setWorkflowId] = useState<string>("current");
+  const [runResult, setRunResult] = useState<string | null>(null);
+  const [runLoading, setRunLoading] = useState(false);
+
+  const loadPredefinedWorkflow = (name: string) => {
+    const predefined: Record<string, Workflow> = {
+      basic_csv_pipeline: {
+        version: "1.0",
+        nodes: [
+          { id: "fetch1", label: "Fetch CSV", type: "fetch", uri: "http://localhost:18091/products.csv", mime_type: "text/csv" },
+          { id: "convert1", label: "Convert to JSON", type: "command", command_type: "converttojson", input: "fetch1", schema_uri: "http://localhost:18090/public-products.json" },
+          { id: "render1", label: "Render Table", type: "render", input: "convert1" },
+        ],
+        outputs: [{ id: "csv_view", source: "render1" }],
+      },
+      http_fetch_pipeline: {
+        version: "1.0",
+        nodes: [
+          { id: "http1", label: "Get API Data", type: "http", url: "http://localhost:18080/health", method: "GET" },
+          { id: "render1", label: "Render Response", type: "render", input: "http1" },
+        ],
+        outputs: [{ id: "api_view", source: "render1" }],
+      },
+    };
+    const wf = predefined[name];
+    if (!wf) return;
+    setNodes(mapToNodes(wf.nodes));
+    setEdges(mapToEdges(wf.nodes));
+    setRunResult(null);
+  };
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -134,6 +164,10 @@ export default function App() {
     setPreview(null);
     setPreviewError(null);
   }, []);
+
+  const onEdgeClick = useCallback((_: any, edge: Edge) => {
+    setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+  }, [setEdges]);
 
   const updateNodeData = (field: string, value: any) => {
     if (!selectedNode) return;
@@ -304,15 +338,71 @@ export default function App() {
             Export workflow
           </button>
           <input type="file" accept=".json" onChange={onUploadWorkflow} style={{ width: "100%", marginBottom: 8 }} />
+          <div style={{ marginBottom: 8 }}>
+            <strong style={{ fontSize: 12 }}>Predefined Workflows</strong>
+            <button
+              onClick={() => loadPredefinedWorkflow("basic_csv_pipeline")}
+              style={{ width: "100%", padding: 6, marginTop: 4, fontSize: 11 }}
+            >Basic CSV → JSON</button>
+            <button
+              onClick={() => loadPredefinedWorkflow("http_fetch_pipeline")}
+              style={{ width: "100%", padding: 6, marginTop: 4, fontSize: 11 }}
+            >HTTP Fetch</button>
+          </div>
           <button
             onClick={() => {
               const workflow = exportWorkflow();
               console.log("Workflow JSON:", workflow);
             }}
-            style={{ width: "100%", padding: 8 }}
+            style={{ width: "100%", padding: 8, marginBottom: 8 }}
           >
             Log JSON
           </button>
+          <button
+            onClick={async () => {
+              const workflow = exportWorkflow();
+              setRunLoading(true);
+              setRunResult(null);
+              try {
+                // Save workflow first
+                const saveRes = await fetch(`/api/v1/workflows/${workflowId}`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(workflow),
+                });
+                if (!saveRes.ok) {
+                  // If not found, create it
+                  const createRes = await fetch(`/api/v1/workflows`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...workflow, id: workflowId }),
+                  });
+                  if (!createRes.ok) throw new Error("Failed to save workflow");
+                }
+                // Run workflow
+                const runRes = await fetch(`/api/v1/workflows/${workflowId}/run`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ workflow_id: workflowId }),
+                });
+                const result = await runRes.json();
+                setRunResult(JSON.stringify(result, null, 2));
+              } catch (err) {
+                setRunResult(`Error: ${err instanceof Error ? err.message : String(err)}`);
+              } finally {
+                setRunLoading(false);
+              }
+            }}
+            disabled={runLoading}
+            style={{ width: "100%", padding: 8, background: "#10b981", color: "white", border: "none", borderRadius: 4, cursor: runLoading ? "not-allowed" : "pointer" }}
+          >
+            {runLoading ? "Running..." : "Save & Run"}
+          </button>
+          {runResult && (
+            <div style={{ marginTop: 8, padding: 8, background: "#e5e7eb", borderRadius: 4, fontSize: 11, maxHeight: 200, overflow: "auto" }}>
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>{runResult}</pre>
+            </div>
+          )}
         </div>
       </div>
 
@@ -325,6 +415,7 @@ export default function App() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={onNodeClick}
+          onEdgeClick={onEdgeClick}
           fitView
         >
           <Controls />

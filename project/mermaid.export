@@ -1,0 +1,237 @@
+flowchart TD
+    subgraph api__agent
+        api__agent__register_backend["register_backend"]
+        api__agent___mcp_execute["_mcp_execute"]
+        api__agent___litellm_execute["_litellm_execute"]
+        api__agent___bash_cli_execute["_bash_cli_execute"]
+        api__agent___http_api_execute["_http_api_execute"]
+        api__agent___websocket_execute["_websocket_execute"]
+        api__agent__execute_agent["execute_agent"]
+    end
+    subgraph api__auth
+        api__auth__JWTManager____init__["__init__"]
+        api__auth__JWTManager__issue["issue"]
+        api__auth__JWTManager__verify["verify"]
+        api__auth__get_jwt_manager["get_jwt_manager"]
+        api__auth__authenticate["authenticate"]
+        api__auth__current_user["current_user"]
+    end
+    subgraph api__commands
+        api__commands__converttobase64__ConvertToBase64Command__execute["execute"]
+        api__commands__fetch__FetchCommand__execute["execute"]
+        api__commands__converttojson__ConvertToJsonCommand__execute{{execute CC=20}}
+        api__commands__converttocsv__ConvertToCsvCommand__execute("execute CC=13")
+        api__commands__Command__execute["execute"]
+        api__commands__CommandRegistry____init__["__init__"]
+        api__commands__CommandRegistry__register["register"]
+        api__commands__CommandRegistry__get["get"]
+        api__commands__CommandRegistry__list["list"]
+        api__commands__get_registry["get_registry"]
+        api__commands__register_default_commands["register_default_commands"]
+        api__commands__pipeline___to_data_uri["_to_data_uri"]
+        api__commands__pipeline___substitute("_substitute CC=8")
+        api__commands__pipeline__PipelineCommand__execute("execute CC=8")
+        api__commands__render__RenderCommand__execute["execute"]
+        api__commands__converttoxml__ConvertToXmlCommand__execute("execute CC=9")
+    end
+    subgraph api__config
+        api__config__load_settings["load_settings"]
+    end
+    subgraph api__main
+        api__main___value_error["_value_error"]
+        api__main___perm_error["_perm_error"]
+        api__main___nf_error["_nf_error"]
+        api__main___key_error["_key_error"]
+        api__main__health["health"]
+        api__main__issue_token["issue_token"]
+        api__main__me["me"]
+        api__main__list_commands["list_commands"]
+        api__main__execute_command["execute_command"]
+        api__main__list_queries["list_queries"]
+        api__main__execute_query["execute_query"]
+        api__main__execute_query_get["execute_query_get"]
+        api__main__catalog["catalog"]
+        api__main__run_agent["run_agent"]
+        api__main__list_agent_backends["list_agent_backends"]
+    end
+    subgraph api__policy
+        api__policy__User__has_role["has_role"]
+        api__policy__PolicyDecision__allow["allow"]
+        api__policy__PolicyDecision__deny["deny"]
+        api__policy__PolicyEngine____init__["__init__"]
+        api__policy__PolicyEngine__from_file["from_file"]
+        api__policy__PolicyEngine___rules_for["_rules_for"]
+        api__policy__PolicyEngine___match_any["_match_any"]
+        api__policy__PolicyEngine__can_execute_command("can_execute_command CC=8")
+        api__policy__PolicyEngine__can_execute_query("can_execute_query CC=8")
+        api__policy__get_engine["get_engine"]
+        api__policy__reload_engine["reload_engine"]
+    end
+    subgraph api__protocols
+        api__protocols__http_protocol__HttpProtocol____init__["__init__"]
+        api__protocols__http_protocol__HttpProtocol__fetch["fetch"]
+        api__protocols__data_protocol__DataProtocol__fetch("fetch CC=9")
+        api__protocols__file_protocol__FileProtocol___resolve("_resolve CC=10")
+        api__protocols__file_protocol__FileProtocol__fetch["fetch"]
+        api__protocols__Protocol__fetch["fetch"]
+        api__protocols__ProtocolRegistry____init__["__init__"]
+        api__protocols__ProtocolRegistry__register["register"]
+        api__protocols__ProtocolRegistry__supported["supported"]
+        api__protocols__ProtocolRegistry__fetch["fetch"]
+        api__protocols__get_registry["get_registry"]
+        api__protocols__register_default_protocols["register_default_protocols"]
+    end
+    subgraph api__queries
+        api__queries__introspect__IntrospectQuery__execute["execute"]
+        api__queries__from_url__FromUrlQuery__execute("execute CC=9")
+        api__queries__Query__execute["execute"]
+        api__queries__QueryRegistry____init__["__init__"]
+        api__queries__QueryRegistry__register["register"]
+        api__queries__QueryRegistry__get["get"]
+        api__queries__QueryRegistry__list["list"]
+        api__queries__get_registry["get_registry"]
+        api__queries__register_default_queries["register_default_queries"]
+    end
+    subgraph api__validators
+        api__validators__SchemaValidationError____init__["__init__"]
+        api__validators__validate_against_schema_uri["validate_against_schema_uri"]
+    end
+    subgraph cqrs_backend_workflows__server
+        cqrs_backend_workflows__server__validate_workflow["validate_workflow"]
+        cqrs_backend_workflows__server__execute_node{{execute_node CC=18}}
+        cqrs_backend_workflows__server__root["root"]
+        cqrs_backend_workflows__server__health["health"]
+        cqrs_backend_workflows__server__list_workflows["list_workflows"]
+        cqrs_backend_workflows__server__get_workflow["get_workflow"]
+        cqrs_backend_workflows__server__create_workflow["create_workflow"]
+        cqrs_backend_workflows__server__update_workflow["update_workflow"]
+        cqrs_backend_workflows__server__delete_workflow["delete_workflow"]
+        cqrs_backend_workflows__server__run_workflow("run_workflow CC=8")
+    end
+    subgraph cqrs_workflow_editor__src
+        cqrs_workflow_editor__src__main__root["root"]
+        cqrs_workflow_editor__src__App__mapToNodes["mapToNodes"]
+        cqrs_workflow_editor__src__App__mapToEdges["mapToEdges"]
+        cqrs_workflow_editor__src__App__initialNodes["initialNodes"]
+        cqrs_workflow_editor__src__App__loadPredefinedWorkflow["loadPredefinedWorkflow"]
+        cqrs_workflow_editor__src__App__wf["wf"]
+        cqrs_workflow_editor__src__App__onConnect["onConnect"]
+        cqrs_workflow_editor__src__App__onEdgeClick["onEdgeClick"]
+        cqrs_workflow_editor__src__App__updateNodeData["updateNodeData"]
+        cqrs_workflow_editor__src__App__fetchPreview("fetchPreview CC=10")
+        cqrs_workflow_editor__src__App__response["response"]
+        cqrs_workflow_editor__src__App__blob["blob"]
+        cqrs_workflow_editor__src__App__sizeKB["sizeKB"]
+        cqrs_workflow_editor__src__App__mime["mime"]
+        cqrs_workflow_editor__src__App__text["text"]
+        cqrs_workflow_editor__src__App__timer["timer"]
+        cqrs_workflow_editor__src__App__exportWorkflow["exportWorkflow"]
+        cqrs_workflow_editor__src__App__outputs["outputs"]
+        cqrs_workflow_editor__src__App__onDownloadWorkflow["onDownloadWorkflow"]
+        cqrs_workflow_editor__src__App__workflow["workflow"]
+        cqrs_workflow_editor__src__App__url["url"]
+        cqrs_workflow_editor__src__App__a["a"]
+        cqrs_workflow_editor__src__App__onUploadWorkflow["onUploadWorkflow"]
+        cqrs_workflow_editor__src__App__file["file"]
+        cqrs_workflow_editor__src__App__reader["reader"]
+        cqrs_workflow_editor__src__App__json["json"]
+        cqrs_workflow_editor__src__App__newNodes["newNodes"]
+        cqrs_workflow_editor__src__App__newEdges["newEdges"]
+        cqrs_workflow_editor__src__App__onAddNode["onAddNode"]
+        cqrs_workflow_editor__src__App__center["center"]
+        cqrs_workflow_editor__src__App__saveRes["saveRes"]
+        cqrs_workflow_editor__src__App__createRes["createRes"]
+        cqrs_workflow_editor__src__App__runRes["runRes"]
+        cqrs_workflow_editor__src__App__result["result"]
+    end
+    subgraph docs__04_workflow_editor_spec
+        docs__04_workflow_editor_spec__mapToNodes["mapToNodes"]
+    end
+    subgraph frontend__html
+        frontend__html__js__api__API("API CC=9")
+        frontend__html__js__api__getToken["getToken"]
+        frontend__html__js__api__setToken["setToken"]
+        frontend__html__js__api__clearToken["clearToken"]
+        frontend__html__js__api__getRole["getRole"]
+        frontend__html__js__api__setRole["setRole"]
+        frontend__html__js__api__request("request CC=9")
+        frontend__html__js__api__resp["resp"]
+        frontend__html__js__api__ct["ct"]
+        frontend__html__js__api__err["err"]
+        frontend__html__js__api__login["login"]
+        frontend__html__js__api__data["data"]
+        frontend__html__js__api__catalog["catalog"]
+        frontend__html__js__api__runCommand["runCommand"]
+        frontend__html__js__api__runQuery["runQuery"]
+        frontend__html__js__app__showAuthed["showAuthed"]
+        frontend__html__js__app__showAnonymous["showAnonymous"]
+        frontend__html__js__app__r["r"]
+        frontend__html__js__app__loadCatalog["loadCatalog"]
+        frontend__html__js__app__cat["cat"]
+        frontend__html__js__app__o["o"]
+        frontend__html__js__app__parseMeta["parseMeta"]
+        frontend__html__js__app__decodeB64["decodeB64"]
+        frontend__html__js__app__bin["bin"]
+        frontend__html__js__app__bytes["bytes"]
+        frontend__html__js__app__renderDecoded("renderDecoded CC=9")
+        frontend__html__js__app__iframe["iframe"]
+        frontend__html__js__app__blob["blob"]
+        frontend__html__js__app__img["img"]
+        frontend__html__js__app__pre["pre"]
+    end
+    frontend__html__js__api__API --> frontend__html__js__api__getToken
+    frontend__html__js__api__API --> frontend__html__js__api__request
+    frontend__html__js__api__API --> frontend__html__js__api__setToken
+    frontend__html__js__api__API --> frontend__html__js__api__setRole
+    frontend__html__js__api__request --> frontend__html__js__api__getToken
+    frontend__html__js__api__login --> frontend__html__js__api__request
+    frontend__html__js__api__login --> frontend__html__js__api__setToken
+    frontend__html__js__api__login --> frontend__html__js__api__setRole
+    frontend__html__js__api__data --> frontend__html__js__api__request
+    frontend__html__js__api__catalog --> frontend__html__js__api__request
+    frontend__html__js__api__runCommand --> frontend__html__js__api__request
+    frontend__html__js__api__runQuery --> frontend__html__js__api__request
+    frontend__html__js__app__renderDecoded --> frontend__html__js__app__decodeB64
+    cqrs_workflow_editor__src__App__loadPredefinedWorkflow --> cqrs_workflow_editor__src__App__mapToNodes
+    cqrs_workflow_editor__src__App__loadPredefinedWorkflow --> cqrs_workflow_editor__src__App__mapToEdges
+    cqrs_workflow_editor__src__App__fetchPreview --> cqrs_workflow_editor__src__App__blob
+    cqrs_workflow_editor__src__App__fetchPreview --> cqrs_workflow_editor__src__App__text
+    cqrs_workflow_editor__src__App__sizeKB --> cqrs_workflow_editor__src__App__text
+    cqrs_workflow_editor__src__App__mime --> cqrs_workflow_editor__src__App__text
+    cqrs_workflow_editor__src__App__timer --> cqrs_workflow_editor__src__App__fetchPreview
+    cqrs_workflow_editor__src__App__onDownloadWorkflow --> cqrs_workflow_editor__src__App__exportWorkflow
+    cqrs_workflow_editor__src__App__workflow --> cqrs_workflow_editor__src__App__json
+    cqrs_workflow_editor__src__App__onUploadWorkflow --> cqrs_workflow_editor__src__App__mapToNodes
+    cqrs_workflow_editor__src__App__onUploadWorkflow --> cqrs_workflow_editor__src__App__mapToEdges
+    cqrs_workflow_editor__src__App__file --> cqrs_workflow_editor__src__App__mapToNodes
+    cqrs_workflow_editor__src__App__file --> cqrs_workflow_editor__src__App__mapToEdges
+    cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToNodes
+    cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToEdges
+    api__commands__converttobase64__ConvertToBase64Command__execute --> api__queries__get_registry
+    api__commands__fetch__FetchCommand__execute --> api__queries__get_registry
+    api__main__issue_token --> api__auth__authenticate
+    api__main__issue_token --> api__auth__get_jwt_manager
+    api__main__execute_command --> api__policy__get_engine
+    api__main__execute_query --> api__policy__get_engine
+    api__main__execute_query_get --> api__main__execute_query
+    api__main__run_agent --> api__agent__execute_agent
+    api__main__run_agent --> api__policy__get_engine
+    api__queries__from_url__FromUrlQuery__execute --> api__queries__get_registry
+    api__commands__converttojson__ConvertToJsonCommand__execute --> api__queries__get_registry
+    api__queries__register_default_queries --> api__queries__get_registry
+    api__commands__converttocsv__ConvertToCsvCommand__execute --> api__queries__QueryRegistry__list
+    api__commands__register_default_commands --> api__commands__get_registry
+    api__commands__pipeline___substitute --> api__commands__pipeline___to_data_uri
+    api__commands__pipeline__PipelineCommand__execute --> api__commands__pipeline___substitute
+    api__validators__validate_against_schema_uri --> api__queries__QueryRegistry__list
+    api__validators__validate_against_schema_uri --> api__queries__get_registry
+    api__protocols__register_default_protocols --> api__protocols__get_registry
+    cqrs_backend_workflows__server__list_workflows --> api__queries__QueryRegistry__list
+    cqrs_backend_workflows__server__create_workflow --> cqrs_backend_workflows__server__validate_workflow
+    cqrs_backend_workflows__server__update_workflow --> cqrs_backend_workflows__server__validate_workflow
+    cqrs_backend_workflows__server__run_workflow --> cqrs_backend_workflows__server__execute_node
+
+    classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
+    class api__commands__converttojson__ConvertToJsonCommand__execute,cqrs_backend_workflows__server__execute_node highCC
+    class frontend__html__js__api__API,frontend__html__js__api__request,frontend__html__js__app__renderDecoded,cqrs_workflow_editor__src__App__fetchPreview,api__protocols__data_protocol__DataProtocol__fetch,api__protocols__file_protocol__FileProtocol___resolve,api__queries__from_url__FromUrlQuery__execute,api__commands__converttocsv__ConvertToCsvCommand__execute,api__policy__PolicyEngine__can_execute_command,api__policy__PolicyEngine__can_execute_query,api__commands__pipeline___substitute,api__commands__pipeline__PipelineCommand__execute,api__commands__converttoxml__ConvertToXmlCommand__execute,cqrs_backend_workflows__server__run_workflow medCC

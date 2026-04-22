@@ -1,0 +1,32 @@
+# cqrs-backend-workflows | 3f 430L | python:2,less:1 | 2026-04-22
+# stats: 12 func | 5 cls | 3 mod | CC̄=3.5 | critical:1 | cycles:0
+# alerts[5]: CC execute_node=18; CC run_workflow=8; CC validate_workflow=2; CC get_workflow=2; CC create_workflow=2
+# hotspots[5]: run_workflow fan=9; create_workflow fan=5; execute_node fan=4; update_workflow fan=4; list_workflows fan=3
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[3]:
+  app.doql.less,60
+  server.py,354
+  tests/test_cqrs_backend_workflows.py,16
+D:
+  server.py:
+    e: validate_workflow,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    WorkflowNode:
+    WorkflowOutput:
+    Workflow:
+    WorkflowExecutionRequest:
+    WorkflowExecutionResponse:
+    validate_workflow(workflow)
+    execute_node(node;node_results;client;token)
+    root()
+    health()
+    list_workflows()
+    get_workflow(workflow_id)
+    create_workflow(workflow)
+    update_workflow(workflow_id;workflow)
+    delete_workflow(workflow_id)
+    run_workflow(workflow_id;request)
+  tests/test_cqrs_backend_workflows.py:
+    e: test_placeholder,test_import
+    test_placeholder()
+    test_import()

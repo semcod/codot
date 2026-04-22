@@ -1,0 +1,9 @@
+# redup/duplication | 0 groups | 23f 2236L | 2026-04-22
+
+SUMMARY:
+  files_scanned: 23
+  total_lines:   2236
+  dup_groups:    0
+  dup_fragments: 0
+  saved_lines:   0
+  scan_ms:       15146

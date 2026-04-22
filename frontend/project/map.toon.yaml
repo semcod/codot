@@ -1,0 +1,13 @@
+# frontend | 5f 353L | javascript:3,less:1,css:1 | 2026-04-22
+# stats: 0 func | 0 cls | 5 mod | CC̄=1.0 | critical:0 | cycles:0
+# alerts[5]: none
+# hotspots[5]: none
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[5]:
+  app.doql.less,60
+  html/css/style.css,35
+  html/js/api.js,62
+  html/js/app.js,188
+  test/codot.test.js,8
+D:

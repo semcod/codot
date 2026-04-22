@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>code2llm Analysis Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --border: #475569;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #eab308;
+            --error: #ef4444;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f8fafc;
+                --surface: #ffffff;
+                --surface-hover: #f1f5f9;
+                --border: #e2e8f0;
+                --text: #1e293b;
+                --text-muted: #64748b;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .search {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        .search input:focus {
+            border-color: var(--accent);
+        }
+
+        .search input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .file-group {
+            margin-bottom: 1rem;
+        }
+
+        .file-group-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            margin-bottom: 0.125rem;
+        }
+
+        .file-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .file-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .file-item.active .file-meta {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .file-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* Content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .content-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .content-title h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface-hover);
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .content-body {
+            flex: 1;
+            overflow: auto;
+            padding: 1.5rem;
+        }
+
+        /* Welcome */
+        .welcome {
+            max-width: 800px;
+        }
+
+        .welcome h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .welcome p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Content Display */
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+        }
+
+        .markdown-content {
+            line-height: 1.7;
+        }
+
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .markdown-content h1 {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content code {
+            background: var(--surface);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+
+        .markdown-content pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        .markdown-content ul,
+        .markdown-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content li {
+            margin-bottom: 0.25rem;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+            margin-left: 0;
+            color: var(--text-muted);
+        }
+
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content th,
+        .markdown-content td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        .markdown-content th {
+            background: var(--surface);
+        }
+
+        .markdown-content img {
+            max-width: 100%;
+            border-radius: 0.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        /* Mermaid */
+        .mermaid-content {
+            background: var(--surface);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .mermaid-content pre {
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background: var(--surface);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .sidebar.open {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .file-size {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="header">
+                <h1>🔍 code2llm</h1>
+                <p>Analysis Results Browser</p>
+            </div>
+            <div class="search">
+                <input type="text" id="search" placeholder="Search files..." oninput="filterFiles(this.value)">
+            </div>
+            <div class="file-list" id="fileList">
+                <!-- Files will be rendered here -->
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="content-header">
+                <div class="content-title">
+                    <span id="contentIcon">📁</span>
+                    <h2 id="contentTitle">Welcome</h2>
+                </div>
+                <div class="content-actions" id="contentActions">
+                    <!-- Actions will be rendered here -->
+                </div>
+            </div>
+            <div class="content-body" id="contentBody">
+                <div class="welcome">
+                    <h2>Analysis Results</h2>
+                    <p>Select a file from the sidebar to view its contents. This interface works on GitHub Pages without any server required.</p>
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Stats will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize mermaid
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+
+        const files = [{"name": "calls.png", "rel_path": "calls.png", "path": "calls.png", "size": "226.3KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "compact_flow.png", "rel_path": "compact_flow.png", "path": "compact_flow.png", "size": "32.3KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "flow.png", "rel_path": "flow.png", "path": "flow.png", "size": "19.9KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "README.md", "rel_path": "README.md", "path": "README.md", "size": "9.3KB", "icon": "📝", "type": "markdown", "type_name": "Markdown", "content": "# code2llm - Generated Analysis Files\n\nThis directory contains the complete analysis of your project generated by `code2llm`. Each file serves a specific purpose for understanding, refactoring, and documenting your codebase.\n\n## 📁 Generated Files Overview\n\nWhen you run `code2llm ./ -f all`, the following files are created:\n\n### 🎯 Core Analysis Files\n\n| File | Format | Purpose | Key Insights |\n|------|--------|---------|--------------|\n| `evolution.toon.yaml` | **YAML** | **📋 Refactoring queue** - Prioritized improvements | 0 refactoring actions needed |\n| `map.toon.yaml` | **YAML** | **🗺️ Structural map + project header** - Modules, imports, exports, signatures, stats, alerts, hotspots, trend | Project architecture overview |\n\n### 🤖 LLM-Ready Documentation\n\n| File | Format | Purpose | Use Case |\n|------|--------|---------|----------|\n| `prompt.txt` | **Text** | **📝 Ready-to-send prompt** - Lists all files with instructions | Attach to LLM conversation as context guide |\n| `context.md` | **Markdown** | **📖 LLM narrative** - Architecture summary | Paste into ChatGPT/Claude for code analysis |\n\n### 📊 Visualizations\n\n| File | Format | Purpose | Description |\n|------|--------|---------|-------------|\n| `flow.mmd` | **Mermaid** | **🔄 Control flow diagram** | Function call paths with complexity styling |\n| `calls.mmd` | **Mermaid** | **📞 Call graph** | Function dependencies (edges only) |\n| `compact_flow.mmd` | **Mermaid** | **📦 Module overview** | Aggregated module-level view |\n\n## 🚀 Quick Start Commands\n\n### Basic Analysis\n```bash\n# Quick health check (TOON format only)\ncode2llm ./ -f toon\n\n# Generate all formats (what created these files)\ncode2llm ./ -f all\n\n# LLM-ready context only\ncode2llm ./ -f context\n```\n\n### Performance Options\n```bash\n# Fast analysis for large projects\ncode2llm ./ -f toon --strategy quick\n\n# Memory-limited analysis\ncode2llm ./ -f all --max-memory 500\n\n# Skip PNG generation (faster)\ncode2llm ./ -f all --no-png\n```\n\n### Refactoring Focus\n```bash\n# Get refactoring recommendations\ncode2llm ./ -f evolution\n\n# Focus on specific code smells\ncode2llm ./ -f toon --refactor --smell god_function\n\n# Data flow analysis\ncode2llm ./ -f flow --data-flow\n```\n\n## 📖 Understanding Each File\n\n### `analysis.toon` - Health Diagnostics\n**Purpose**: Quick overview of code health issues\n**Key sections**:\n- **HEALTH**: Critical issues (🔴) and warnings (🟡)\n- **REFACTOR**: Prioritized refactoring actions\n- **COUPLING**: Module dependencies and potential cycles\n- **LAYERS**: Package complexity metrics\n- **FUNCTIONS**: High-complexity functions (CC ≥ 10)\n- **CLASSES**: Complex classes needing attention\n\n**Example usage**:\n```bash\n# View health issues\ncat analysis.toon | head -30\n\n# Check refactoring priorities\ngrep \"REFACTOR\" analysis.toon\n```\n\n### `evolution.toon.yaml` - Refactoring Queue\n**Purpose**: Step-by-step refactoring plan\n**Key sections**:\n- **NEXT**: Immediate actions to take\n- **RISKS**: Potential breaking changes\n- **METRICS-TARGET**: Success criteria\n\n**Example usage**:\n```bash\n# Get refactoring plan\ncat evolution.toon.yaml\n\n# Track progress\ngrep \"NEXT\" evolution.toon.yaml\n```\n\n### `flow.toon` - Legacy Data Flow Analysis\n**Purpose**: Understand data movement through the system (legacy / explicit opt-in)\n**Key sections**:\n- **PIPELINES**: Data processing chains\n- **CONTRACTS**: Function input/output contracts\n- **SIDE_EFFECTS**: Functions with external impacts\n\n**Example usage**:\n```bash\n# Find data pipelines\ngrep \"PIPELINES\" flow.toon\n\n# Identify side effects\ngrep \"SIDE_EFFECTS\" flow.toon\n```\n\n### `map.toon.yaml` - Structural Map + Project Header\n**Purpose**: High-level architecture overview plus compact project header\n**Key sections**:\n- **MODULES**: All modules with basic stats\n- **IMPORTS**: Dependency relationships\n- **EXPORTS**: Public API surface and signatures\n- **HEADER**: Stats, alerts, hotspots, evolution trend\n\n**Example usage**:\n```bash\n# See project structure\ncat map.toon.yaml | head -50\n\n# Find public APIs\ngrep \"SIGNATURES\" map.toon.yaml\n```\n\n### `project.toon.yaml` - Compact Analysis View\n**Purpose**: Compact module view generated from project.yaml data\n**Status**: Legacy view generated on demand from unified project.yaml\n\n**Example usage**:\n```bash\n# View compact project structure\ncat project.toon.yaml | head -30\n\n# Find largest files\ngrep -E \"^  .*[0-9]{3,}$\" project.toon.yaml | sort -t',' -k2 -n -r | head -10\n```\n\n### `prompt.txt` - Ready-to-Send LLM Prompt\n**Purpose**: Pre-formatted prompt listing all generated files for LLM conversation\n**Generation**: Written when `code2llm` runs with a source path and requests `-f all` (including `--no-chunk`) or `code2logic`\n**Contents**:\n- **Files section**: Lists all existing generated files with descriptions, including `project.toon.yaml` when generated by `-f all`\n- **Source files section**: Highlights important source files such as `cli_exports/orchestrator.py`\n- **Missing section**: Shows which files weren't generated (if any)\n- **Task section**: Refactoring brief with concrete execution instructions, not just analysis\n- **Priority Order section**: State-dependent refactoring priorities, starting with blockers and then architecture cleanup\n- **Requirements section**: Guidelines for suggested changes\n\n**Example usage**:\n```bash\n# View the prompt\ncat prompt.txt\n\n# Copy to clipboard and paste into ChatGPT/Claude\ncat prompt.txt | pbcopy  # macOS\ncat prompt.txt | xclip -sel clip  # Linux\n```\n\n### `context.md` - LLM Narrative\n**Purpose**: Ready-to-paste context for AI assistants\n**Key sections**:\n- **Overview**: Project statistics\n- **Architecture**: Module breakdown\n- **Entry Points**: Public interfaces\n- **Patterns**: Design patterns detected\n\n**Example usage**:\n```bash\n# Copy to clipboard for LLM\ncat context.md | pbcopy  # macOS\ncat context.md | xclip -sel clip  # Linux\n\n# Use with Claude/ChatGPT for code analysis\n```\n\n### Visualization Files (`*.mmd`, `*.png`)\n**Purpose**: Visual understanding of code structure\n**Files**:\n- `flow.mmd` - Detailed control flow with complexity colors\n- `calls.mmd` - Simple call graph\n- `compact_flow.mmd` - High-level module view\n- `*.png` - Pre-rendered images\n\n**Example usage**:\n```bash\n# View diagrams\nopen flow.png  # macOS\nxdg-open flow.png  # Linux\n\n# Edit in Mermaid Live Editor\n# Copy content of .mmd files to https://mermaid.live\n```\n\n## 🔍 Common Analysis Patterns\n\n### 1. Code Health Assessment\n```bash\n# Quick health check\ncode2llm ./ -f toon\ncat analysis.toon | grep -E \"(HEALTH|REFACTOR)\"\n```\n\n### 2. Refactoring Planning\n```bash\n# Get refactoring queue\ncode2llm ./ -f evolution\ncat evolution.toon.yaml\n\n# Focus on specific issues\ncode2llm ./ -f toon --refactor --smell god_function\n```\n\n### 3. LLM Assistance\n```bash\n# Generate context for AI\ncode2llm ./ -f context\ncat context.md\n\n# Use with Claude: \"Based on this context, help me refactor the god modules\"\n```\n\n### 4. Team Documentation\n```bash\n# Generate all docs for team\ncode2llm ./ -f all -o ./docs/\n\n# Create visual diagrams\nopen docs/flow.png\n```\n\n## 📊 Interpreting Metrics\n\n### Complexity Metrics (CC)\n- **🔴 Critical (≥5.0)**: Immediate refactoring needed\n- **🟠 High (3.0-4.9)**: Consider refactoring\n- **🟡 Medium (1.5-2.9)**: Monitor complexity\n- **🟢 Low (0.1-1.4)**: Acceptable\n- **⚪ Basic (0.0)**: Simple functions\n\n### Module Health\n- **GOD Module**: Too large (>500 lines, >20 methods)\n- **HUB**: High fan-out (calls many modules)\n- **FAN-IN**: High incoming dependencies\n- **CYCLES**: Circular dependencies\n\n### Data Flow Indicators\n- **PIPELINE**: Sequential data processing\n- **CONTRACT**: Clear input/output specification\n- **SIDE_EFFECT**: External state modification\n\n## 🛠️ Integration Examples\n\n### CI/CD Pipeline\n```bash\n#!/bin/bash\n# Analyze code quality in CI\ncode2llm ./ -f toon -o ./analysis\nif grep -q \"🔴 GOD\" ./analysis/analysis.toon; then\n    echo \"❌ God modules detected\"\n    exit 1\nfi\n```\n\n### Pre-commit Hook\n```bash\n#!/bin/sh\n# .git/hooks/pre-commit\ncode2llm ./ -f toon -o ./temp_analysis\nif grep -q \"🔴\" ./temp_analysis/analysis.toon; then\n    echo \"⚠️  Critical issues found. Review before committing.\"\nfi\nrm -rf ./temp_analysis\n```\n\n### Documentation Generation\n```bash\n# Generate docs for README\ncode2llm ./ -f context -o ./docs/\necho \"## Architecture\" >> README.md\ncat docs/context.md >> README.md\n```\n\n## 📚 Next Steps\n\n1. **Review `analysis.toon`** - Identify critical issues\n2. **Check `evolution.toon.yaml`** - Plan refactoring priorities\n3. **Use `context.md`** - Get LLM assistance for complex changes\n4. **Reference visualizations** - Understand system architecture\n5. **Track progress** - Re-run analysis after changes\n\n## 🔧 Advanced Usage\n\n### Custom Analysis\n```bash\n# Deep analysis with all insights\ncode2llm ./ -m hybrid -f all --max-depth 15 -v\n\n# Performance-optimized\ncode2llm ./ -m static -f toon --strategy quick\n\n# Refactoring-focused\ncode2llm ./ -f toon,evolution --refactor\n```\n\n### Output Customization\n```bash\n# Separate output directories\ncode2llm ./ -f all -o ./analysis-$(date +%Y%m%d)\n\n# Split YAML into multiple files\ncode2llm ./ -f yaml --split-output\n\n# Separate orphaned functions\ncode2llm ./ -f yaml --separate-orphans\n```\n\n---\n\n**Generated by**: `code2llm ./ -f all --readme`  \n**Analysis Date**: 2026-04-22  \n**Total Functions**: 154  \n**Total Classes**: 48  \n**Modules**: 75  \n\nFor more information about code2llm, visit: https://github.com/tom-sapletta/code2llm\n", "is_subdir": false}, {"name": "context.md", "rel_path": "context.md", "path": "context.md", "size": "17.2KB", "icon": "📝", "type": "markdown", "type_name": "Markdown", "content": "# System Architecture Analysis\n\n## Overview\n\n- **Project**: /home/tom/github/semcod/codot\n- **Primary Language**: python\n- **Languages**: python: 23, md: 13, json: 9, shell: 7, txt: 4\n- **Analysis Mode**: static\n- **Total Functions**: 154\n- **Total Classes**: 48\n- **Modules**: 75\n- **Entry Points**: 128\n\n## Architecture by Module\n\n### cqrs-workflow-editor.src.App\n- **Functions**: 36\n- **File**: `App.tsx`\n\n### frontend.html.js.app\n- **Functions**: 19\n- **File**: `app.js`\n\n### frontend.html.js.api\n- **Functions**: 15\n- **File**: `api.js`\n\n### api.main\n- **Functions**: 15\n- **File**: `main.py`\n\n### api.policy\n- **Functions**: 11\n- **Classes**: 3\n- **File**: `__init__.py`\n\n### cqrs-backend-workflows.server\n- **Functions**: 10\n- **Classes**: 5\n- **File**: `server.py`\n\n### api.queries\n- **Functions**: 7\n- **Classes**: 2\n- **File**: `__init__.py`\n\n### api.commands\n- **Functions**: 7\n- **Classes**: 2\n- **File**: `__init__.py`\n\n### api.agent\n- **Functions**: 7\n- **File**: `agent.py`\n\n### api.protocols\n- **Functions**: 7\n- **Classes**: 3\n- **File**: `__init__.py`\n\n### api.auth\n- **Functions**: 6\n- **Classes**: 1\n- **File**: `__init__.py`\n\n### api.commands.pipeline\n- **Functions**: 3\n- **Classes**: 1\n- **File**: `pipeline.py`\n\n### api.protocols.http_protocol\n- **Functions**: 2\n- **Classes**: 1\n- **File**: `http_protocol.py`\n\n### api.protocols.file_protocol\n- **Functions**: 2\n- **Classes**: 1\n- **File**: `file_protocol.py`\n\n### api.validators\n- **Functions**: 2\n- **Classes**: 1\n- **File**: `__init__.py`\n\n### docs.04-workflow-editor-spec\n- **Functions**: 1\n- **Classes**: 3\n- **File**: `04-workflow-editor-spec.md`\n\n### cqrs-workflow-editor.src.main\n- **Functions**: 1\n- **File**: `main.tsx`\n\n### api.commands.converttobase64\n- **Functions**: 1\n- **Classes**: 1\n- **File**: `converttobase64.py`\n\n### api.commands.fetch\n- **Functions**: 1\n- **Classes**: 1\n- **File**: `fetch.py`\n\n### api.protocols.data_protocol\n- **Functions**: 1\n- **Classes**: 1\n- **File**: `data_protocol.py`\n\n## Key Entry Points\n\nMain execution flows into the system:\n\n### api.agent._mcp_execute\n> Execute agent via MCP server.\n\nbackend_config keys:\n    - server_url: SSE endpoint URL (or stdio command if absent)\n    - stdio_command: list[str] com\n- **Calls**: cfg.get, cfg.get, AgentResponse, trace.append, trace.append, AgentResponse, httpx.AsyncClient, resp.raise_for_status\n\n### api.commands.converttojson.ConvertToJsonCommand.execute\n- **Calls**: None.get, None.lower, fetched.content.decode, None.encode, CommandResponse, ValueError, None.fetch, None.strip\n\n### api.commands.converttocsv.ConvertToCsvCommand.execute\n- **Calls**: json.loads, io.StringIO, csv.DictWriter, writer.writeheader, None.encode, CommandResponse, ValueError, None.fetch\n\n### api.agent._litellm_execute\n> Execute agent via LiteLLM proxy.\n\nbackend_config keys:\n    - model: LiteLLM model string (e.g. \"gpt-4\", \"openrouter/qwen/...\")\n    - api_base: LiteLLM\n- **Calls**: cfg.get, cfg.get, cfg.get, cfg.get, cfg.get, AgentResponse, os.environ.get, os.environ.get\n\n### api.commands.render.RenderCommand.execute\n- **Calls**: meta.get, Environment, env.from_string, template.render, html.encode, CommandResponse, meta.get, t.content.decode\n\n### api.agent._bash_cli_execute\n> Execute agent via shell / CLI.\n\nbackend_config keys:\n    - shell: shell path (default /bin/bash)\n    - timeout: seconds (default 30)\n    - working_dir\n- **Calls**: cfg.get, cfg.get, cfg.get, cfg.get, AgentResponse, None.replace, request.context.get, stdout.decode\n\n### api.commands.converttoxml.ConvertToXmlCommand.execute\n- **Calls**: None.get, None.lower, fetched.content.decode, isinstance, xmltodict.unparse, xml.encode, CommandResponse, ValueError\n\n### api.agent._websocket_execute\n> Execute agent via WebSocket (sends JSON, waits for first text message).\n\nbackend_config keys:\n    - uri: WebSocket URI (ws://... / wss://...)\n    - su\n- **Calls**: cfg.get, cfg.get, float, json.dumps, AgentResponse, cfg.get, AgentResponse, trace.append\n\n### api.protocols.file_protocol.FileProtocol._resolve\n- **Calls**: urlparse, unquote, None.resolve, ValueError, None.resolve, any, PermissionError, path.exists\n\n### api.config.load_settings\n- **Calls**: os.environ.get, Settings, os.environ.get, os.environ.get, int, os.environ.get, tuple, os.environ.get\n\n### api.agent._http_api_execute\n> Execute agent via generic HTTP REST API.\n\nbackend_config keys:\n    - url: endpoint URL\n    - method: HTTP method (default POST)\n    - headers: dict\n  \n- **Calls**: cfg.get, cfg.get, cfg.get, cfg.get, AgentResponse, AgentResponse, httpx.AsyncClient, resp.raise_for_status\n\n### api.commands.register_default_commands\n- **Calls**: api.commands.get_registry, reg.register, reg.register, reg.register, reg.register, reg.register, reg.register, reg.register\n\n### cqrs-backend-workflows.server.run_workflow\n> Execute a workflow\n- **Calls**: app.post, HTTPException, workflow.get, WorkflowExecutionResponse, httpx.AsyncClient, output_def.get, WorkflowExecutionResponse, WorkflowNode\n\n### frontend.html.js.api.API\n- **Calls**: frontend.html.js.api.getItem, frontend.html.js.api.setItem, frontend.html.js.api.removeItem, frontend.html.js.api.getToken, frontend.html.js.api.fetch, frontend.html.js.api.stringify, frontend.html.js.api.get, frontend.html.js.api.includes\n\n### api.queries.from_url.FromUrlQuery.execute\n- **Calls**: api.queries.get_registry, QueryResponse, ValueError, parts.append, registry.fetch, mime.startswith, None.decode, fetched.content.decode\n\n### api.commands.pipeline.PipelineCommand.execute\n- **Calls**: get_command_registry, enumerate, CommandResponse, None.get, ValueError, step.get, api.commands.pipeline._substitute, CommandRequest\n\n### api.main.execute_command\n- **Calls**: app.put, Depends, None.can_execute_command, log.info, log.info, HTTPException, None.get, command.execute\n\n### api.policy.PolicyEngine.can_execute_query\n- **Calls**: self._rules_for, PolicyDecision.deny, PolicyDecision.deny, rule.get, rule.get, PolicyDecision.allow, self._match_any, all\n\n### frontend.html.js.app.renderDecoded\n- **Calls**: frontend.html.js.app.decodeB64, frontend.html.js.app.startsWith, frontend.html.js.app.createElement, frontend.html.js.app.TextDecoder, frontend.html.js.app.decode, frontend.html.js.app.appendChild, frontend.html.js.app.Blob, frontend.html.js.app.createObjectURL\n\n### api.commands.converttobase64.ConvertToBase64Command.execute\n- **Calls**: None.decode, encoded.encode, CommandResponse, ValueError, None.fetch, base64.b64encode, None.decode, api.queries.get_registry\n\n### api.protocols.file_protocol.FileProtocol.fetch\n- **Calls**: self._resolve, path.read_bytes, mimetypes.guess_type, FetchResult, len, ValueError, str, str\n\n### api.policy.PolicyEngine.can_execute_command\n- **Calls**: self._rules_for, PolicyDecision.deny, PolicyDecision.deny, rule.get, PolicyDecision.allow, self._match_any, rule.get, rule.get\n\n### frontend.html.js.app.bytes\n- **Calls**: frontend.html.js.app.startsWith, frontend.html.js.app.createElement, frontend.html.js.app.TextDecoder, frontend.html.js.app.decode, frontend.html.js.app.appendChild, frontend.html.js.app.Blob, frontend.html.js.app.createObjectURL, frontend.html.js.app.includes\n\n### api.protocols.http_protocol.HttpProtocol.fetch\n- **Calls**: httpx.AsyncClient, resp.raise_for_status, FetchResult, client.get, len, ValueError, resp.headers.get, dict\n\n### api.protocols.data_protocol.DataProtocol.fetch\n- **Calls**: None.partition, FetchResult, uri.startswith, ValueError, ValueError, header.split, base64.b64decode, None.encode\n\n### api.protocols.register_default_protocols\n- **Calls**: api.protocols.get_registry, reg.register, reg.register, reg.register, reg.register, HttpProtocol, HttpProtocol, FileProtocol\n\n### cqrs-workflow-editor.src.App.onUploadWorkflow\n- **Calls**: cqrs-workflow-editor.src.App.FileReader, cqrs-workflow-editor.src.App.parse, cqrs-workflow-editor.src.App.mapToNodes, cqrs-workflow-editor.src.App.mapToEdges, cqrs-workflow-editor.src.App.setNodes, cqrs-workflow-editor.src.App.setEdges, cqrs-workflow-editor.src.App.alert, cqrs-workflow-editor.src.App.readAsText\n\n### api.auth.JWTManager.issue\n- **Calls**: datetime.now, jwt.encode, int, int, int, now.timestamp, exp.timestamp, self.expires.total_seconds\n\n### api.policy.PolicyEngine.from_file\n- **Calls**: Path, cls, p.exists, logger.warning, cls, yaml.safe_load, data.get, p.read_text\n\n### cqrs-workflow-editor.src.App.workflow\n- **Calls**: cqrs-workflow-editor.src.App.fetch, cqrs-workflow-editor.src.App.stringify, cqrs-workflow-editor.src.App.Error, cqrs-workflow-editor.src.App.json, cqrs-workflow-editor.src.App.setRunResult, cqrs-workflow-editor.src.App.String, cqrs-workflow-editor.src.App.setRunLoading\n\n## Process Flows\n\nKey execution flows identified:\n\n### Flow 1: _mcp_execute\n```\n_mcp_execute [api.agent]\n```\n\n### Flow 2: execute\n```\nexecute [api.commands.converttojson.ConvertToJsonCommand]\n```\n\n### Flow 3: _litellm_execute\n```\n_litellm_execute [api.agent]\n```\n\n### Flow 4: _bash_cli_execute\n```\n_bash_cli_execute [api.agent]\n```\n\n### Flow 5: _websocket_execute\n```\n_websocket_execute [api.agent]\n```\n\n### Flow 6: _resolve\n```\n_resolve [api.protocols.file_protocol.FileProtocol]\n```\n\n### Flow 7: load_settings\n```\nload_settings [api.config]\n```\n\n### Flow 8: _http_api_execute\n```\n_http_api_execute [api.agent]\n```\n\n### Flow 9: register_default_commands\n```\nregister_default_commands [api.commands]\n  └─> get_registry\n```\n\n### Flow 10: run_workflow\n```\nrun_workflow [cqrs-backend-workflows.server]\n```\n\n## Key Classes\n\n### api.policy.PolicyEngine\n- **Methods**: 6\n- **Key Methods**: api.policy.PolicyEngine.__init__, api.policy.PolicyEngine.from_file, api.policy.PolicyEngine._rules_for, api.policy.PolicyEngine._match_any, api.policy.PolicyEngine.can_execute_command, api.policy.PolicyEngine.can_execute_query\n\n### api.queries.QueryRegistry\n- **Methods**: 4\n- **Key Methods**: api.queries.QueryRegistry.__init__, api.queries.QueryRegistry.register, api.queries.QueryRegistry.get, api.queries.QueryRegistry.list\n\n### api.commands.CommandRegistry\n- **Methods**: 4\n- **Key Methods**: api.commands.CommandRegistry.__init__, api.commands.CommandRegistry.register, api.commands.CommandRegistry.get, api.commands.CommandRegistry.list\n\n### api.protocols.ProtocolRegistry\n- **Methods**: 4\n- **Key Methods**: api.protocols.ProtocolRegistry.__init__, api.protocols.ProtocolRegistry.register, api.protocols.ProtocolRegistry.supported, api.protocols.ProtocolRegistry.fetch\n\n### api.auth.JWTManager\n- **Methods**: 3\n- **Key Methods**: api.auth.JWTManager.__init__, api.auth.JWTManager.issue, api.auth.JWTManager.verify\n\n### api.protocols.http_protocol.HttpProtocol\n- **Methods**: 2\n- **Key Methods**: api.protocols.http_protocol.HttpProtocol.__init__, api.protocols.http_protocol.HttpProtocol.fetch\n\n### api.protocols.file_protocol.FileProtocol\n> Access local files. Only paths under ALLOWED_LOCAL_ROOTS are permitted\n(by default /data and /schema\n- **Methods**: 2\n- **Key Methods**: api.protocols.file_protocol.FileProtocol._resolve, api.protocols.file_protocol.FileProtocol.fetch\n\n### api.policy.PolicyDecision\n- **Methods**: 2\n- **Key Methods**: api.policy.PolicyDecision.allow, api.policy.PolicyDecision.deny\n\n### api.commands.converttobase64.ConvertToBase64Command\n- **Methods**: 1\n- **Key Methods**: api.commands.converttobase64.ConvertToBase64Command.execute\n- **Inherits**: Command\n\n### api.commands.fetch.FetchCommand\n- **Methods**: 1\n- **Key Methods**: api.commands.fetch.FetchCommand.execute\n- **Inherits**: Command\n\n### api.protocols.data_protocol.DataProtocol\n> Implements RFC 2397 data URIs: data:[<mime>][;base64],<data>.\n\nUseful when callers want to pass inli\n- **Methods**: 1\n- **Key Methods**: api.protocols.data_protocol.DataProtocol.fetch\n\n### api.queries.introspect.IntrospectQuery\n- **Methods**: 1\n- **Key Methods**: api.queries.introspect.IntrospectQuery.execute\n- **Inherits**: Query\n\n### api.queries.from_url.FromUrlQuery\n- **Methods**: 1\n- **Key Methods**: api.queries.from_url.FromUrlQuery.execute\n- **Inherits**: Query\n\n### api.commands.converttojson.ConvertToJsonCommand\n- **Methods**: 1\n- **Key Methods**: api.commands.converttojson.ConvertToJsonCommand.execute\n- **Inherits**: Command\n\n### api.queries.Query\n- **Methods**: 1\n- **Key Methods**: api.queries.Query.execute\n- **Inherits**: abc.ABC\n\n### api.commands.converttocsv.ConvertToCsvCommand\n- **Methods**: 1\n- **Key Methods**: api.commands.converttocsv.ConvertToCsvCommand.execute\n- **Inherits**: Command\n\n### api.commands.Command\n- **Methods**: 1\n- **Key Methods**: api.commands.Command.execute\n- **Inherits**: abc.ABC\n\n### api.policy.User\n- **Methods**: 1\n- **Key Methods**: api.policy.User.has_role\n\n### api.commands.pipeline.PipelineCommand\n- **Methods**: 1\n- **Key Methods**: api.commands.pipeline.PipelineCommand.execute\n- **Inherits**: Command\n\n### api.commands.render.RenderCommand\n- **Methods**: 1\n- **Key Methods**: api.commands.render.RenderCommand.execute\n- **Inherits**: Command\n\n## Data Transformation Functions\n\nKey functions that process and transform data:\n\n### frontend.html.js.app.parseMeta\n- **Output to**: frontend.html.js.app.trim, frontend.html.js.app.parse, frontend.html.js.app.Error\n\n### frontend.html.js.app.decodeB64\n- **Output to**: frontend.html.js.app.atob, frontend.html.js.app.Uint8Array, frontend.html.js.app.charCodeAt\n\n### frontend.html.js.app.renderDecoded\n- **Output to**: frontend.html.js.app.decodeB64, frontend.html.js.app.startsWith, frontend.html.js.app.createElement, frontend.html.js.app.TextDecoder, frontend.html.js.app.decode\n\n### api.validators.validate_against_schema_uri\n> Fetch a JSON Schema from the given URI and validate the instance.\n\nThe URI is resolved via the proto\n- **Output to**: Draft202012Validator, sorted, json.loads, validator.iter_errors, SchemaValidationError\n\n### cqrs-backend-workflows.server.validate_workflow\n> Validate workflow against JSON Schema\n- **Output to**: jsonschema.validate, HTTPException\n\n## Behavioral Patterns\n\n### recursion__substitute\n- **Type**: recursion\n- **Confidence**: 0.90\n- **Functions**: api.commands.pipeline._substitute\n\n## Public API Surface\n\nFunctions exposed as public API (no underscore prefix):\n\n- `api.commands.converttojson.ConvertToJsonCommand.execute` - 27 calls\n- `api.commands.converttocsv.ConvertToCsvCommand.execute` - 23 calls\n- `api.commands.render.RenderCommand.execute` - 22 calls\n- `api.commands.converttoxml.ConvertToXmlCommand.execute` - 21 calls\n- `api.config.load_settings` - 17 calls\n- `api.commands.register_default_commands` - 15 calls\n- `cqrs-backend-workflows.server.run_workflow` - 15 calls\n- `frontend.html.js.api.API` - 14 calls\n- `api.queries.from_url.FromUrlQuery.execute` - 13 calls\n- `api.commands.pipeline.PipelineCommand.execute` - 13 calls\n- `api.validators.validate_against_schema_uri` - 13 calls\n- `cqrs-backend-workflows.server.execute_node` - 13 calls\n- `cqrs-workflow-editor.src.App.fetchPreview` - 11 calls\n- `api.main.execute_command` - 11 calls\n- `api.policy.PolicyEngine.can_execute_query` - 11 calls\n- `frontend.html.js.app.renderDecoded` - 10 calls\n- `api.commands.converttobase64.ConvertToBase64Command.execute` - 10 calls\n- `api.protocols.file_protocol.FileProtocol.fetch` - 10 calls\n- `api.policy.PolicyEngine.can_execute_command` - 10 calls\n- `frontend.html.js.app.bytes` - 9 calls\n- `api.protocols.http_protocol.HttpProtocol.fetch` - 9 calls\n- `api.main.execute_query` - 9 calls\n- `api.protocols.data_protocol.DataProtocol.fetch` - 9 calls\n- `api.protocols.register_default_protocols` - 9 calls\n- `frontend.html.js.api.request` - 8 calls\n- `cqrs-workflow-editor.src.App.onUploadWorkflow` - 8 calls\n- `api.auth.JWTManager.issue` - 8 calls\n- `api.policy.PolicyEngine.from_file` - 8 calls\n- `cqrs-workflow-editor.src.App.workflow` - 7 calls\n- `api.commands.fetch.FetchCommand.execute` - 7 calls\n- `api.main.catalog` - 7 calls\n- `api.main.run_agent` - 7 calls\n- `api.queries.introspect.IntrospectQuery.execute` - 7 calls\n- `api.auth.current_user` - 7 calls\n- `api.protocols.ProtocolRegistry.fetch` - 7 calls\n- `cqrs-workflow-editor.src.App.onDownloadWorkflow` - 6 calls\n- `cqrs-workflow-editor.src.App.file` - 6 calls\n- `cqrs-workflow-editor.src.App.reader` - 6 calls\n- `api.main.issue_token` - 6 calls\n- `frontend.html.js.app.loadCatalog` - 5 calls\n\n## System Interactions\n\nHow components interact:\n\n```mermaid\ngraph TD\n    _mcp_execute --> get\n    _mcp_execute --> AgentResponse\n    _mcp_execute --> append\n    execute --> get\n    execute --> lower\n    execute --> decode\n    execute --> encode\n    execute --> CommandResponse\n    execute --> loads\n    execute --> StringIO\n    execute --> DictWriter\n    execute --> writeheader\n    _litellm_execute --> get\n    execute --> Environment\n    execute --> from_string\n    execute --> render\n    _bash_cli_execute --> get\n    _bash_cli_execute --> AgentResponse\n    execute --> isinstance\n    execute --> unparse\n    _websocket_execute --> get\n    _websocket_execute --> float\n    _websocket_execute --> dumps\n    _websocket_execute --> AgentResponse\n    _resolve --> urlparse\n    _resolve --> unquote\n    _resolve --> resolve\n    _resolve --> ValueError\n    load_settings --> get\n    load_settings --> Settings\n```\n\n## Reverse Engineering Guidelines\n\n1. **Entry Points**: Start analysis from the entry points listed above\n2. **Core Logic**: Focus on classes with many methods\n3. **Data Flow**: Follow data transformation functions\n4. **Process Flows**: Use the flow diagrams for execution paths\n5. **API Surface**: Public API functions reveal the interface\n\n## Context for LLM\n\nMaintain the identified architectural patterns and public API surface when suggesting changes.", "is_subdir": false}, {"name": "calls.mmd", "rel_path": "calls.mmd", "path": "calls.mmd", "size": "7.2KB", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart LR\n    subgraph api__agent\n        api__agent__execute_agent[&quot;execute_agent&quot;]\n    end\n    subgraph api__auth\n        api__auth__get_jwt_manager[&quot;get_jwt_manager&quot;]\n        api__auth__authenticate[&quot;authenticate&quot;]\n    end\n    subgraph api__commands\n        api__commands__pipeline__PipelineCommand__execute[&quot;execute&quot;]\n        api__commands__converttobase64__ConvertToBase64Command__execute[&quot;execute&quot;]\n        api__commands__get_registry[&quot;get_registry&quot;]\n        api__commands__pipeline___substitute[&quot;_substitute&quot;]\n        api__commands__fetch__FetchCommand__execute[&quot;execute&quot;]\n        api__commands__register_default_commands[&quot;register_default_commands&quot;]\n        api__commands__pipeline___to_data_uri[&quot;_to_data_uri&quot;]\n    end\n    subgraph api__main\n        api__main__issue_token[&quot;issue_token&quot;]\n        api__main__execute_query_get[&quot;execute_query_get&quot;]\n        api__main__run_agent[&quot;run_agent&quot;]\n        api__main__execute_query[&quot;execute_query&quot;]\n        api__main__execute_command[&quot;execute_command&quot;]\n    end\n    subgraph api__policy\n        api__policy__get_engine[&quot;get_engine&quot;]\n    end\n    subgraph api__protocols\n        api__protocols__get_registry[&quot;get_registry&quot;]\n        api__protocols__register_default_protocols[&quot;register_default_protocols&quot;]\n    end\n    subgraph api__queries\n        api__queries__QueryRegistry__list[&quot;list&quot;]\n        api__queries__from_url__FromUrlQuery__execute[&quot;execute&quot;]\n        api__queries__get_registry[&quot;get_registry&quot;]\n        api__queries__register_default_queries[&quot;register_default_queries&quot;]\n    end\n    subgraph api__validators\n        api__validators__validate_against_schema_uri[&quot;validate_against_schema_uri&quot;]\n    end\n    subgraph cqrs_backend_workflows__server\n        cqrs_backend_workflows__server__create_workflow[&quot;create_workflow&quot;]\n        cqrs_backend_workflows__server__validate_workflow[&quot;validate_workflow&quot;]\n        cqrs_backend_workflows__server__list_workflows[&quot;list_workflows&quot;]\n        cqrs_backend_workflows__server__update_workflow[&quot;update_workflow&quot;]\n    end\n    subgraph cqrs_workflow_editor__src\n        cqrs_workflow_editor__src__App__blob[&quot;blob&quot;]\n        cqrs_workflow_editor__src__App__onUploadWorkflow[&quot;onUploadWorkflow&quot;]\n        cqrs_workflow_editor__src__App__file[&quot;file&quot;]\n        cqrs_workflow_editor__src__App__workflow[&quot;workflow&quot;]\n        cqrs_workflow_editor__src__App__sizeKB[&quot;sizeKB&quot;]\n        cqrs_workflow_editor__src__App__reader[&quot;reader&quot;]\n        cqrs_workflow_editor__src__App__json[&quot;json&quot;]\n        cqrs_workflow_editor__src__App__mime[&quot;mime&quot;]\n        cqrs_workflow_editor__src__App__timer[&quot;timer&quot;]\n        cqrs_workflow_editor__src__App__mapToEdges[&quot;mapToEdges&quot;]\n        cqrs_workflow_editor__src__App__exportWorkflow[&quot;exportWorkflow&quot;]\n        cqrs_workflow_editor__src__App__onDownloadWorkflow[&quot;onDownloadWorkflow&quot;]\n        cqrs_workflow_editor__src__App__loadPredefinedWorkflow[&quot;loadPredefinedWorkflow&quot;]\n        cqrs_workflow_editor__src__App__fetchPreview[&quot;fetchPreview&quot;]\n        cqrs_workflow_editor__src__App__text[&quot;text&quot;]\n        cqrs_workflow_editor__src__App__mapToNodes[&quot;mapToNodes&quot;]\n    end\n    subgraph frontend__html\n        frontend__html__js__app__decodeB64[&quot;decodeB64&quot;]\n        frontend__html__js__app__renderDecoded[&quot;renderDecoded&quot;]\n        frontend__html__js__api__setToken[&quot;setToken&quot;]\n        frontend__html__js__api__request[&quot;request&quot;]\n        frontend__html__js__api__catalog[&quot;catalog&quot;]\n        frontend__html__js__api__runQuery[&quot;runQuery&quot;]\n        frontend__html__js__api__API[&quot;API&quot;]\n        frontend__html__js__api__setRole[&quot;setRole&quot;]\n        frontend__html__js__api__runCommand[&quot;runCommand&quot;]\n        frontend__html__js__api__login[&quot;login&quot;]\n        frontend__html__js__api__data[&quot;data&quot;]\n        frontend__html__js__api__getToken[&quot;getToken&quot;]\n    end\n    frontend__html__js__api__API --&gt; frontend__html__js__api__getToken\n    frontend__html__js__api__request --&gt; frontend__html__js__api__getToken\n    frontend__html__js__api__login --&gt; frontend__html__js__api__request\n    frontend__html__js__api__login --&gt; frontend__html__js__api__setToken\n    frontend__html__js__api__login --&gt; frontend__html__js__api__setRole\n    frontend__html__js__api__data --&gt; frontend__html__js__api__request\n    frontend__html__js__api__catalog --&gt; frontend__html__js__api__request\n    frontend__html__js__api__runCommand --&gt; frontend__html__js__api__request\n    frontend__html__js__api__runQuery --&gt; frontend__html__js__api__request\n    frontend__html__js__app__renderDecoded --&gt; frontend__html__js__app__decodeB64\n    cqrs_workflow_editor__src__App__loadPredefinedWorkflow --&gt; cqrs_workflow_editor__src__App__mapToNodes\n    cqrs_workflow_editor__src__App__loadPredefinedWorkflow --&gt; cqrs_workflow_editor__src__App__mapToEdges\n    cqrs_workflow_editor__src__App__fetchPreview --&gt; cqrs_workflow_editor__src__App__blob\n    cqrs_workflow_editor__src__App__fetchPreview --&gt; cqrs_workflow_editor__src__App__text\n    cqrs_workflow_editor__src__App__sizeKB --&gt; cqrs_workflow_editor__src__App__text\n    cqrs_workflow_editor__src__App__mime --&gt; cqrs_workflow_editor__src__App__text\n    cqrs_workflow_editor__src__App__timer --&gt; cqrs_workflow_editor__src__App__fetchPreview\n    cqrs_workflow_editor__src__App__onDownloadWorkflow --&gt; cqrs_workflow_editor__src__App__exportWorkflow\n    cqrs_workflow_editor__src__App__workflow --&gt; cqrs_workflow_editor__src__App__json\n    cqrs_workflow_editor__src__App__onUploadWorkflow --&gt; cqrs_workflow_editor__src__App__mapToNodes\n    cqrs_workflow_editor__src__App__onUploadWorkflow --&gt; cqrs_workflow_editor__src__App__mapToEdges\n    cqrs_workflow_editor__src__App__file --&gt; cqrs_workflow_editor__src__App__mapToNodes\n    cqrs_workflow_editor__src__App__file --&gt; cqrs_workflow_editor__src__App__mapToEdges\n    cqrs_workflow_editor__src__App__reader --&gt; cqrs_workflow_editor__src__App__mapToNodes\n    cqrs_workflow_editor__src__App__reader --&gt; cqrs_workflow_editor__src__App__mapToEdges\n    api__commands__converttobase64__ConvertToBase64Command__execute --&gt; api__queries__get_registry\n    api__commands__fetch__FetchCommand__execute --&gt; api__queries__get_registry\n    api__main__issue_token --&gt; api__auth__authenticate\n    api__main__issue_token --&gt; api__auth__get_jwt_manager\n    api__main__execute_command --&gt; api__policy__get_engine\n    api__main__execute_query --&gt; api__policy__get_engine\n    api__main__execute_query_get --&gt; api__main__execute_query\n    api__main__run_agent --&gt; api__agent__execute_agent\n    api__main__run_agent --&gt; api__policy__get_engine\n    api__queries__from_url__FromUrlQuery__execute --&gt; api__queries__get_registry\n    api__queries__register_default_queries --&gt; api__queries__get_registry\n    api__commands__register_default_commands --&gt; api__commands__get_registry\n    api__commands__pipeline___substitute --&gt; api__commands__pipeline___to_data_uri\n    api__commands__pipeline__PipelineCommand__execute --&gt; api__commands__pipeline___substitute\n    api__validators__validate_against_schema_uri --&gt; api__queries__QueryRegistry__list\n    api__protocols__register_default_protocols --&gt; api__protocols__get_registry\n    cqrs_backend_workflows__server__list_workflows --&gt; api__queries__QueryRegistry__list\n    cqrs_backend_workflows__server__create_workflow --&gt; cqrs_backend_workflows__server__validate_workflow\n    cqrs_backend_workflows__server__update_workflow --&gt; cqrs_backend_workflows__server__validate_workflow\n", "is_subdir": false}, {"name": "compact_flow.mmd", "rel_path": "compact_flow.mmd", "path": "compact_flow.mmd", "size": "666B", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart TD\n    api__agent[&quot;api.agent&lt;br/&gt;7 funcs&quot;]\n    api__auth[&quot;api.auth&lt;br/&gt;6 funcs&quot;]\n    api__commands[&quot;api.commands&lt;br/&gt;16 funcs&quot;]\n    api__main[&quot;api.main&lt;br/&gt;15 funcs&quot;]\n    api__policy[&quot;api.policy&lt;br/&gt;11 funcs&quot;]\n    api__queries[&quot;api.queries&lt;br/&gt;9 funcs&quot;]\n    api__validators[&quot;api.validators&lt;br/&gt;2 funcs&quot;]\n    cqrs_backend_workflows__server[&quot;cqrs-backend-workflows.server&lt;br/&gt;10 funcs&quot;]\n    api__commands ==&gt;|10| api__queries\n    api__main --&gt;|3| api__policy\n    api__main --&gt;|2| api__auth\n    api__validators --&gt;|2| api__queries\n    api__main --&gt;|1| api__agent\n    api__commands --&gt;|1| api__validators\n    cqrs_backend_workflows__server --&gt;|1| api__queries\n", "is_subdir": false}, {"name": "flow.mmd", "rel_path": "flow.mmd", "path": "flow.mmd", "size": "1.3KB", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart TD\n\n    %% Entry points (blue)\n    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff\n\n    subgraph Core\n        frontend__html__js__api__API[&quot;API&quot;]\n        frontend__html__js__api__getToken[&quot;getToken&quot;]\n        frontend__html__js__api__clearToken[&quot;clearToken&quot;]\n        frontend__html__js__api__getRole[&quot;getRole&quot;]\n        frontend__html__js__api__request(&quot;request CC=9&quot;)\n        frontend__html__js__api__resp[&quot;resp&quot;]\n        frontend__html__js__api__ct[&quot;ct&quot;]\n        frontend__html__js__api__err[&quot;err&quot;]\n        frontend__html__js__api__login[&quot;login&quot;]\n        frontend__html__js__api__data[&quot;data&quot;]\n        frontend__html__js__api__catalog[&quot;catalog&quot;]\n        frontend__html__js__api__runCommand[&quot;runCommand&quot;]\n        frontend__html__js__api__runQuery[&quot;runQuery&quot;]\n        docs__04_workflow_editor_spec__mapToNodes[&quot;mapToNodes&quot;]\n        frontend__html__js__app__showAuthed[&quot;showAuthed&quot;]\n        ...[&quot;+109 more&quot;]\n    end\n\n    subgraph Exporters\n    end\n\n    class frontend__html__js__api__API,frontend__html__js__api__clearToken,frontend__html__js__api__getRole,frontend__html__js__api__resp,frontend__html__js__api__ct,frontend__html__js__api__err,frontend__html__js__api__login,frontend__html__js__api__data,frontend__html__js__api__catalog,frontend__html__js__api__runCommand entry\n", "is_subdir": false}, {"name": "prompt.txt", "rel_path": "prompt.txt", "path": "prompt.txt", "size": "2.9KB", "icon": "📄", "type": "text", "type_name": "Text", "content": "You are an AI assistant helping me understand and improve a codebase.\nUse the attached/generated files as the authoritative context.\nYour goal is to refactor the project based on these files, not just summarize it.\n\nwe are in project path: codot\n\nFiles for analysis:\n\nNote: project/validation.toon.yaml and project/duplication.toon.yaml are generated by external tools (vallm and redup)\n- analysis.toon.yaml  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities) [7KB]\n- map.toon.yaml  (Structural map - files, sizes, imports, exports, signatures, project header) [11KB]\n- evolution.toon.yaml  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history) [1KB]\n- project.toon.yaml  (Compact project overview - generated from project.yaml data) [2KB]\n- context.md  (LLM narrative - architecture summary and project context) [17KB]\n\nMissing files (not generated in this run):\n- README.md\n\nTask:\n- Treat this prompt as a refactoring brief: identify the highest-priority changes and prepare concrete edits.\n- Use the file set to decide whether the first pass should focus on correctness, duplication, complexity reduction, or architecture cleanup.\n- If you can safely implement the refactor, do it; otherwise give an exact file-by-file change plan and test plan.\n- Use analysis.toon.yaml to locate high-CC functions and god modules that should be split first.\n- Keep module boundaries intact and update imports/exports according to map.toon.yaml.\n- Use evolution.toon.yaml as the execution backlog and work from the top-ranked items.\n- Keep project.toon.yaml aligned with the refactored architecture.\n\nPriority Order:\nP1 — Split or simplify the highest-CC / god modules identified in analysis.toon.yaml.\nP1 — Preserve module boundaries and update imports/exports according to map.toon.yaml.\nP2 — Keep the compact project overview in project.toon.yaml aligned with the refactor.\nP2 — Execute the highest-impact items from evolution.toon.yaml in order of benefit/risk.\n\nFocus Areas for Analysis:\n1. **Code Health Analysis** - Review complexity metrics, god modules, coupling issues from analysis.toon.yaml\n2. **Structural Map** - Use map.toon.yaml to inspect imports, exports, signatures, and the project header\n3. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon.yaml\n4. **Project Overview** - Review the compact project overview from project.toon.yaml\n\nAnalysis Strategy:\n- Start with analysis.toon.yaml for health metrics, then map.toon.yaml for structure and signatures\n- Review evolution.toon.yaml for action priorities and next steps\n- Compare the compact project overview in project.toon.yaml with the main analysis files\n\nConstraints:\n- Prefer minimal, incremental changes.\n- Maintain full backward compatibility.\n- Base recommendations on concrete metrics from the provided files.\n- If uncertain, ask clarifying questions.\n", "is_subdir": false}, {"name": "mermaid.export", "rel_path": "mermaid.export", "path": "mermaid.export", "size": "14.2KB", "icon": "📄", "type": "unknown", "type_name": "EXPORT", "content": "[Binary file]", "is_subdir": false}, {"name": "analysis.toon.yaml", "rel_path": "analysis.toon.yaml", "path": "analysis.toon.yaml", "size": "7.2KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm | 75f 6733L | python:23,md:13,json:9,shell:7,txt:4,typescript:3,yaml:2,yml:2,conf:2,javascript:2,toml:1,cfg:1 | 2026-04-22\n# CC̄=2.8 | critical:2/154 | dups:0 | cycles:1\n\nHEALTH[2]:\n  🟡 CC    execute CC=20 (limit:15)\n  🟡 CC    execute_node CC=18 (limit:15)\n\nREFACTOR[2]:\n  1. split 2 high-CC methods  (CC&gt;15)\n  2. break 1 circular dependencies\n\nPIPELINES[103]:\n  [1] Src [API]: API → getToken\n      PURITY: 100% pure\n  [2] Src [clearToken]: clearToken\n      PURITY: 100% pure\n  [3] Src [getRole]: getRole\n      PURITY: 100% pure\n  [4] Src [resp]: resp\n      PURITY: 100% pure\n  [5] Src [ct]: ct\n      PURITY: 100% pure\n\nLAYERS:\n  cqrs-backend-workflows/         CC̄=3.9    ←in:0  →out:1\n  │ !! server                     354L  5C   10m  CC=18     ←0\n  │ README.md                  135L  0C    0m  CC=0.0    ←0\n  │ workflow.schema.json        69L  0C    0m  CC=0.0    ←0\n  │ example-workflow.json       35L  0C    0m  CC=0.0    ←0\n  │ requirements.txt             5L  0C    0m  CC=0.0    ←0\n  │ Makefile                     0L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0\n  │\n  api/                            CC̄=3.1    ←in:13  →out:0\n  │ agent                      373L  0C    7m  CC=7      ←1\n  │ main                       239L  0C   15m  CC=3      ←0\n  │ __init__                   149L  3C   11m  CC=8      ←1\n  │ models                     124L  13C    0m  CC=0.0    ←0\n  │ __init__                   102L  1C    6m  CC=3      ←1\n  │ render                      97L  1C    1m  CC=6      ←0\n  │ !! converttojson               79L  1C    1m  CC=20     ←0\n  │ pipeline                    78L  1C    3m  CC=8      ←0\n  │ __init__                    77L  2C    7m  CC=2      ←0\n  │ __init__                    66L  3C    7m  CC=3      ←0\n  │ rules.yaml                  66L  0C    0m  CC=0.0    ←0\n  │ converttocsv                60L  1C    1m  CC=13     ←0\n  │ __init__                    53L  2C    7m  CC=2      ←9\n  │ file_protocol               51L  1C    2m  CC=10     ←0\n  │ converttoxml                51L  1C    1m  CC=9      ←0\n  │ __init__                    48L  1C    2m  CC=7      ←1\n  │ from_url                    45L  1C    1m  CC=9      ←0\n  │ data_protocol               40L  1C    1m  CC=9      ←0\n  │ converttobase64             34L  1C    1m  CC=2      ←0\n  │ config                      34L  1C    1m  CC=3      ←0\n  │ http_protocol               33L  1C    2m  CC=2      ←0\n  │ fetch                       27L  1C    1m  CC=2      ←0\n  │ introspect                  22L  1C    1m  CC=1      ←0\n  │ requirements.txt            11L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0\n  │\n  frontend/                       CC̄=2.5    ←in:0  →out:0\n  │ app.js                     187L  0C   15m  CC=9      ←0\n  │ api.js                      61L  0C   15m  CC=9      ←0\n  │ package.json                28L  0C    0m  CC=0.0    ←0\n  │ nginx.conf                  17L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0\n  │\n  cqrs-workflow-editor/           CC̄=2.1    ←in:0  →out:0\n  │ !! App.tsx                    622L  0C   33m  CC=10     ←0\n  │ README.md                   92L  0C    0m  CC=0.0    ←0\n  │ tsconfig.json               26L  0C    0m  CC=0.0    ←0\n  │ package.json                23L  0C    0m  CC=0.0    ←0\n  │ vite.config.ts              21L  0C    0m  CC=0.0    ←0\n  │ main.tsx                    11L  0C    1m  CC=1      ←0\n  │ nginx.conf                  10L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0\n  │\n  docs/                           CC̄=0.0    ←in:0  →out:0\n  │ 04-workflow-editor-spec.md   497L  3C    1m  CC=0.0    ←0\n  │ 03-multi-agent-architecture.md   295L  0C    0m  CC=0.0    ←0\n  │ 02-market-comparison.md    276L  0C    0m  CC=0.0    ←0\n  │ 01-cqrs-url-platform-status.md    66L  0C    0m  CC=0.0    ←0\n  │ 05-pipeline-composition-status.md    60L  0C    0m  CC=0.0    ←0\n  │ 03-policy-engine-status.md    58L  0C    0m  CC=0.0    ←0\n  │ 02-protocol-registry-status.md    55L  1C    0m  CC=0.0    ←0\n  │ 04-frontend-playground-status.md    45L  0C    0m  CC=0.0    ←0\n  │\n  ./                              CC̄=0.0    ←in:0  →out:0\n  │ !! goal.yaml                  511L  0C    0m  CC=0.0    ←0\n  │ README.md                  161L  1C    0m  CC=0.0    ←0\n  │ pyproject.toml              94L  0C    0m  CC=0.0    ←0\n  │ docker-compose.yml          89L  0C    0m  CC=0.0    ←0\n  │ CHANGELOG.md                42L  0C    0m  CC=0.0    ←0\n  │ project.sh                  36L  0C    0m  CC=0.0    ←0\n  │ Makefile                     0L  0C    0m  CC=0.0    ←0\n  │\n  schemas/                        CC̄=0.0    ←in:0  →out:0\n  │ public-products.json        23L  0C    0m  CC=0.0    ←0\n  │ public-posts.json           16L  0C    0m  CC=0.0    ←0\n  │\n  examples/                       CC̄=0.0    ←in:0  →out:0\n  │ 04-pipeline.sh             124L  0C    0m  CC=0.0    ←0\n  │ README.md                  122L  0C    0m  CC=0.0    ←0\n  │ 06-rbac.sh                  66L  0C    0m  CC=0.0    ←0\n  │ 05-query.sh                 51L  0C    0m  CC=0.0    ←0\n  │ 01-fetch.sh                 48L  0C    0m  CC=0.0    ←0\n  │ 02-convert-to-json.sh       48L  0C    0m  CC=0.0    ←0\n  │ 03-render-html.sh           40L  0C    0m  CC=0.0    ←0\n  │\n  sample-data/                    CC̄=0.0    ←in:0  →out:0\n  │ doc.txt                      6L  0C    0m  CC=0.0    ←0\n  │ doc.txt                      6L  0C    0m  CC=0.0    ←0\n  │ posts.json                   5L  0C    0m  CC=0.0    ←0\n  │ posts.json                   5L  0C    0m  CC=0.0    ←0\n  │\n  ansible/                        CC̄=0.0    ←in:0  →out:0\n  │ test-services.yml          229L  0C    0m  CC=0.0    ←0\n  │ ansible.cfg                  4L  0C    0m  CC=0.0    ←0\n  │\n  ── zero ──\n     Makefile                                  0L\n     api/Dockerfile                            0L\n     cqrs-backend-workflows/Dockerfile         0L\n     cqrs-backend-workflows/Makefile           0L\n     cqrs-workflow-editor/Dockerfile           0L\n     frontend/Dockerfile                       0L\n\nCOUPLING:\n                                             api            api.commands             api.queries  cqrs-backend-workflows\n                     api                      ──                     ←11                      ←1                      ←1  hub\n            api.commands                      11                      ──                                                  !! fan-out\n             api.queries                       1                                              ──                        \n  cqrs-backend-workflows                       1                                                                      ──\n  CYCLES: 1\n  HUB: api/ (fan-in=13)\n  SMELL: api.commands/ fan-out=11 → split needed\n\nEXTERNAL:\n  validation: run `vallm batch .` → validation.toon\n  duplication: run `redup scan .` → duplication.toon\n", "is_subdir": false}, {"name": "calls.toon.yaml", "rel_path": "calls.toon.yaml", "path": "calls.toon.yaml", "size": "6.6KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm call graph | /home/tom/github/semcod/codot\n# nodes: 55 | edges: 44 | modules: 16\n# CC̄=2.8\n\nHUBS[20]:\n  api.commands.register_default_commands\n    CC=1  in:0  out:15  total:15\n  api.validators.validate_against_schema_uri\n    CC=7  in:1  out:13  total:14\n  frontend.html.js.api.request\n    CC=9  in:6  out:8  total:14\n  frontend.html.js.api.API\n    CC=9  in:0  out:14  total:14\n  api.queries.from_url.FromUrlQuery.execute\n    CC=9  in:0  out:13  total:13\n  api.commands.pipeline.PipelineCommand.execute\n    CC=8  in:0  out:13  total:13\n  cqrs-workflow-editor.src.App.fetchPreview\n    CC=10  in:1  out:11  total:12\n  api.main.execute_command\n    CC=3  in:0  out:11  total:11\n  api.commands.converttobase64.ConvertToBase64Command.execute\n    CC=2  in:0  out:10  total:10\n  api.commands.pipeline._substitute\n    CC=8  in:3  out:7  total:10\n  frontend.html.js.app.renderDecoded\n    CC=9  in:0  out:10  total:10\n  api.main.execute_query\n    CC=3  in:1  out:9  total:10\n  api.queries.get_registry\n    CC=1  in:10  out:0  total:10\n  api.protocols.register_default_protocols\n    CC=1  in:0  out:9  total:9\n  cqrs-workflow-editor.src.App.onUploadWorkflow\n    CC=4  in:0  out:8  total:8\n  cqrs-workflow-editor.src.App.workflow\n    CC=5  in:0  out:7  total:7\n  api.main.run_agent\n    CC=2  in:0  out:7  total:7\n  api.commands.fetch.FetchCommand.execute\n    CC=2  in:0  out:7  total:7\n  api.main.issue_token\n    CC=2  in:0  out:6  total:6\n  api.queries.QueryRegistry.list\n    CC=2  in:5  out:1  total:6\n\nMODULES:\n  api.agent  [1 funcs]\n    execute_agent  CC=2  out:3\n  api.auth  [2 funcs]\n    authenticate  CC=3  out:1\n    get_jwt_manager  CC=1  out:0\n  api.commands  [2 funcs]\n    get_registry  CC=1  out:0\n    register_default_commands  CC=1  out:15\n  api.commands.converttobase64  [1 funcs]\n    execute  CC=2  out:10\n  api.commands.fetch  [1 funcs]\n    execute  CC=2  out:7\n  api.commands.pipeline  [3 funcs]\n    execute  CC=8  out:13\n    _substitute  CC=8  out:7\n    _to_data_uri  CC=3  out:0\n  api.main  [5 funcs]\n    execute_command  CC=3  out:11\n    execute_query  CC=3  out:9\n    execute_query_get  CC=1  out:5\n    issue_token  CC=2  out:6\n    run_agent  CC=2  out:7\n  api.policy  [1 funcs]\n    get_engine  CC=2  out:1\n  api.protocols  [2 funcs]\n    get_registry  CC=1  out:0\n    register_default_protocols  CC=1  out:9\n  api.queries  [3 funcs]\n    list  CC=2  out:1\n    get_registry  CC=1  out:0\n    register_default_queries  CC=1  out:5\n  api.queries.from_url  [1 funcs]\n    execute  CC=9  out:13\n  api.validators  [1 funcs]\n    validate_against_schema_uri  CC=7  out:13\n  cqrs-backend-workflows.server  [4 funcs]\n    create_workflow  CC=2  out:5\n    list_workflows  CC=1  out:3\n    update_workflow  CC=2  out:4\n    validate_workflow  CC=2  out:2\n  cqrs-workflow-editor.src.App  [16 funcs]\n    blob  CC=1  out:2\n    exportWorkflow  CC=1  out:4\n    fetchPreview  CC=10  out:11\n    file  CC=2  out:6\n    json  CC=2  out:0\n    loadPredefinedWorkflow  CC=2  out:5\n    mapToEdges  CC=4  out:2\n    mapToNodes  CC=1  out:1\n    mime  CC=4  out:2\n    onDownloadWorkflow  CC=1  out:6\n  frontend.html.js.api  [10 funcs]\n    API  CC=9  out:14\n    catalog  CC=1  out:1\n    data  CC=1  out:1\n    getToken  CC=1  out:1\n    login  CC=1  out:3\n    request  CC=9  out:8\n    runCommand  CC=1  out:1\n    runQuery  CC=1  out:1\n    setRole  CC=1  out:1\n    setToken  CC=1  out:1\n  frontend.html.js.app  [2 funcs]\n    decodeB64  CC=3  out:3\n    renderDecoded  CC=9  out:10\n\nEDGES:\n  frontend.html.js.api.API → frontend.html.js.api.getToken\n  frontend.html.js.api.request → frontend.html.js.api.getToken\n  frontend.html.js.api.login → frontend.html.js.api.request\n  frontend.html.js.api.login → frontend.html.js.api.setToken\n  frontend.html.js.api.login → frontend.html.js.api.setRole\n  frontend.html.js.api.data → frontend.html.js.api.request\n  frontend.html.js.api.catalog → frontend.html.js.api.request\n  frontend.html.js.api.runCommand → frontend.html.js.api.request\n  frontend.html.js.api.runQuery → frontend.html.js.api.request\n  frontend.html.js.app.renderDecoded → frontend.html.js.app.decodeB64\n  cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToNodes\n  cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToEdges\n  cqrs-workflow-editor.src.App.fetchPreview → cqrs-workflow-editor.src.App.blob\n  cqrs-workflow-editor.src.App.fetchPreview → cqrs-workflow-editor.src.App.text\n  cqrs-workflow-editor.src.App.sizeKB → cqrs-workflow-editor.src.App.text\n  cqrs-workflow-editor.src.App.mime → cqrs-workflow-editor.src.App.text\n  cqrs-workflow-editor.src.App.timer → cqrs-workflow-editor.src.App.fetchPreview\n  cqrs-workflow-editor.src.App.onDownloadWorkflow → cqrs-workflow-editor.src.App.exportWorkflow\n  cqrs-workflow-editor.src.App.workflow → cqrs-workflow-editor.src.App.json\n  cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToNodes\n  cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToEdges\n  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToNodes\n  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToEdges\n  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToNodes\n  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToEdges\n  api.commands.converttobase64.ConvertToBase64Command.execute → api.queries.get_registry\n  api.commands.fetch.FetchCommand.execute → api.queries.get_registry\n  api.main.issue_token → api.auth.authenticate\n  api.main.issue_token → api.auth.get_jwt_manager\n  api.main.execute_command → api.policy.get_engine\n  api.main.execute_query → api.policy.get_engine\n  api.main.execute_query_get → api.main.execute_query\n  api.main.run_agent → api.agent.execute_agent\n  api.main.run_agent → api.policy.get_engine\n  api.queries.from_url.FromUrlQuery.execute → api.queries.get_registry\n  api.queries.register_default_queries → api.queries.get_registry\n  api.commands.register_default_commands → api.commands.get_registry\n  api.commands.pipeline._substitute → api.commands.pipeline._to_data_uri\n  api.commands.pipeline.PipelineCommand.execute → api.commands.pipeline._substitute\n  api.validators.validate_against_schema_uri → api.queries.QueryRegistry.list\n  api.protocols.register_default_protocols → api.protocols.get_registry\n  cqrs-backend-workflows.server.list_workflows → api.queries.QueryRegistry.list\n  cqrs-backend-workflows.server.create_workflow → cqrs-backend-workflows.server.validate_workflow\n  cqrs-backend-workflows.server.update_workflow → cqrs-backend-workflows.server.validate_workflow\n", "is_subdir": false}, {"name": "calls.yaml", "rel_path": "calls.yaml", "path": "calls.yaml", "size": "20.8KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "project: /home/tom/github/semcod/codot\ngenerated_from: code2llm call graph analysis\nstats:\n  total_nodes: 55\n  total_edges: 44\n  modules_count: 16\nnodes:\n  cqrs-backend-workflows.server.create_workflow:\n    name: create_workflow\n    module: cqrs-backend-workflows.server\n    line: 258\n    cyclomatic_complexity: 2\n    calls_out: 5\n    calls_in: 0\n  cqrs-backend-workflows.server.validate_workflow:\n    name: validate_workflow\n    module: cqrs-backend-workflows.server\n    line: 111\n    cyclomatic_complexity: 2\n    calls_out: 2\n    calls_in: 2\n  cqrs-workflow-editor.src.App.blob:\n    name: blob\n    module: cqrs-workflow-editor.src.App\n    line: 261\n    cyclomatic_complexity: 1\n    calls_out: 2\n    calls_in: 1\n  api.auth.get_jwt_manager:\n    name: get_jwt_manager\n    module: api.auth\n    line: 73\n    cyclomatic_complexity: 1\n    calls_out: 0\n    calls_in: 1\n  api.main.issue_token:\n    name: issue_token\n    module: api.main\n    line: 98\n    cyclomatic_complexity: 2\n    calls_out: 6\n    calls_in: 0\n  api.queries.QueryRegistry.list:\n    name: list\n    module: api.queries\n    line: 33\n    cyclomatic_complexity: 2\n    calls_out: 1\n    calls_in: 5\n  cqrs-workflow-editor.src.App.onUploadWorkflow:\n    name: onUploadWorkflow\n    module: cqrs-workflow-editor.src.App\n    line: 271\n    cyclomatic_complexity: 4\n    calls_out: 8\n    calls_in: 0\n  cqrs-workflow-editor.src.App.file:\n    name: file\n    module: cqrs-workflow-editor.src.App\n    line: 272\n    cyclomatic_complexity: 2\n    calls_out: 6\n    calls_in: 0\n  api.queries.from_url.FromUrlQuery.execute:\n    name: execute\n    module: api.queries.from_url\n    line: 18\n    cyclomatic_complexity: 9\n    calls_out: 13\n    calls_in: 0\n  cqrs-workflow-editor.src.App.workflow:\n    name: workflow\n    module: cqrs-workflow-editor.src.App\n    line: 363\n    cyclomatic_complexity: 5\n    calls_out: 7\n    calls_in: 0\n  api.commands.pipeline.PipelineCommand.execute:\n    name: execute\n    module: api.commands.pipeline\n    line: 46\n    cyclomatic_complexity: 8\n    calls_out: 13\n    calls_in: 0\n  api.commands.converttobase64.ConvertToBase64Command.execute:\n    name: execute\n    module: api.commands.converttobase64\n    line: 15\n    cyclomatic_complexity: 2\n    calls_out: 10\n    calls_in: 0\n  frontend.html.js.app.decodeB64:\n    name: decodeB64\n    module: frontend.html.js.app\n    line: 87\n    cyclomatic_complexity: 3\n    calls_out: 3\n    calls_in: 1\n  api.main.execute_query_get:\n    name: execute_query_get\n    module: api.main\n    line: 176\n    cyclomatic_complexity: 1\n    calls_out: 5\n    calls_in: 0\n  api.commands.get_registry:\n    name: get_registry\n    module: api.commands\n    line: 57\n    cyclomatic_complexity: 1\n    calls_out: 0\n    calls_in: 1\n  api.main.run_agent:\n    name: run_agent\n    module: api.main\n    line: 204\n    cyclomatic_complexity: 2\n    calls_out: 7\n    calls_in: 0\n  api.validators.validate_against_schema_uri:\n    name: validate_against_schema_uri\n    module: api.validators\n    line: 21\n    cyclomatic_complexity: 7\n    calls_out: 13\n    calls_in: 1\n  cqrs-workflow-editor.src.App.sizeKB:\n    name: sizeKB\n    module: cqrs-workflow-editor.src.App\n    line: 196\n    cyclomatic_complexity: 4\n    calls_out: 2\n    calls_in: 0\n  api.commands.pipeline._substitute:\n    name: _substitute\n    module: api.commands.pipeline\n    line: 23\n    cyclomatic_complexity: 8\n    calls_out: 7\n    calls_in: 3\n  frontend.html.js.app.renderDecoded:\n    name: renderDecoded\n    module: frontend.html.js.app\n    line: 94\n    cyclomatic_complexity: 9\n    calls_out: 10\n    calls_in: 0\n  api.main.execute_query:\n    name: execute_query\n    module: api.main\n    line: 155\n    cyclomatic_complexity: 3\n    calls_out: 9\n    calls_in: 1\n  cqrs-workflow-editor.src.App.reader:\n    name: reader\n    module: cqrs-workflow-editor.src.App\n    line: 275\n    cyclomatic_complexity: 2\n    calls_out: 6\n    calls_in: 0\n  cqrs-workflow-editor.src.App.json:\n    name: json\n    module: cqrs-workflow-editor.src.App\n    line: 278\n    cyclomatic_complexity: 2\n    calls_out: 0\n    calls_in: 1\n  cqrs-workflow-editor.src.App.mime:\n    name: mime\n    module: cqrs-workflow-editor.src.App\n    line: 197\n    cyclomatic_complexity: 4\n    calls_out: 2\n    calls_in: 0\n  cqrs-backend-workflows.server.list_workflows:\n    name: list_workflows\n    module: cqrs-backend-workflows.server\n    line: 244\n    cyclomatic_complexity: 1\n    calls_out: 3\n    calls_in: 0\n  frontend.html.js.api.setToken:\n    name: setToken\n    module: frontend.html.js.api\n    line: 7\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 2\n  frontend.html.js.api.request:\n    name: request\n    module: frontend.html.js.api\n    line: 15\n    cyclomatic_complexity: 9\n    calls_out: 8\n    calls_in: 6\n  cqrs-workflow-editor.src.App.timer:\n    name: timer\n    module: cqrs-workflow-editor.src.App\n    line: 218\n    cyclomatic_complexity: 1\n    calls_out: 2\n    calls_in: 0\n  frontend.html.js.api.catalog:\n    name: catalog\n    module: frontend.html.js.api\n    line: 50\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 0\n  api.commands.fetch.FetchCommand.execute:\n    name: execute\n    module: api.commands.fetch\n    line: 15\n    cyclomatic_complexity: 2\n    calls_out: 7\n    calls_in: 0\n  api.protocols.get_registry:\n    name: get_registry\n    module: api.protocols\n    line: 53\n    cyclomatic_complexity: 1\n    calls_out: 0\n    calls_in: 1\n  cqrs-workflow-editor.src.App.mapToEdges:\n    name: mapToEdges\n    module: cqrs-workflow-editor.src.App\n    line: 90\n    cyclomatic_complexity: 4\n    calls_out: 2\n    calls_in: 4\n  frontend.html.js.api.runQuery:\n    name: runQuery\n    module: frontend.html.js.api\n    line: 56\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 0\n  api.commands.register_default_commands:\n    name: register_default_commands\n    module: api.commands\n    line: 61\n    cyclomatic_complexity: 1\n    calls_out: 15\n    calls_in: 0\n  frontend.html.js.api.API:\n    name: API\n    module: frontend.html.js.api\n    line: 2\n    cyclomatic_complexity: 9\n    calls_out: 14\n    calls_in: 0\n  api.commands.pipeline._to_data_uri:\n    name: _to_data_uri\n    module: api.commands.pipeline\n    line: 18\n    cyclomatic_complexity: 3\n    calls_out: 0\n    calls_in: 1\n  frontend.html.js.api.setRole:\n    name: setRole\n    module: frontend.html.js.api\n    line: 13\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 2\n  api.queries.get_registry:\n    name: get_registry\n    module: api.queries\n    line: 43\n    cyclomatic_complexity: 1\n    calls_out: 0\n    calls_in: 10\n  cqrs-workflow-editor.src.App.exportWorkflow:\n    name: exportWorkflow\n    module: cqrs-workflow-editor.src.App\n    line: 226\n    cyclomatic_complexity: 1\n    calls_out: 4\n    calls_in: 1\n  frontend.html.js.api.runCommand:\n    name: runCommand\n    module: frontend.html.js.api\n    line: 52\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 0\n  frontend.html.js.api.login:\n    name: login\n    module: frontend.html.js.api\n    line: 39\n    cyclomatic_complexity: 1\n    calls_out: 3\n    calls_in: 0\n  api.protocols.register_default_protocols:\n    name: register_default_protocols\n    module: api.protocols\n    line: 57\n    cyclomatic_complexity: 1\n    calls_out: 9\n    calls_in: 0\n  frontend.html.js.api.data:\n    name: data\n    module: frontend.html.js.api\n    line: 40\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 0\n  cqrs-workflow-editor.src.App.onDownloadWorkflow:\n    name: onDownloadWorkflow\n    module: cqrs-workflow-editor.src.App\n    line: 259\n    cyclomatic_complexity: 1\n    calls_out: 6\n    calls_in: 0\n  api.auth.authenticate:\n    name: authenticate\n    module: api.auth\n    line: 77\n    cyclomatic_complexity: 3\n    calls_out: 1\n    calls_in: 1\n  api.queries.register_default_queries:\n    name: register_default_queries\n    module: api.queries\n    line: 47\n    cyclomatic_complexity: 1\n    calls_out: 5\n    calls_in: 0\n  api.policy.get_engine:\n    name: get_engine\n    module: api.policy\n    line: 139\n    cyclomatic_complexity: 2\n    calls_out: 1\n    calls_in: 3\n  frontend.html.js.api.getToken:\n    name: getToken\n    module: frontend.html.js.api\n    line: 6\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 2\n  api.main.execute_command:\n    name: execute_command\n    module: api.main\n    line: 121\n    cyclomatic_complexity: 3\n    calls_out: 11\n    calls_in: 0\n  cqrs-workflow-editor.src.App.loadPredefinedWorkflow:\n    name: loadPredefinedWorkflow\n    module: cqrs-workflow-editor.src.App\n    line: 128\n    cyclomatic_complexity: 2\n    calls_out: 5\n    calls_in: 0\n  cqrs-workflow-editor.src.App.fetchPreview:\n    name: fetchPreview\n    module: cqrs-workflow-editor.src.App\n    line: 186\n    cyclomatic_complexity: 10\n    calls_out: 11\n    calls_in: 1\n  cqrs-workflow-editor.src.App.text:\n    name: text\n    module: cqrs-workflow-editor.src.App\n    line: 201\n    cyclomatic_complexity: 1\n    calls_out: 0\n    calls_in: 3\n  cqrs-backend-workflows.server.update_workflow:\n    name: update_workflow\n    module: cqrs-backend-workflows.server\n    line: 270\n    cyclomatic_complexity: 2\n    calls_out: 4\n    calls_in: 0\n  cqrs-workflow-editor.src.App.mapToNodes:\n    name: mapToNodes\n    module: cqrs-workflow-editor.src.App\n    line: 81\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 4\n  api.agent.execute_agent:\n    name: execute_agent\n    module: api.agent\n    line: 359\n    cyclomatic_complexity: 2\n    calls_out: 3\n    calls_in: 1\nedges:\n- caller: frontend.html.js.api.API\n  callee: frontend.html.js.api.getToken\n  call_type: resolved\n- caller: frontend.html.js.api.request\n  callee: frontend.html.js.api.getToken\n  call_type: resolved\n- caller: frontend.html.js.api.login\n  callee: frontend.html.js.api.request\n  call_type: resolved\n- caller: frontend.html.js.api.login\n  callee: frontend.html.js.api.setToken\n  call_type: resolved\n- caller: frontend.html.js.api.login\n  callee: frontend.html.js.api.setRole\n  call_type: resolved\n- caller: frontend.html.js.api.data\n  callee: frontend.html.js.api.request\n  call_type: resolved\n- caller: frontend.html.js.api.catalog\n  callee: frontend.html.js.api.request\n  call_type: resolved\n- caller: frontend.html.js.api.runCommand\n  callee: frontend.html.js.api.request\n  call_type: resolved\n- caller: frontend.html.js.api.runQuery\n  callee: frontend.html.js.api.request\n  call_type: resolved\n- caller: frontend.html.js.app.renderDecoded\n  callee: frontend.html.js.app.decodeB64\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.loadPredefinedWorkflow\n  callee: cqrs-workflow-editor.src.App.mapToNodes\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.loadPredefinedWorkflow\n  callee: cqrs-workflow-editor.src.App.mapToEdges\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.fetchPreview\n  callee: cqrs-workflow-editor.src.App.blob\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.fetchPreview\n  callee: cqrs-workflow-editor.src.App.text\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.sizeKB\n  callee: cqrs-workflow-editor.src.App.text\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.mime\n  callee: cqrs-workflow-editor.src.App.text\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.timer\n  callee: cqrs-workflow-editor.src.App.fetchPreview\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.onDownloadWorkflow\n  callee: cqrs-workflow-editor.src.App.exportWorkflow\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.workflow\n  callee: cqrs-workflow-editor.src.App.json\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.onUploadWorkflow\n  callee: cqrs-workflow-editor.src.App.mapToNodes\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.onUploadWorkflow\n  callee: cqrs-workflow-editor.src.App.mapToEdges\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.file\n  callee: cqrs-workflow-editor.src.App.mapToNodes\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.file\n  callee: cqrs-workflow-editor.src.App.mapToEdges\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.reader\n  callee: cqrs-workflow-editor.src.App.mapToNodes\n  call_type: resolved\n- caller: cqrs-workflow-editor.src.App.reader\n  callee: cqrs-workflow-editor.src.App.mapToEdges\n  call_type: resolved\n- caller: api.commands.converttobase64.ConvertToBase64Command.execute\n  callee: api.queries.get_registry\n  call_type: resolved\n- caller: api.commands.fetch.FetchCommand.execute\n  callee: api.queries.get_registry\n  call_type: resolved\n- caller: api.main.issue_token\n  callee: api.auth.authenticate\n  call_type: resolved\n- caller: api.main.issue_token\n  callee: api.auth.get_jwt_manager\n  call_type: resolved\n- caller: api.main.execute_command\n  callee: api.policy.get_engine\n  call_type: resolved\n- caller: api.main.execute_query\n  callee: api.policy.get_engine\n  call_type: resolved\n- caller: api.main.execute_query_get\n  callee: api.main.execute_query\n  call_type: resolved\n- caller: api.main.run_agent\n  callee: api.agent.execute_agent\n  call_type: resolved\n- caller: api.main.run_agent\n  callee: api.policy.get_engine\n  call_type: resolved\n- caller: api.queries.from_url.FromUrlQuery.execute\n  callee: api.queries.get_registry\n  call_type: resolved\n- caller: api.queries.register_default_queries\n  callee: api.queries.get_registry\n  call_type: resolved\n- caller: api.commands.register_default_commands\n  callee: api.commands.get_registry\n  call_type: resolved\n- caller: api.commands.pipeline._substitute\n  callee: api.commands.pipeline._to_data_uri\n  call_type: resolved\n- caller: api.commands.pipeline.PipelineCommand.execute\n  callee: api.commands.pipeline._substitute\n  call_type: resolved\n- caller: api.validators.validate_against_schema_uri\n  callee: api.queries.QueryRegistry.list\n  call_type: resolved\n- caller: api.protocols.register_default_protocols\n  callee: api.protocols.get_registry\n  call_type: resolved\n- caller: cqrs-backend-workflows.server.list_workflows\n  callee: api.queries.QueryRegistry.list\n  call_type: resolved\n- caller: cqrs-backend-workflows.server.create_workflow\n  callee: cqrs-backend-workflows.server.validate_workflow\n  call_type: resolved\n- caller: cqrs-backend-workflows.server.update_workflow\n  callee: cqrs-backend-workflows.server.validate_workflow\n  call_type: resolved\nmodules:\n  api.agent:\n  - api.agent.execute_agent\n  api.auth:\n  - api.auth.authenticate\n  - api.auth.get_jwt_manager\n  api.commands:\n  - api.commands.get_registry\n  - api.commands.register_default_commands\n  api.commands.converttobase64:\n  - api.commands.converttobase64.ConvertToBase64Command.execute\n  api.commands.fetch:\n  - api.commands.fetch.FetchCommand.execute\n  api.commands.pipeline:\n  - api.commands.pipeline.PipelineCommand.execute\n  - api.commands.pipeline._substitute\n  - api.commands.pipeline._to_data_uri\n  api.main:\n  - api.main.execute_command\n  - api.main.execute_query\n  - api.main.execute_query_get\n  - api.main.issue_token\n  - api.main.run_agent\n  api.policy:\n  - api.policy.get_engine\n  api.protocols:\n  - api.protocols.get_registry\n  - api.protocols.register_default_protocols\n  api.queries:\n  - api.queries.QueryRegistry.list\n  - api.queries.get_registry\n  - api.queries.register_default_queries\n  api.queries.from_url:\n  - api.queries.from_url.FromUrlQuery.execute\n  api.validators:\n  - api.validators.validate_against_schema_uri\n  cqrs-backend-workflows.server:\n  - cqrs-backend-workflows.server.create_workflow\n  - cqrs-backend-workflows.server.list_workflows\n  - cqrs-backend-workflows.server.update_workflow\n  - cqrs-backend-workflows.server.validate_workflow\n  cqrs-workflow-editor.src.App:\n  - cqrs-workflow-editor.src.App.blob\n  - cqrs-workflow-editor.src.App.exportWorkflow\n  - cqrs-workflow-editor.src.App.fetchPreview\n  - cqrs-workflow-editor.src.App.file\n  - cqrs-workflow-editor.src.App.json\n  - cqrs-workflow-editor.src.App.loadPredefinedWorkflow\n  - cqrs-workflow-editor.src.App.mapToEdges\n  - cqrs-workflow-editor.src.App.mapToNodes\n  - cqrs-workflow-editor.src.App.mime\n  - cqrs-workflow-editor.src.App.onDownloadWorkflow\n  - cqrs-workflow-editor.src.App.onUploadWorkflow\n  - cqrs-workflow-editor.src.App.reader\n  - cqrs-workflow-editor.src.App.sizeKB\n  - cqrs-workflow-editor.src.App.text\n  - cqrs-workflow-editor.src.App.timer\n  - cqrs-workflow-editor.src.App.workflow\n  frontend.html.js.api:\n  - frontend.html.js.api.API\n  - frontend.html.js.api.catalog\n  - frontend.html.js.api.data\n  - frontend.html.js.api.getToken\n  - frontend.html.js.api.login\n  - frontend.html.js.api.request\n  - frontend.html.js.api.runCommand\n  - frontend.html.js.api.runQuery\n  - frontend.html.js.api.setRole\n  - frontend.html.js.api.setToken\n  frontend.html.js.app:\n  - frontend.html.js.app.decodeB64\n  - frontend.html.js.app.renderDecoded\nentry_points:\n- api.agent._bash_cli_execute\n- api.agent._http_api_execute\n- api.agent._litellm_execute\n- api.agent._mcp_execute\n- api.agent._websocket_execute\n- api.agent.register_backend\n- api.auth.JWTManager.__init__\n- api.auth.JWTManager.issue\n- api.auth.JWTManager.verify\n- api.auth.current_user\n- api.commands.Command.execute\n- api.commands.CommandRegistry.__init__\n- api.commands.CommandRegistry.get\n- api.commands.CommandRegistry.list\n- api.commands.CommandRegistry.register\n- api.commands.converttobase64.ConvertToBase64Command.execute\n- api.commands.converttocsv.ConvertToCsvCommand.execute\n- api.commands.converttojson.ConvertToJsonCommand.execute\n- api.commands.converttoxml.ConvertToXmlCommand.execute\n- api.commands.fetch.FetchCommand.execute\n- api.commands.pipeline.PipelineCommand.execute\n- api.commands.register_default_commands\n- api.commands.render.RenderCommand.execute\n- api.config.load_settings\n- api.main._key_error\n- api.main._nf_error\n- api.main._perm_error\n- api.main._value_error\n- api.main.catalog\n- api.main.execute_command\n- api.main.execute_query_get\n- api.main.health\n- api.main.issue_token\n- api.main.list_agent_backends\n- api.main.list_commands\n- api.main.list_queries\n- api.main.me\n- api.main.run_agent\n- api.policy.PolicyDecision.allow\n- api.policy.PolicyDecision.deny\n- api.policy.PolicyEngine.__init__\n- api.policy.PolicyEngine._match_any\n- api.policy.PolicyEngine._rules_for\n- api.policy.PolicyEngine.can_execute_command\n- api.policy.PolicyEngine.can_execute_query\n- api.policy.PolicyEngine.from_file\n- api.policy.User.has_role\n- api.policy.reload_engine\n- api.protocols.Protocol.fetch\n- api.protocols.ProtocolRegistry.__init__\n- api.protocols.ProtocolRegistry.fetch\n- api.protocols.ProtocolRegistry.register\n- api.protocols.ProtocolRegistry.supported\n- api.protocols.data_protocol.DataProtocol.fetch\n- api.protocols.file_protocol.FileProtocol._resolve\n- api.protocols.file_protocol.FileProtocol.fetch\n- api.protocols.http_protocol.HttpProtocol.__init__\n- api.protocols.http_protocol.HttpProtocol.fetch\n- api.protocols.register_default_protocols\n- api.queries.Query.execute\n- api.queries.QueryRegistry.__init__\n- api.queries.QueryRegistry.get\n- api.queries.QueryRegistry.register\n- api.queries.from_url.FromUrlQuery.execute\n- api.queries.introspect.IntrospectQuery.execute\n- api.queries.register_default_queries\n- api.validators.SchemaValidationError.__init__\n- cqrs-backend-workflows.server.create_workflow\n- cqrs-backend-workflows.server.delete_workflow\n- cqrs-backend-workflows.server.get_workflow\n- cqrs-backend-workflows.server.health\n- cqrs-backend-workflows.server.list_workflows\n- cqrs-backend-workflows.server.root\n- cqrs-backend-workflows.server.run_workflow\n- cqrs-backend-workflows.server.update_workflow\n- cqrs-workflow-editor.src.App.a\n- cqrs-workflow-editor.src.App.center\n- cqrs-workflow-editor.src.App.createRes\n- cqrs-workflow-editor.src.App.file\n- cqrs-workflow-editor.src.App.initialNodes\n- cqrs-workflow-editor.src.App.loadPredefinedWorkflow\n- cqrs-workflow-editor.src.App.mime\n- cqrs-workflow-editor.src.App.newEdges\n- cqrs-workflow-editor.src.App.newNodes\n- cqrs-workflow-editor.src.App.onAddNode\n- cqrs-workflow-editor.src.App.onConnect\n- cqrs-workflow-editor.src.App.onDownloadWorkflow\n- cqrs-workflow-editor.src.App.onEdgeClick\n- cqrs-workflow-editor.src.App.onUploadWorkflow\n- cqrs-workflow-editor.src.App.outputs\n- cqrs-workflow-editor.src.App.reader\n- cqrs-workflow-editor.src.App.response\n- cqrs-workflow-editor.src.App.result\n- cqrs-workflow-editor.src.App.runRes\n- cqrs-workflow-editor.src.App.saveRes\n- cqrs-workflow-editor.src.App.sizeKB\n- cqrs-workflow-editor.src.App.timer\n- cqrs-workflow-editor.src.App.updateNodeData\n- cqrs-workflow-editor.src.App.url\n- cqrs-workflow-editor.src.App.wf\n- cqrs-workflow-editor.src.App.workflow\n- cqrs-workflow-editor.src.main.root\n- docs.04-workflow-editor-spec.mapToNodes\n- frontend.html.js.api.API\n- frontend.html.js.api.catalog\n- frontend.html.js.api.clearToken\n- frontend.html.js.api.ct\n- frontend.html.js.api.data\n- frontend.html.js.api.err\n- frontend.html.js.api.getRole\n- frontend.html.js.api.login\n- frontend.html.js.api.resp\n- frontend.html.js.api.runCommand\n- frontend.html.js.api.runQuery\n- frontend.html.js.app.bin\n- frontend.html.js.app.blob\n- frontend.html.js.app.bytes\n- frontend.html.js.app.cat\n- frontend.html.js.app.iframe\n- frontend.html.js.app.img\n- frontend.html.js.app.loadCatalog\n- frontend.html.js.app.o\n- frontend.html.js.app.parseMeta\n- frontend.html.js.app.pre\n- frontend.html.js.app.r\n- frontend.html.js.app.renderDecoded\n- frontend.html.js.app.showAnonymous\n- frontend.html.js.app.showAuthed\n", "is_subdir": false}, {"name": "evolution.toon.yaml", "rel_path": "evolution.toon.yaml", "path": "evolution.toon.yaml", "size": "1.6KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm/evolution | 154 func | 27f | 2026-04-22\n\nNEXT[2] (ranked by impact):\n  [1] !  SPLIT-FUNC      ConvertToJsonCommand.execute  CC=20  fan=23\n      WHY: CC=20 exceeds 15\n      EFFORT: ~1h  IMPACT: 460\n\n  [2] !  SPLIT-FUNC      execute_node  CC=18  fan=4\n      WHY: CC=18 exceeds 15\n      EFFORT: ~1h  IMPACT: 72\n\n\nRISKS[0]: none\n\nMETRICS-TARGET:\n  CC̄:          2.8 → ≤2.0\n  max-CC:      20 → ≤10\n  god-modules: 0 → 0\n  high-CC(≥15): 2 → ≤1\n  hub-types:   0 → ≤0\n\nPATTERNS (language parser shared logic):\n  _extract_declarations() in base.py — unified extraction for:\n    - TypeScript: interfaces, types, classes, functions, arrow funcs\n    - PHP: namespaces, traits, classes, functions, includes\n    - Ruby: modules, classes, methods, requires\n    - C++: classes, structs, functions, #includes\n    - C#: classes, interfaces, methods, usings\n    - Java: classes, interfaces, methods, imports\n    - Go: packages, functions, structs\n    - Rust: modules, functions, traits, use statements\n\n  Shared regex patterns per language:\n    - import: language-specific import/require/using patterns\n    - class: class/struct/trait declarations with inheritance\n    - function: function/method signatures with visibility\n    - brace_tracking: for C-family languages ({ })\n    - end_keyword_tracking: for Ruby (module/class/def...end)\n\n  Benefits:\n    - Consistent extraction logic across all languages\n    - Reduced code duplication (~70% reduction in parser LOC)\n    - Easier maintenance: fix once, apply everywhere\n    - Standardized FunctionInfo/ClassInfo models\n\nHISTORY:\n  (first run — no previous data)\n", "is_subdir": false}, {"name": "map.toon.yaml", "rel_path": "map.toon.yaml", "path": "map.toon.yaml", "size": "11.6KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# codot | 75f 6990L | yaml:2,yml:2,toml:1,conf:2,md:13,json:9,shell:7,javascript:2,typescript:3,txt:4,cfg:1,python:23 | 2026-04-22\n# stats: 154 func | 0 cls | 75 mod | CC̄=2.8 | critical:2 | cycles:0\n# alerts[5]: fan-out ConvertToJsonCommand.execute=23; fan-out ConvertToCsvCommand.execute=21; fan-out ConvertToXmlCommand.execute=20; CC ConvertToJsonCommand.execute=20; CC execute_node=18\n# hotspots[5]: ConvertToJsonCommand.execute fan=23; ConvertToCsvCommand.execute fan=21; ConvertToXmlCommand.execute fan=20; _mcp_execute fan=18; RenderCommand.execute fan=16\n# evolution: baseline\n# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods\nM[75]:\n  CHANGELOG.md,42\n  Makefile,51\n  README.md,161\n  ansible/ansible.cfg,4\n  ansible/test-services.yml,229\n  api/Dockerfile,20\n  api/agent.py,373\n  api/auth/__init__.py,102\n  api/commands/__init__.py,77\n  api/commands/converttobase64.py,34\n  api/commands/converttocsv.py,60\n  api/commands/converttojson.py,79\n  api/commands/converttoxml.py,51\n  api/commands/fetch.py,27\n  api/commands/pipeline.py,78\n  api/commands/render.py,97\n  api/config.py,34\n  api/main.py,239\n  api/models.py,124\n  api/policy/__init__.py,149\n  api/policy/rules.yaml,66\n  api/protocols/__init__.py,66\n  api/protocols/data_protocol.py,40\n  api/protocols/file_protocol.py,51\n  api/protocols/http_protocol.py,33\n  api/queries/__init__.py,53\n  api/queries/from_url.py,45\n  api/queries/introspect.py,22\n  api/requirements.txt,11\n  api/validators/__init__.py,48\n  cqrs-backend-workflows/Dockerfile,12\n  cqrs-backend-workflows/Makefile,153\n  cqrs-backend-workflows/README.md,135\n  cqrs-backend-workflows/example-workflow.json,35\n  cqrs-backend-workflows/requirements.txt,5\n  cqrs-backend-workflows/server.py,354\n  cqrs-backend-workflows/workflow.schema.json,69\n  cqrs-workflow-editor/Dockerfile,18\n  cqrs-workflow-editor/README.md,92\n  cqrs-workflow-editor/nginx.conf,10\n  cqrs-workflow-editor/package.json,23\n  cqrs-workflow-editor/src/App.tsx,622\n  cqrs-workflow-editor/src/main.tsx,11\n  cqrs-workflow-editor/tsconfig.json,26\n  cqrs-workflow-editor/vite.config.ts,21\n  docker-compose.yml,89\n  docs/01-cqrs-url-platform-status.md,66\n  docs/02-market-comparison.md,276\n  docs/02-protocol-registry-status.md,55\n  docs/03-multi-agent-architecture.md,295\n  docs/03-policy-engine-status.md,58\n  docs/04-frontend-playground-status.md,45\n  docs/04-workflow-editor-spec.md,497\n  docs/05-pipeline-composition-status.md,60\n  examples/01-fetch.sh,48\n  examples/02-convert-to-json.sh,48\n  examples/03-render-html.sh,40\n  examples/04-pipeline.sh,124\n  examples/05-query.sh,51\n  examples/06-rbac.sh,66\n  examples/README.md,122\n  frontend/Dockerfile,3\n  frontend/html/js/api.js,61\n  frontend/html/js/app.js,187\n  frontend/nginx.conf,17\n  frontend/package.json,28\n  goal.yaml,511\n  project.sh,36\n  pyproject.toml,94\n  sample-data/doc.txt,6\n  sample-data/posts.json,5\n  sample-data/public/doc.txt,6\n  sample-data/public/posts.json,5\n  schemas/public-posts.json,16\n  schemas/public-products.json,23\nD:\n  api/commands/converttojson.py:\n    e: ConvertToJsonCommand\n    ConvertToJsonCommand(Command): execute(1)\n  cqrs-backend-workflows/server.py:\n    e: WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse,validate_workflow,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow\n    WorkflowNode(BaseModel):\n    WorkflowOutput(BaseModel):\n    Workflow(BaseModel):\n    WorkflowExecutionRequest(BaseModel):\n    WorkflowExecutionResponse(BaseModel):\n    validate_workflow(workflow)\n    execute_node(node;node_results;client;token)\n    root()\n    health()\n    list_workflows()\n    get_workflow(workflow_id)\n    create_workflow(workflow)\n    update_workflow(workflow_id;workflow)\n    delete_workflow(workflow_id)\n    run_workflow(workflow_id;request)\n  api/commands/converttocsv.py:\n    e: ConvertToCsvCommand\n    ConvertToCsvCommand(Command): execute(1)\n  cqrs-workflow-editor/src/App.tsx:\n    i: react\n    e: mapToNodes,mapToEdges,initialNodes,loadPredefinedWorkflow,wf,onConnect,onEdgeClick,updateNodeData,fetchPreview,response,blob,sizeKB,mime,text,timer,exportWorkflow,outputs,onDownloadWorkflow,workflow,blob,url,a,onUploadWorkflow,file,reader,json,newNodes,newEdges,onAddNode,center,workflow,workflow,saveRes,createRes,runRes,result\n    mapToNodes()\n    mapToEdges()\n    initialNodes()\n    loadPredefinedWorkflow()\n    wf()\n    onConnect()\n    onEdgeClick()\n    updateNodeData()\n    fetchPreview()\n    response()\n    blob()\n    sizeKB()\n    mime()\n    text()\n    timer()\n    exportWorkflow()\n    outputs()\n    onDownloadWorkflow()\n    workflow()\n    blob()\n    url()\n    a()\n    onUploadWorkflow()\n    file()\n    reader()\n    json()\n    newNodes()\n    newEdges()\n    onAddNode()\n    center()\n    workflow()\n    workflow()\n    saveRes()\n    createRes()\n    runRes()\n    result()\n  api/protocols/file_protocol.py:\n    e: FileProtocol\n    FileProtocol: _resolve(1),fetch(1)  # Access local files. Only paths under ALLOWED_LOCAL_ROOTS are...\n  frontend/html/js/api.js:\n    e: API,getToken,setToken,clearToken,getRole,setRole,request,resp,ct,err,login,data,catalog,runCommand,runQuery\n    API()\n    getToken()\n    setToken()\n    clearToken()\n    getRole()\n    setRole()\n    request()\n    resp()\n    ct()\n    err()\n    login()\n    data()\n    catalog()\n    runCommand()\n    runQuery()\n  frontend/html/js/app.js:\n    e: showAuthed,showAnonymous,r,loadCatalog,cat,o,o,parseMeta,decodeB64,bin,bytes,renderDecoded,bytes,iframe,blob,img,pre,r,r\n    showAuthed()\n    showAnonymous()\n    r()\n    loadCatalog()\n    cat()\n    o()\n    o()\n    parseMeta()\n    decodeB64()\n    bin()\n    bytes()\n    renderDecoded()\n    bytes()\n    iframe()\n    blob()\n    img()\n    pre()\n    r()\n    r()\n  api/protocols/data_protocol.py:\n    e: DataProtocol\n    DataProtocol: fetch(1)  # Implements RFC 2397 data URIs: data:[&lt;mime&gt;][;base64],&lt;data&gt;...\n  api/queries/from_url.py:\n    e: FromUrlQuery\n    FromUrlQuery(Query): execute(1)\n  api/commands/converttoxml.py:\n    e: ConvertToXmlCommand\n    ConvertToXmlCommand(Command): execute(1)\n  api/policy/__init__.py:\n    e: User,PolicyDecision,PolicyEngine,get_engine,reload_engine\n    User: has_role(1)\n    PolicyDecision: allow(1),deny(1)\n    PolicyEngine: __init__(1),from_file(1),_rules_for(1),_match_any(1),can_execute_command(4),can_execute_query(4)\n    get_engine()\n    reload_engine()\n  api/commands/pipeline.py:\n    e: PipelineCommand,_to_data_uri,_substitute\n    PipelineCommand(Command): execute(1)\n    _to_data_uri(resp)\n    _substitute(value;previous)\n  api/validators/__init__.py:\n    e: SchemaValidationError,validate_against_schema_uri\n    SchemaValidationError(Exception): __init__(2)\n    validate_against_schema_uri(instance;schema_uri)\n  api/agent.py:\n    e: register_backend,_mcp_execute,_litellm_execute,_bash_cli_execute,_http_api_execute,_websocket_execute,execute_agent\n    register_backend(backend;executor)\n    _mcp_execute(node;request)\n    _litellm_execute(node;request)\n    _bash_cli_execute(node;request)\n    _http_api_execute(node;request)\n    _websocket_execute(node;request)\n    execute_agent(request)\n  api/commands/render.py:\n    e: RenderCommand\n    RenderCommand(Command): execute(1)\n  api/main.py:\n    e: _value_error,_perm_error,_nf_error,_key_error,health,issue_token,me,list_commands,execute_command,list_queries,execute_query,execute_query_get,catalog,run_agent,list_agent_backends\n    _value_error(_;exc)\n    _perm_error(_;exc)\n    _nf_error(_;exc)\n    _key_error(_;exc)\n    health()\n    issue_token(req)\n    me(user)\n    list_commands(user)\n    execute_command(name;body;user)\n    list_queries(user)\n    execute_query(name;body;user)\n    execute_query_get(name;source_uris;user)\n    catalog()\n    run_agent(agent_id;body;user)\n    list_agent_backends()\n  api/auth/__init__.py:\n    e: JWTManager,get_jwt_manager,authenticate,current_user\n    JWTManager: __init__(3),issue(3),verify(1)\n    get_jwt_manager()\n    authenticate(username;password)\n    current_user(creds)\n  api/config.py:\n    e: Settings,load_settings\n    Settings:\n    load_settings()\n  api/protocols/__init__.py:\n    e: FetchResult,Protocol,ProtocolRegistry,get_registry,register_default_protocols\n    FetchResult:\n    Protocol(TypingProtocol): fetch(1)\n    ProtocolRegistry: __init__(0),register(1),supported(0),fetch(1)\n    get_registry()\n    register_default_protocols()\n  api/commands/converttobase64.py:\n    e: ConvertToBase64Command\n    ConvertToBase64Command(Command): execute(1)\n  api/protocols/http_protocol.py:\n    e: HttpProtocol\n    HttpProtocol: __init__(1),fetch(1)\n  api/commands/fetch.py:\n    e: FetchCommand\n    FetchCommand(Command): execute(1)\n  api/queries/__init__.py:\n    e: Query,QueryRegistry,get_registry,register_default_queries\n    Query(abc.ABC): execute(1)\n    QueryRegistry: __init__(0),register(1),get(1),list(0)\n    get_registry()\n    register_default_queries()\n  api/commands/__init__.py:\n    e: Command,CommandRegistry,get_registry,register_default_commands\n    Command(abc.ABC): execute(1)\n    CommandRegistry: __init__(0),register(1),get(1),list(0)\n    get_registry()\n    register_default_commands()\n  cqrs-workflow-editor/src/main.tsx:\n    i: ./App,@xyflow/react,react,react-dom/client\n    e: root\n    root()\n  api/queries/introspect.py:\n    e: IntrospectQuery\n    IntrospectQuery(Query): execute(1)\n  goal.yaml:\n  Makefile:\n  docker-compose.yml:\n  pyproject.toml:\n  frontend/nginx.conf:\n  CHANGELOG.md:\n  schemas/public-posts.json:\n  docs/02-protocol-registry-status.md:\n    e: MyProtocol\n    MyProtocol:\n  project.sh:\n  README.md:\n    e: MyThingCommand\n    MyThingCommand:\n  schemas/public-products.json:\n  frontend/Dockerfile:\n  docs/04-frontend-playground-status.md:\n  docs/03-policy-engine-status.md:\n  docs/05-pipeline-composition-status.md:\n  cqrs-workflow-editor/tsconfig.json:\n  cqrs-workflow-editor/package.json:\n  cqrs-workflow-editor/nginx.conf:\n  cqrs-workflow-editor/Dockerfile:\n  docs/03-multi-agent-architecture.md:\n  frontend/package.json:\n  examples/03-render-html.sh:\n  docs/01-cqrs-url-platform-status.md:\n  cqrs-workflow-editor/README.md:\n  docs/02-market-comparison.md:\n  cqrs-workflow-editor/vite.config.ts:\n    i: @vitejs/plugin-react,vite\n  examples/01-fetch.sh:\n  examples/02-convert-to-json.sh:\n  examples/05-query.sh:\n  examples/06-rbac.sh:\n  examples/README.md:\n  sample-data/posts.json:\n  examples/04-pipeline.sh:\n  sample-data/doc.txt:\n  sample-data/public/doc.txt:\n  docs/04-workflow-editor-spec.md:\n    e: WorkflowNode,WorkflowEdge,Workflow,mapToNodes\n    WorkflowNode:\n    WorkflowEdge:\n    Workflow:\n    mapToNodes()\n  cqrs-backend-workflows/requirements.txt:\n  cqrs-backend-workflows/workflow.schema.json:\n  cqrs-backend-workflows/example-workflow.json:\n  cqrs-backend-workflows/Makefile:\n  ansible/test-services.yml:\n  ansible/ansible.cfg:\n  cqrs-backend-workflows/Dockerfile:\n  api/Dockerfile:\n  cqrs-backend-workflows/README.md:\n  api/requirements.txt:\n  sample-data/public/posts.json:\n  api/policy/rules.yaml:\n  api/models.py:\n    e: CommandRequest,CommandResponse,QueryRequest,QueryResponse,TokenRequest,TokenResponse,PipelineStep,PipelineRequest,ErrorResponse,AgentCommunicationBackend,AgentNode,AgentRequest,AgentResponse\n    CommandRequest(BaseModel):  # Envelope for every command invocation.\n\n- input_uri: URI of ...\n    CommandResponse(BaseModel):\n    QueryRequest(BaseModel):\n    QueryResponse(BaseModel):\n    TokenRequest(BaseModel):\n    TokenResponse(BaseModel):\n    PipelineStep(BaseModel):\n    PipelineRequest(BaseModel):\n    ErrorResponse(BaseModel):\n    AgentCommunicationBackend(str,Enum):  # Supported communication backends for Agent formula...\n    AgentNode(BaseModel):  # Agent node definition for DAG / orchestration.\n\nAn Agent nod...\n    AgentRequest(BaseModel):  # Request to execute an Agent node.\n\n- backend_config: backend...\n    AgentResponse(BaseModel):\n", "is_subdir": false}, {"name": "project.toon.yaml", "rel_path": "project.toon.yaml", "path": "project.toon.yaml", "size": "2.5KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# codot | 154 func | 27f | 9861L | python | 2026-04-22\n\nHEALTH:\n  CC̄=2.8  critical=5 (limit:10)  dup=2  cycles=1\n\nALERTS[19]:\n  !!! high_fan_out     ConvertToJsonCommand.execute = 23 (limit:10)\n  !!! high_fan_out     ConvertToCsvCommand.execute = 21 (limit:10)\n  !!! high_fan_out     ConvertToXmlCommand.execute = 20 (limit:10)\n  !!  cc_exceeded      ConvertToJsonCommand.execute = 20 (limit:15)\n  !!  high_fan_out     _mcp_execute = 18 (limit:10)\n  !!  high_fan_out     RenderCommand.execute = 16 (limit:10)\n  !!  high_fan_out     _bash_cli_execute = 15 (limit:10)\n  !   cc_exceeded      execute_node = 18 (limit:15)\n  !   high_fan_out     API = 14 (limit:10)\n  !   high_fan_out     _litellm_execute = 14 (limit:10)\n\nMODULES[75] (top by size):\n  M[cqrs-workflow-editor/src/App.tsx] 622L C:0 F:33 CC↑10 D:0 (typescript)\n  M[goal.yaml] 511L C:0 F:0 CC↑0 D:0 (yaml)\n  M[docs/04-workflow-editor-spec.md] 497L C:3 F:1 CC↑0 D:0 (md)\n  M[api/agent.py] 373L C:0 F:7 CC↑7 D:1 (python)\n  M[cqrs-backend-workflows/server.py] 354L C:5 F:10 CC↑18 D:0 (python)\n  M[docs/03-multi-agent-architecture.md] 295L C:0 F:0 CC↑0 D:0 (md)\n  M[docs/02-market-comparison.md] 276L C:0 F:0 CC↑0 D:0 (md)\n  M[api/main.py] 239L C:0 F:15 CC↑3 D:0 (python)\n  M[ansible/test-services.yml] 229L C:0 F:0 CC↑0 D:0 (yml)\n  M[frontend/html/js/app.js] 187L C:0 F:15 CC↑9 D:0 (javascript)\n  M[README.md] 161L C:1 F:0 CC↑0 D:0 (md)\n  M[api/policy/__init__.py] 149L C:3 F:11 CC↑8 D:1 (python)\n  M[cqrs-backend-workflows/README.md] 135L C:0 F:0 CC↑0 D:0 (md)\n  M[api/models.py] 124L C:13 F:0 CC↑0 D:0 (python)\n  M[examples/04-pipeline.sh] 124L C:0 F:0 CC↑0 D:0 (shell)\n  LANGS: python:23/md:13/json:9/shell:7/other:6/txt:4/typescript:3/javascript:2/yml:2/yaml:2/conf:2/cfg:1/toml:1\n\nHOTSPOTS[10]:\n  ★ ConvertToJsonCommand.execute fan=23  // Orchestrates 23 calls\n  ★ ConvertToCsvCommand.execute fan=21  // Orchestrates 21 calls\n  ★ ConvertToXmlCommand.execute fan=20  // Orchestrates 20 calls\n  ★ _mcp_execute fan=18  // Execute agent via MCP server.\n\nbackend_config keys:\n    - server_url: SSE endpoi\n  ★ RenderCommand.execute fan=16  // Orchestrates 16 calls\n\nREFACTOR[8]:\n  [1] H/H Split god module cqrs-workflow-editor/src/App.tsx (622L, 0 classes)\n  [2] H/H Split god module goal.yaml (511L, 0 classes)\n  [3] M/L Split ConvertToJsonCommand.execute (CC=20)\n  [4] M/L Split execute_node (CC=18)\n  [5] M/L Break circular dependency: api.commands.pipeline._substitute\n\nEVOLUTION:\n  2026-04-22 CC̄=2.8 crit=5 9861L // Automated analysis\n", "is_subdir": false}];
+        let currentFile = null;
+
+        function renderFileList(filter = '') {
+            const list = document.getElementById('fileList');
+            const filtered = files.filter(f =>
+                f.name.toLowerCase().includes(filter.toLowerCase()) ||
+                f.path.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state">No files found</div>';
+                return;
+            }
+
+            // Group by type
+            const groups = {};
+            for (const file of filtered) {
+                const type = file.type_name;
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(file);
+            }
+
+            let html = '';
+            for (const [typeName, groupFiles] of Object.entries(groups)) {
+                html += `
+                    <div class="file-group">
+                        <div class="file-group-title">${typeName} Files (${groupFiles.length})</div>
+                        ${groupFiles.map(f => `
+                            <div class="file-item ${currentFile?.name === f.name ? 'active' : ''}"
+                                 onclick="selectFile('${f.name}')">
+                                <span class="file-icon">${f.icon}</span>
+                                <div class="file-info">
+                                    <div class="file-name">${f.name}</div>
+                                    <div class="file-meta">${f.path}</div>
+                                </div>
+                                <span class="file-size">${f.size}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            list.innerHTML = html;
+        }
+
+        function selectFile(name) {
+            const file = files.find(f => f.name === name);
+            if (!file) return;
+
+            currentFile = file;
+
+            document.getElementById('contentIcon').textContent = file.icon;
+            document.getElementById('contentTitle').textContent = file.name;
+
+            // Actions
+            const actions = document.getElementById('contentActions');
+            actions.innerHTML = `
+                <a href="${file.rel_path}" download class="btn">⬇ Download</a>
+                <a href="${file.rel_path}" target="_blank" class="btn btn-primary">↗ Open Raw</a>
+            `;
+
+            // Content
+            const body = document.getElementById('contentBody');
+            if (file.type === 'markdown') {
+                // Render markdown as HTML using marked.js
+                body.innerHTML = `<div class="markdown-content">${marked.parse(file.content)}</div>`;
+            } else if (file.type === 'html') {
+                // For HTML files, show in iframe for safety
+                body.innerHTML = `<iframe src="${file.rel_path}" style="width:100%;height:100%;border:none;border-radius:0.5rem;"></iframe>`;
+            } else if (file.type === 'image') {
+                // For images, display the actual image
+                body.innerHTML = `<div class="image-preview"><img src="${file.rel_path}" alt="${file.name}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:0.5rem;"></div>`;
+            } else if (file.type === 'mermaid') {
+                // Render mermaid diagram
+                const diagramId = 'mermaid-diagram-' + Date.now();
+                body.innerHTML = `<div class="mermaid-content"><pre class="mermaid" id="${diagramId}">${file.content}</pre></div>`;
+                // Initialize mermaid on the new element
+                setTimeout(() => {
+                    mermaid.init(undefined, document.getElementById(diagramId));
+                }, 0);
+            } else if (file.type === 'json') {
+                try {
+                    const json = JSON.parse(file.content.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
+                    const formatted = JSON.stringify(json, null, 2);
+                    body.innerHTML = `<pre><code class="language-json">${formatted.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                    hljs.highlightElement(body.querySelector('code'));
+                } catch {
+                    body.innerHTML = `<pre>${file.content}</pre>`;
+                }
+            } else if (file.type === 'yaml') {
+                // YAML with syntax highlighting
+                body.innerHTML = `<pre><code class="language-yaml">${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else if (file.type === 'toon') {
+                // TOON with simple highlighting (use ini as closest match for key: value format)
+                body.innerHTML = `<pre><code class="language-ini">${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else if (file.type === 'code') {
+                // Code files with auto-highlighting
+                body.innerHTML = `<pre><code>${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else {
+                body.innerHTML = `<pre>${file.content}</pre>`;
+            }
+
+            renderFileList(document.getElementById('search').value);
+        }
+
+        function filterFiles(query) {
+            renderFileList(query);
+        }
+
+        function renderStats() {
+            const stats = {};
+            for (const f of files) {
+                stats[f.type_name] = (stats[f.type_name] || 0) + 1;
+            }
+
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => `
+                    <div class="stat-card">
+                        <div class="stat-value">${count}</div>
+                        <div class="stat-label">${type}</div>
+                    </div>
+                `).join('');
+        }
+
+        // Initialize
+        renderStats();
+        renderFileList();
+
+        // Select first file if available
+        if (files.length > 0) {
+            selectFile(files[0].name);
+        }
+    </script>
+</body>
+</html>

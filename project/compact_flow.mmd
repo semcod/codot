@@ -1,0 +1,16 @@
+flowchart TD
+    api__agent["api.agent<br/>7 funcs"]
+    api__auth["api.auth<br/>6 funcs"]
+    api__commands["api.commands<br/>16 funcs"]
+    api__main["api.main<br/>15 funcs"]
+    api__policy["api.policy<br/>11 funcs"]
+    api__queries["api.queries<br/>9 funcs"]
+    api__validators["api.validators<br/>2 funcs"]
+    cqrs_backend_workflows__server["cqrs-backend-workflows.server<br/>10 funcs"]
+    api__commands ==>|10| api__queries
+    api__main -->|3| api__policy
+    api__main -->|2| api__auth
+    api__validators -->|2| api__queries
+    api__main -->|1| api__agent
+    api__commands -->|1| api__validators
+    cqrs_backend_workflows__server -->|1| api__queries

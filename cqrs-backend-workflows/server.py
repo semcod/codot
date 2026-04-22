@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import jsonschema
 from pathlib import Path
+import os
 
 app = FastAPI(title="codot Workflow API", version="1.0.0")
 
@@ -20,7 +21,7 @@ with open(SCHEMA_PATH, "r") as f:
     WORKFLOW_SCHEMA = json.load(f)
 
 # Configuration
-CODOT_API_URL = "http://localhost:18080"
+CODOT_API_URL = os.environ.get("CODOT_API_URL", "http://localhost:18080")
 workflow_store: Dict[str, Dict[str, Any]] = {
     "example": {
         "version": "1.0",
