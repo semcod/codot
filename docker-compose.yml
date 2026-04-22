@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: cqrs-api
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me-32-chars-minimum-xyz}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - POLICY_RULES_PATH=/app/policy/rules.yaml
+      - ALLOWED_LOCAL_ROOTS=/data,/schemas
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./sample-data:/data:ro
+      - ./schemas:/schemas:ro
+      - ./api/policy/rules.yaml:/app/policy/rules.yaml:ro
+    ports:
+      - "18080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  schemas:
+    image: nginx:alpine
+    container_name: cqrs-schemas
+    volumes:
+      - ./schemas:/usr/share/nginx/html:ro
+    ports:
+      - "18090:80"
+    restart: unless-stopped
+
+  data:
+    image: nginx:alpine
+    container_name: cqrs-data
+    volumes:
+      - ./sample-data:/usr/share/nginx/html:ro
+    ports:
+      - "18091:80"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cqrs-frontend
+    ports:
+      - "18000:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  workflow-api:
+    build:
+      context: ./cqrs-backend-workflows
+      dockerfile: Dockerfile
+    container_name: cqrs-workflow-api
+    environment:
+      - CODOT_API_URL=http://api:8080
+    ports:
+      - "18001:8000"
+    depends_on:
+      - api
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  workflow-editor:
+    build:
+      context: ./cqrs-workflow-editor
+      dockerfile: Dockerfile
+    container_name: cqrs-workflow-editor
+    ports:
+      - "18002:80"
+    depends_on:
+      - workflow-api
+    restart: unless-stopped
+
+networks:
+  default:
+    name: cqrs-net

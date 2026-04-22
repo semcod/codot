@@ -1,0 +1,28 @@
+{
+  "name": "codot",
+  "version": "0.1.0",
+  "description": "CQRS-URL Platform - Frontend Playground",
+  "main": "html/index.html",
+  "scripts": {
+    "serve": "npx http-server html -p 8000 -c-1",
+    "build": "echo 'No build step required - static HTML/CSS/JS'"
+  },
+  "keywords": [
+    "cqrs",
+    "url",
+    "commands",
+    "queries",
+    "api",
+    "playground"
+  ],
+  "author": "codot contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/semcod/codot"
+  },
+  "homepage": "https://github.com/semcod/codot",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

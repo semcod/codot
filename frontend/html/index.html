@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CQRS-URL Playground</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>CQRS-URL Playground</h1>
+    <div id="user-box">
+      <span id="user-label">not logged in</span>
+      <button id="logout-btn" hidden>logout</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Login -->
+    <section id="login-section" class="card">
+      <h2>Sign in</h2>
+      <p class="hint">Dev users: <code>admin/admin</code>, <code>alice/alice</code> (analyst), <code>bob/bob</code> (user)</p>
+      <div class="row">
+        <input id="username" placeholder="username" value="admin">
+        <input id="password" type="password" placeholder="password" value="admin">
+        <button id="login-btn">Login</button>
+      </div>
+      <div id="login-msg" class="msg"></div>
+    </section>
+
+    <!-- Catalog -->
+    <section id="catalog-section" class="card" hidden>
+      <h2>Catalog</h2>
+      <div class="row">
+        <button id="refresh-catalog">Reload</button>
+      </div>
+      <div id="catalog-box">loading...</div>
+    </section>
+
+    <!-- Command runner -->
+    <section id="runner-section" class="card" hidden>
+      <h2>Run a command</h2>
+      <div class="row">
+        <label>Command:
+          <select id="command-select"></select>
+        </label>
+      </div>
+      <div class="row">
+        <label>input_uri:
+          <input id="input-uri" size="60" placeholder="http://data/posts.json or file:///data/products.csv">
+        </label>
+      </div>
+      <div class="row">
+        <label>schema_uri (optional):
+          <input id="schema-uri" size="60" placeholder="http://schemas/public-posts.json">
+        </label>
+      </div>
+      <div class="row">
+        <label>meta (JSON):
+          <textarea id="meta" rows="4">{}</textarea>
+        </label>
+      </div>
+      <div class="row">
+        <button id="run-btn">PUT /commands/...</button>
+        <button id="preset-csv">Preset: CSV → JSON</button>
+        <button id="preset-render">Preset: render posts</button>
+        <button id="preset-pipeline">Preset: pipeline fetch→json→render</button>
+      </div>
+      <h3>Response</h3>
+      <pre id="response"></pre>
+      <h3>Decoded payload</h3>
+      <div id="decoded"></div>
+    </section>
+
+    <!-- Query runner -->
+    <section id="query-section" class="card" hidden>
+      <h2>Run a query</h2>
+      <div class="row">
+        <label>Query:
+          <select id="query-select"></select>
+        </label>
+      </div>
+      <div class="row">
+        <label>source_uris (one per line):
+          <textarea id="query-uris" rows="3" placeholder="http://data/posts.json"></textarea>
+        </label>
+      </div>
+      <div class="row">
+        <button id="run-query-btn">POST /queries/...</button>
+      </div>
+      <h3>Response</h3>
+      <pre id="query-response"></pre>
+    </section>
+  </main>
+
+  <footer>
+    <small>CQRS-URL Platform · <a href="/api/docs">OpenAPI docs</a></small>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

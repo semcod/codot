@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "public-products.json",
+  "title": "Products (from CSV)",
+  "type": "object",
+  "required": ["rows", "fields"],
+  "properties": {
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "price", "currency"],
+        "properties": {
+          "name":     { "type": "string", "minLength": 1 },
+          "price":    { "type": "string" },
+          "currency": { "type": "string", "enum": ["USD", "EUR", "PLN", "GBP"] },
+          "category": { "type": "string" }
+        }
+      }
+    },
+    "fields": { "type": "array", "items": { "type": "string" } }
+  }
+}

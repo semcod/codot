@@ -1,0 +1,66 @@
+# Policy rules
+# -----------
+# Each rule is matched in order per user role. The first rule whose allowed_*
+# patterns match the request is decisive. Patterns use shell-style globbing
+# (fnmatch): '*' matches anything, '?' matches one char.
+#
+# Fields:
+#   role               - user role the rule applies to ('*' means any role)
+#   allowed_commands   - glob patterns for command names
+#   allowed_queries    - glob patterns for query names
+#   allowed_uris       - glob patterns matched against input_uri / source_uris
+#   allowed_schemas    - glob patterns matched against schema_uri
+
+policies:
+  # ------------- admin: everything -----------------
+  - role: admin
+    allowed_commands: ["*"]
+    allowed_queries:  ["*"]
+    allowed_uris:     ["*"]
+    allowed_schemas:  ["*"]
+    allowed_agents:   ["*"]
+
+  # ------------- analyst: read + transform, no writes -----------------
+  - role: analyst
+    allowed_commands:
+      - "fetch"
+      - "converttojson"
+      - "converttoxml"
+      - "converttobase64"
+      - "converttocsv"
+      - "render"
+      - "pipeline"
+      - "agent_run"
+    allowed_queries:  ["*"]
+    allowed_uris:
+      - "http://*"
+      - "https://*"
+      - "file:///data/*"
+      - "file:///schemas/*"
+      - "data:*"
+    allowed_schemas:
+      - "http://schemas/*"
+      - "https://schemas/*"
+      - "file:///schemas/*"
+
+  # ------------- user: only public data -----------------
+  - role: user
+    allowed_commands:
+      - "fetch"
+      - "converttojson"
+      - "converttobase64"
+      - "render"
+    allowed_queries:
+      - "from-url"
+      - "introspect"
+    allowed_uris:
+      - "http://cqrs-data/*"
+      - "http://localhost:8091/*"
+      - "http://data:*/*"
+      - "https://public-*"
+      - "file:///data/public/*"
+      - "data:*"
+    allowed_schemas:
+      - "http://schemas/public-*"
+      - "https://schemas/public-*"
+      - "file:///schemas/public-*"

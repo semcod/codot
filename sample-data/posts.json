@@ -1,0 +1,5 @@
+[
+  {"id": 1, "title": "Hello world", "author": "alice", "tags": ["intro", "demo"]},
+  {"id": 2, "title": "CQRS explained", "author": "bob", "tags": ["architecture"]},
+  {"id": 3, "title": "URL as identity", "author": "carol", "tags": ["architecture", "rest"]}
+]

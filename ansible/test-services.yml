@@ -1,0 +1,229 @@
+---
+# Ansible playbook to test all codot services
+# Tests API health, endpoints, and workflow functionality
+
+- name: Test codot Services
+  hosts: localhost
+  gather_facts: no
+  vars:
+    codot_api_url: "http://localhost:18080"
+    codot_data_url: "http://localhost:18091"
+    codot_schemas_url: "http://localhost:18090"
+    codot_frontend_url: "http://localhost:18000"
+    workflow_api_url: "http://localhost:18001"
+    workflow_editor_url: "http://localhost:18002"
+
+  tasks:
+    - name: Test codot API Health
+      uri:
+        url: "{{ codot_api_url }}/health"
+        method: GET
+        return_content: yes
+      register: api_health
+      ignore_errors: yes
+
+    - name: Verify codot API Health Response
+      assert:
+        that:
+          - api_health.status == 200
+          - api_health.json.status == "ok"
+        fail_msg: "codot API health check failed"
+        success_msg: "✓ codot API health check passed"
+      ignore_errors: yes
+
+    - name: Test codot API Catalog
+      uri:
+        url: "{{ codot_api_url }}/catalog"
+        method: GET
+        return_content: yes
+      register: api_catalog
+      ignore_errors: yes
+
+    - name: Verify codot API Catalog Response
+      assert:
+        that:
+          - api_catalog.status == 200
+          - "'commands' in api_catalog.json"
+          - "'queries' in api_catalog.json"
+        fail_msg: "codot API catalog check failed"
+        success_msg: "✓ codot API catalog check passed"
+      ignore_errors: yes
+
+    - name: Get Admin Token
+      uri:
+        url: "{{ codot_api_url }}/auth/token"
+        method: POST
+        body_format: json
+        body:
+          username: admin
+          password: admin
+        return_content: yes
+      register: admin_token
+      ignore_errors: yes
+
+    - name: Verify Admin Token
+      assert:
+        that:
+          - admin_token.status == 200
+          - "'access_token' in admin_token.json"
+        fail_msg: "Admin token retrieval failed"
+        success_msg: "✓ Admin token retrieved successfully"
+      ignore_errors: yes
+
+    - name: Set token variable
+      set_fact:
+        auth_token: "{{ admin_token.json.access_token }}"
+      when: admin_token.status == 200
+
+    - name: Test Fetch Command
+      uri:
+        url: "{{ codot_api_url }}/commands/fetch"
+        method: PUT
+        headers:
+          Authorization: "Bearer {{ auth_token }}"
+        body_format: json
+        body:
+          input_uri: "file:///data/doc.txt"
+        return_content: yes
+      register: fetch_command
+      ignore_errors: yes
+      when: auth_token is defined
+
+    - name: Verify Fetch Command
+      assert:
+        that:
+          - fetch_command.status == 200
+          - fetch_command.json.ok == true
+        fail_msg: "Fetch command failed"
+        success_msg: "✓ Fetch command executed successfully"
+      ignore_errors: yes
+      when: auth_token is defined
+
+    - name: Test codot Data Service
+      uri:
+        url: "{{ codot_data_url }}/products.csv"
+        method: GET
+        return_content: yes
+      register: data_service
+      ignore_errors: yes
+
+    - name: Verify codot Data Service
+      assert:
+        that:
+          - data_service.status == 200
+          - "'name' in data_service.content"
+        fail_msg: "codot Data service check failed"
+        success_msg: "✓ codot Data service check passed"
+      ignore_errors: yes
+
+    - name: Test codot Schemas Service
+      uri:
+        url: "{{ codot_schemas_url }}/public-products.json"
+        method: GET
+        return_content: yes
+      register: schemas_service
+      ignore_errors: yes
+
+    - name: Verify codot Schemas Service
+      assert:
+        that:
+          - schemas_service.status == 200
+        fail_msg: "codot Schemas service check failed"
+        success_msg: "✓ codot Schemas service check passed"
+      ignore_errors: yes
+
+    - name: Test codot Frontend
+      uri:
+        url: "{{ codot_frontend_url }}/"
+        method: GET
+        return_content: yes
+      register: frontend_service
+      ignore_errors: yes
+
+    - name: Verify codot Frontend
+      assert:
+        that:
+          - frontend_service.status == 200
+          - "'CQRS-URL Playground' in frontend_service.content"
+        fail_msg: "codot Frontend check failed"
+        success_msg: "✓ codot Frontend check passed"
+      ignore_errors: yes
+
+    - name: Test Workflow API Health
+      uri:
+        url: "{{ workflow_api_url }}/health"
+        method: GET
+        return_content: yes
+      register: workflow_health
+      ignore_errors: yes
+
+    - name: Verify Workflow API Health
+      assert:
+        that:
+          - workflow_health.status == 200
+          - workflow_health.json.status == "ok"
+        fail_msg: "Workflow API health check failed"
+        success_msg: "✓ Workflow API health check passed"
+      ignore_errors: yes
+
+    - name: Test Workflow API List Workflows
+      uri:
+        url: "{{ workflow_api_url }}/v1/workflows"
+        method: GET
+        return_content: yes
+      register: workflow_list
+      ignore_errors: yes
+
+    - name: Verify Workflow API List
+      assert:
+        that:
+          - workflow_list.status == 200
+          - "'workflows' in workflow_list.json"
+        fail_msg: "Workflow API list check failed"
+        success_msg: "✓ Workflow API list check passed"
+      ignore_errors: yes
+
+    - name: Test Workflow API Get Example
+      uri:
+        url: "{{ workflow_api_url }}/v1/workflows/example"
+        method: GET
+        return_content: yes
+      register: workflow_example
+      ignore_errors: yes
+
+    - name: Verify Workflow API Get Example
+      assert:
+        that:
+          - workflow_example.status == 200
+          - "'nodes' in workflow_example.json"
+        fail_msg: "Workflow API get example check failed"
+        success_msg: "✓ Workflow API get example check passed"
+      ignore_errors: yes
+
+    - name: Test Workflow Editor
+      uri:
+        url: "{{ workflow_editor_url }}/"
+        method: GET
+        return_content: yes
+      register: workflow_editor
+      ignore_errors: yes
+
+    - name: Verify Workflow Editor
+      assert:
+        that:
+          - workflow_editor.status == 200
+        fail_msg: "Workflow Editor check failed"
+        success_msg: "✓ Workflow Editor check passed"
+      ignore_errors: yes
+
+    - name: Display Test Summary
+      debug:
+        msg:
+          - "=== codot Services Test Summary ==="
+          - "codot API (18080): {{ '✓ PASS' if api_health.status == 200 else '✗ FAIL' }}"
+          - "codot Data (18091): {{ '✓ PASS' if data_service.status == 200 else '✗ FAIL' }}"
+          - "codot Schemas (18090): {{ '✓ PASS' if schemas_service.status == 200 else '✗ FAIL' }}"
+          - "codot Frontend (18000): {{ '✓ PASS' if frontend_service.status == 200 else '✗ FAIL' }}"
+          - "Workflow API (18001): {{ '✓ PASS' if workflow_health.status == 200 else '✗ FAIL' }}"
+          - "Workflow Editor (18002): {{ '✓ PASS' if workflow_editor.status == 200 else '✗ FAIL' }}"
+          - "==================================="
