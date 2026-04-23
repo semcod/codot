@@ -65,7 +65,21 @@ class PipelineCommand(Command):
                 from models import AgentNode
                 from agent import execute_agent
                 agent_node = AgentNode(**agent_node_raw)
-                agent_req = AgentRequest(agent_node=agent_node, context=req.meta)
+                agent_ctx = dict(req.meta)
+                if agent_ctx.get("input", "").startswith("data:"):
+                    try:
+                        import base64
+                        from urllib.parse import unquote
+                        data_uri = agent_ctx["input"]
+                        after_colon = data_uri.split(":", 1)[1]
+                        mime_b64 = after_colon.split(";", 1)
+                        mime = mime_b64[0] if ";" in after_colon else ""
+                        b64_part = mime_b64[1].split(",", 1)[1] if ";" in after_colon else after_colon.split(",", 1)[1]
+                        decoded = base64.b64decode(b64_part).decode("utf-8", errors="replace")
+                        agent_ctx["text"] = decoded
+                    except Exception:
+                        pass
+                agent_req = AgentRequest(agent_node=agent_node, context=agent_ctx)
                 agent_resp = await execute_agent(agent_req)
                 payload_b64 = base64.b64encode(json.dumps(agent_resp.output).encode()).decode()
                 resp = CommandResponse(

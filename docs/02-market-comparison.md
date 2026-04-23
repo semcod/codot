@@ -1,6 +1,6 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
+# Market Comparison: CQRS-URL vs Workflow / Data-Pipeline Ecosystems
 
-# jakie rozwiązania i DSL-e moga robić podobne zadania jak nasz system i jakie bazy danych mozna z nim uzywac aby np korzystać rowniez z danych prywatnych i np porpzez MCP, pokazyprzykladowe uzycie i poronwaj nasze rozwiazanie do tego co na rynku z charkaterystyka
+Comparison of the CQRS-URL DAG-JSON approach with Airflow, Dagu, Databricks, Camunda, and MCP-focused orchestrators.
 
 Masz system **workflow‑CQRS**:
 pobierasz dane z URL‑zasobów, przetwarzasz je Command’ami, renderujesz Query‑View‑y, walidujesz schema / mime‑type, kontrolujesz dostęp – i to wszystko oparte na DAG‑JSON.

@@ -112,23 +112,33 @@ def main() -> int:
 
     if args.raw:
         print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
+
+    if not result.get("ok"):
+        print("FAILED:", result.get("error", result))
+        return 1
+
+    if args.agent:
+        print("=== AGENT OUTPUT ===")
+        print(json.dumps(result.get("output", {}), indent=2, ensure_ascii=False))
+        trace = result.get("reasoning_trace", [])
+        if trace:
+            print("\n=== TRACE ===")
+            for line in trace:
+                print(f"  {line}")
     else:
-        if result.get("ok"):
-            meta = result.get("meta", {})
-            trace = meta.get("pipeline_trace", [])
-            for t in trace:
-                print(f"  step {t['step']}: {t['command']} → mime={t.get('mime')}")
-            if "payload_b64" in result:
-                try:
-                    decoded = base64.b64decode(result["payload_b64"]).decode("utf-8")
-                    print("\n=== OUTPUT ===")
-                    print(decoded)
-                except Exception:
-                    print("\n=== OUTPUT (base64) ===")
-                    print(result["payload_b64"])
-        else:
-            print("FAILED:", result.get("error", result))
-            return 1
+        meta = result.get("meta", {})
+        trace = meta.get("pipeline_trace", [])
+        for t in trace:
+            print(f"  step {t['step']}: {t['command']} → mime={t.get('mime')}")
+        if "payload_b64" in result:
+            try:
+                decoded = base64.b64decode(result["payload_b64"]).decode("utf-8")
+                print("\n=== OUTPUT ===")
+                print(decoded)
+            except Exception:
+                print("\n=== OUTPUT (base64) ===")
+                print(result["payload_b64"])
 
     return 0
 

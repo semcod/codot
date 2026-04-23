@@ -75,4 +75,41 @@ STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "$API/commands/fetch" \
   -d '{"input_uri":"file:///etc/passwd"}')
 [ "$STATUS" = "403" ] || [ "$STATUS" = "400" ] && ok "traversal blocked ($STATUS)" || die "expected 403/400 got $STATUS"
 
+say "12. catalog includes agent backends"
+curl -fsS "$API/catalog" \
+  | python3 -c "import json,sys; r=json.load(sys.stdin); assert 'agent_backends' in r and 'mcp' in r['agent_backends'], r; print('backends:', r['agent_backends'])" \
+  && ok "agent backends in catalog"
+
+say "13. agent backends endpoint"
+curl -fsS "$API/agents/backends" \
+  | python3 -c "import json,sys; r=json.load(sys.stdin); assert any(b['name']=='mcp' for b in r.get('backends',[])), r" \
+  && ok "/agents/backends lists backends"
+
+say "14. pipeline with agent_node (bash_cli backend)"
+python3 -c "
+import json,sys
+json.dump({
+  'meta': {
+    'steps': [
+      {'command':'fetch','request':{'input_uri':'data:text/plain;base64,cXdlcnR5'}},
+      {
+        'command':'agent',
+        'request':{'meta':{'input':'\$previous.output'}},
+        'agent_node':{
+          'id':'smoke-agent','role':'tester','goal':'echo hello',
+          'tools':[],'backend':'bash_cli',
+          'backend_config':{'command_template':'echo hello_from_agent'}
+        }
+      }
+    ]
+  }
+}, open('/tmp/smoke_agent.json','w'))
+"
+curl -fsS -X PUT "$API/commands/pipeline" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data @/tmp/smoke_agent.json \
+  | python3 -c "import json,sys; r=json.load(sys.stdin); trace=r['meta']['pipeline_trace']; assert len(trace)==2, trace; assert trace[1]['command']=='agent', trace; print('agent step ok')" \
+  && ok "pipeline with agent_node works"
+
 printf "\n\033[32m✓ all smoke tests passed\033[0m\n"

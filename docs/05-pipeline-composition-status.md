@@ -11,7 +11,9 @@ date: 2026-04-22
 
 The `pipeline` command chains other commands into a sequence. You hand it a list of steps; it runs them in order; each step can reference the previous step's output via the sentinel string `"$previous.output"`, which the engine rewrites at runtime into a `data:<mime>;base64,<bytes>` URI.
 
-This is the tiniest possible "DSL for Command pipelines" — one sentinel, one substitution rule — but it covers every composition case we've needed so far. The canonical example from the design doc works verbatim:
+A step can also carry an `agent_node` — a full agent definition with `role`, `goal`, `tools`, `backend`, and `backend_config`. When the pipeline sees `agent_node`, it dispatches to `execute_agent()` instead of the command registry, and the agent's JSON output becomes the next step's `$previous.output`.
+
+This is the tiniest possible "DSL for Command pipelines" — one sentinel, one substitution rule, plus optional agent nodes — but it covers every composition case we've needed so far. The canonical example from the design doc works verbatim:
 
 ```json
 {
@@ -32,7 +34,8 @@ The implementation is ~50 lines and it's exercised by the smoke test. What works
 
 - **Sequential execution** of arbitrary commands from the registry.
 - **`$previous.output` substitution** anywhere in a step's request body, including nested inside `meta`. We recurse through dicts and lists.
-- **Trace in the response.** The final `meta` includes a `pipeline_trace` array with each step's command name, output mime, and meta — so callers can see what happened between input and output without having to instrument each command.
+- **Agent nodes inside steps.** A step can include `agent_node` (with `backend`, `backend_config`, `role`, `goal`, `tools`). The pipeline dispatches to `execute_agent()`, and the agent's JSON output becomes the next step's `$previous.output` after being base64-encoded as a `data:` URI.
+- **Trace in the response.** The final `meta` includes a `pipeline_trace` array with each step's command name, output mime, and meta — so callers can see what happened between input and output without having to instrument each command. Agent steps include `agent_trace` and `agent_ok` in their meta.
 - **Errors bubble up.** If step 3 fails, the pipeline fails; the trace up to step 2 is lost because we return the error instead. We might change this, but for now it keeps the happy-path response shape simple.
 
 What's deliberately not in:

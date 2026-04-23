@@ -1,12 +1,12 @@
-# redup/duplication | 1 groups | 37f 3642L | 2026-04-23
+# redup/duplication | 1 groups | 38f 3812L | 2026-04-23
 
 SUMMARY:
-  files_scanned: 37
-  total_lines:   3642
+  files_scanned: 38
+  total_lines:   3812
   dup_groups:    1
   dup_fragments: 2
   saved_lines:   3
-  scan_ms:       9474
+  scan_ms:       8760
 
 HOTSPOTS[1] (files with most duplication):
   service-factory/factory/generators/types.py  dup=6L  groups=1  frags=2  (0.2%)

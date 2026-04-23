@@ -125,9 +125,18 @@ class MCPStdioClient(MCPClient):
 
     async def close(self) -> None:
         if self._proc is not None:
-            self._proc.stdin.write(b'{"jsonrpc":"2.0","method":"notifications/initialized"}\n')
-            self._proc.kill()
-            await self._proc.wait()
+            try:
+                if self._proc.stdin and not self._proc.stdin.is_closing():
+                    self._proc.stdin.write(b'{"jsonrpc":"2.0","method":"notifications/initialized"}\n')
+                    await self._proc.stdin.drain()
+            except (RuntimeError, BrokenPipeError):
+                pass
+            try:
+                if self._proc.returncode is None:
+                    self._proc.kill()
+                    await self._proc.wait()
+            except ProcessLookupError:
+                pass
             self._proc = None
 
 

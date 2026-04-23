@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-04-23
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update SUMD.md
+- Update SUMR.md
+- Update TODO/TODO.md
+- Update api/SUMD.md
+- Update docs/01-cqrs-url-platform-status.md
+- Update docs/02-market-comparison.md
+- Update docs/03-multi-agent-architecture.md
+- Update docs/03-policy-engine-status.md
+- ... and 4 more files
+
+### Test
+- Update tests/smoke.sh
+
+### Other
+- Update Makefile
+- Update api/project/map.toon.yaml
+- Update app.doql.less
+- Update codot_run.py
+- Update cqrs-workflow-editor/src/App.tsx
+- Update examples/agent_mcp.json
+- Update examples/workflow_agent_mcp.json
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- ... and 13 more files
+
 ## [0.1.7] - 2026-04-23
 
 ### Docs
@@ -21,6 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update frontend/SUMR.md
 - Update project/README.md
 - ... and 1 more files
+
+### Fixed
+- `api/test_all_agents.py` — added missing `@pytest.mark.asyncio` decorators and absolute `_SUMMARY_SERVER` path so pytest (strict mode) passes all 4 agent backend tests (MCP, Bash, LiteLLM mock, pipeline+agent).
+- `docs/04-workflow-editor-spec.md` and `docs/02-market-comparison.md` — removed Perplexity-logo / prompt artifacts that leaked into published docs.
 
 ### Other
 - Update api/project/map.toon.yaml

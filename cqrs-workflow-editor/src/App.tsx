@@ -444,7 +444,7 @@ export default function App() {
   return (
     <div style={{ width: "100%", height: "100vh", display: "flex", overflow: "hidden" }}>
       {/* Node Palette Sidebar */}
-      <div style={{ width: 180, padding: 8, background: "#f3f4f6", borderRight: "1px solid #e5e7eb", boxSizing: "border-box" }}>
+      <div style={{ width: 180, padding: 8, background: "#f3f4f6", borderRight: "1px solid #e5e7eb", boxSizing: "border-box", overflowY: "auto" }}>
         <h3 style={{ marginTop: 0, marginBottom: 16 }}>Node Palette</h3>
         {NODE_TYPES.map((nt) => (
           <button
@@ -808,16 +808,18 @@ export default function App() {
       )}
 
       {!selectedNode && (
-        <div style={{ width: 340, padding: 8, background: "#f9fafb", borderLeft: "1px solid #e5e7eb", overflowY: "auto", boxSizing: "border-box" }}>
-          <h3 style={{ marginTop: 0, marginBottom: 12, fontSize: 14 }}>Workflow JSON</h3>
-          <SyntaxHighlighter
-            language="json"
-            style={oneDark}
-            customStyle={{ fontSize: 10, margin: 0, borderRadius: 4, maxHeight: "calc(100vh - 120px)" }}
-            wrapLongLines
-          >
-            {JSON.stringify(exportWorkflow(), null, 2)}
-          </SyntaxHighlighter>
+        <div style={{ width: 340, padding: 8, background: "#f9fafb", borderLeft: "1px solid #e5e7eb", boxSizing: "border-box", display: "flex", flexDirection: "column", height: "100vh" }}>
+          <h3 style={{ marginTop: 0, marginBottom: 12, fontSize: 14, flexShrink: 0 }}>Workflow JSON</h3>
+          <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+            <SyntaxHighlighter
+              language="json"
+              style={oneDark}
+              customStyle={{ fontSize: 10, margin: 0, borderRadius: 4 }}
+              wrapLongLines
+            >
+              {JSON.stringify(exportWorkflow(), null, 2)}
+            </SyntaxHighlighter>
+          </div>
         </div>
       )}
     </div>

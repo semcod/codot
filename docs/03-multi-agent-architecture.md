@@ -1,295 +1,205 @@
-To, co masz w tym bashu + Twoim pipeline/DAG JSON + CQRS command layer, jest w praktyce **bardzo dobrym fundamentem pod multi-agent orchestration system** — tylko teraz masz „single executor model”, a nie „agent model”.
+# Multi-Agent Architecture — implemented
 
-Pokażę Ci jak to się mapuje.
+> Status: implemented and tested (April 2026)
+
+This document describes the multi-agent execution layer that now lives on top of the CQRS-URL platform. What used to be a "command executor" is now a hybrid system where each pipeline node can be either a deterministic command or an autonomous agent with its own communication backend.
 
 ---
 
-# 1. Najważniejsza zmiana mentalna
+# 1. What changed
 
-Teraz masz:
+Before:
 
 > **command executor (deterministic pipeline)**
 
-W multi-agentach chcesz:
+Now:
 
-> **graph of autonomous workers (agents) + tool execution + shared state**
+> **graph of commands + agents with multiple communication backends**
 
-Czyli:
+A node is no longer just a command. It can be an `AgentNode` with:
 
-* node ≠ tylko command
-* node = agent (z rolą + pamięcią + narzędziami)
+- `role` — e.g. `data-researcher`, `summarizer`
+- `goal` — what the agent should accomplish
+- `tools` — list of tool names the agent may call
+- `backend` — how the agent communicates (`mcp`, `litellm`, `bash_cli`, `http_api`, `websocket`)
+- `backend_config` — backend-specific parameters (e.g. `stdio_command`, `server_url`)
 
 ---
 
-# 2. Jak Twój pipeline JSON mapuje się na multi-agenty
+# 2. Models
 
-Twój przykład:
+All agent models live in `api/models.py`:
 
-```json
-fetch → convert → render
+```python
+class AgentCommunicationBackend(str, Enum):
+    MCP = "mcp"
+    LITELLM = "litellm"
+    BASH_CLI = "bash_cli"
+    HTTP_API = "http_api"
+    WEBSOCKET = "websocket"
+
+class AgentNode(BaseModel):
+    id: str
+    role: str
+    goal: str
+    tools: list[str]
+    backend: AgentCommunicationBackend = AgentCommunicationBackend.MCP
+    backend_config: dict[str, Any]
+    memory_uri: str | None
+    input: str | None
+    inputs: list[str]
+    description: str | None
+
+class AgentRequest(BaseModel):
+    agent_node: AgentNode
+    context: dict[str, Any]
+    shared_state_uri: str | None
+
+class AgentResponse(BaseModel):
+    ok: bool
+    output: dict[str, Any]
+    reasoning_trace: list[str]
+    meta: dict[str, Any]
 ```
 
-W multi-agent systemie to staje się:
-
-| Node     | Agent role         | Tool            |
-| -------- | ------------------ | --------------- |
-| fetch1   | Data Agent         | HTTP/File fetch |
-| convert1 | Transformer Agent  | schema + parser |
-| render1  | Presentation Agent | HTML generator  |
-
-Czyli:
-
-> każdy node = wyspecjalizowany agent
+`PipelineStep` was extended with an optional `agent_node` field, so a workflow can mix commands and agents in the same pipeline.
 
 ---
 
-# 3. Twój smoke test = orchestration test harness
+# 3. Agent execution backends
 
-Twój bash test już robi coś bardzo ważnego:
+All backends are registered in `api/agent.py`.
 
-### ON = orchestration layer verification
+| Backend   | Driver | Typical use |
+|-----------|--------|-------------|
+| `mcp`     | `MCPStdioClient` / `MCPSseClient` | Any MCP-compatible server (JSON-RPC 2.0 over stdio or SSE) |
+| `litellm` | `httpx` | LLM inference via LiteLLM/OpenAI-compatible APIs |
+| `bash_cli`| `asyncio.create_subprocess_shell` | Shell scripts, local tools |
+| `http_api`| `httpx` | Generic REST/GraphQL endpoints |
+| `websocket`| `websockets` | Real-time streaming agents |
 
-Masz:
+## 3.1 MCP backend
 
-* auth boundaries (admin/user)
-* command execution
-* pipeline composition
-* security constraints
-* schema validation
+The MCP backend is the most important one. It uses `api/mcp_client.py` — a lightweight JSON-RPC 2.0 client that implements the Model Context Protocol initialize handshake:
 
-To jest dokładnie to, co robi:
+1. `initialize` — protocol version negotiation
+2. `notifications/initialized` — client ready
+3. `tools/list` — discover available tools
+4. `tools/call` — invoke the requested tool with arguments from `context`
 
-> **agent runtime verification layer**
-
----
-
-# 4. Jak to rozszerzyć do multi-agent systemu
-
-## 4.1 Zamiast "command", masz "agent"
-
-Przykład:
+Example `backend_config` for stdio:
 
 ```json
 {
-  "id": "agent1",
-  "type": "agent",
-  "role": "data-researcher",
-  "goal": "fetch and normalize product data",
-  "tools": ["fetch", "converttojson"],
-  "input": "fetch1"
+  "stdio_command": ["python3", "/abs/path/to/mcp_server.py"]
 }
 ```
 
----
-
-## 4.2 Agent ma stan (to jest kluczowa zmiana)
-
-Teraz pipeline:
-
-```id="t9w8p0"
-stateless: input → output
-```
-
-Multi-agent:
-
-```id="k3m1q2"
-stateful: memory + context + observations + output
-```
-
-Dodajesz:
+Example for SSE:
 
 ```json
-"memory_uri": "memory://agent1/session"
+{
+  "server_url": "http://mcp-server:8080/sse"
+}
 ```
+
+A minimal test server is provided in `mcp_servers/summary_server.py`. It exposes a single `summarize` tool.
 
 ---
 
-## 4.3 Twój `$previous.output` → becomes "shared blackboard"
+# 4. Pipeline integration
 
-Obecnie:
+`PipelineCommand` (`api/commands/pipeline.py`) now recognises `agent_node` inside a step:
 
-```text
-$previous.output
+```python
+for idx, step in enumerate(steps):
+    agent_node_raw = step.get("agent_node")
+    if agent_node_raw is not None:
+        agent_node = AgentNode(**agent_node_raw)
+        # decode data: URI from $previous.output into agent context
+        agent_req = AgentRequest(agent_node=agent_node, context=...)
+        agent_resp = await execute_agent(agent_req)
+        # agent output becomes a data:application/json;base64 URI for next step
 ```
 
-W multi-agent:
-
-* to nie tylko „previous”
-* to **shared workspace / blackboard**
-
-Czyli:
-
-> agents czytają i zapisują do wspólnego kontekstu DAG
+This means a workflow DAG can contain a mix of `fetch` / `convert` / `render` commands **and** `agent` nodes, all wired together through `$previous.output`.
 
 ---
 
-# 5. Jak Twój pipeline staje się multi-agent orchestrator
+# 5. API endpoints
 
-Twój pipeline executor robi:
+Two new endpoints were added in `api/main.py`:
 
-```text
-step1 → step2 → step3
-```
+- `POST /agents/{agent_id}/run` — execute a single agent given an `AgentRequest` body
+- `GET /agents/backends` — list registered backends (returned by `/catalog` as well)
 
-W multi-agent runtime:
-
-```text
-agent1 observes → acts → writes state
-agent2 observes → acts → writes state
-agent3 reacts → final output
-```
+Policy rules in `api/policy/rules.yaml` grant `agent_run` permission to `admin` and `analyst` roles.
 
 ---
 
-# 6. Co już masz (i to jest ważne)
+# 6. CLI runner
 
-Twoja architektura już ma:
-
-### 1. Deterministic execution
-
-→ idealne do debuggingu agentów
-
-### 2. Command isolation
-
-→ idealne jako “tool layer”
-
-### 3. gRPC CQRS backend
-
-→ idealne jako “agent tool runtime”
-
-### 4. Pipeline DSL
-
-→ idealne jako “agent graph definition”
-
----
-
-# 7. Jak Twój bash test staje się multi-agent test harness
-
-Twój test:
+`codot_run.py` in the repo root lets you run workflows and agents from shell without writing curl:
 
 ```bash
-curl → command → assert output
+# Standalone MCP agent
+python3 codot_run.py examples/agent_mcp.json --url http://localhost:18080 --agent
+
+# Workflow with an agent step
+python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080
 ```
 
-W multi-agent systemie to zmienia się w:
+The CLI authenticates, converts the JSON definition into the correct API payload, and prints a human-friendly trace.
 
-### Agent scenario test:
+---
+
+# 7. Mapping: old pipeline → new hybrid pipeline
+
+Old pipeline:
 
 ```text
-GIVEN:
-  data agent + transformer agent + renderer agent
-
-WHEN:
-  pipeline executed
-
-THEN:
-  verify:
-    - agent roles respected
-    - tool boundaries enforced
-    - memory consistency correct
+fetch → convert → render
 ```
 
-Czyli Twój smoke test → staje się:
+New hybrid pipeline:
 
-> **agent behavior regression suite**
-
----
-
-# 8. Najważniejszy upgrade: "pipeline → swarm"
-
-Masz teraz:
-
-> linear execution graph
-
-Możesz przejść do:
-
-### 8.1 hybrid model (najlepszy krok)
-
-* DAG nadal istnieje
-* ale node = agent
-* agent może:
-
-  * emitować sub-tasks
-  * delegować
-  * enrichować context
+| Step | Type   | Role / Command | Backend |
+|------|--------|----------------|---------|
+| fetch1 | command | `fetch` | protocol registry |
+| agent1 | agent | `data-researcher` | `mcp` (stdio server) |
+| convert1 | command | `converttojson` | — |
+| render1 | command | `render` | Jinja2 |
 
 ---
 
-# 9. Gdzie Twój system jest naprawdę mocny
+# 8. Shared state
 
-Twoja architektura jest idealna do:
+`$previous.output` is still the primary mechanism for passing data between steps. When an agent step receives a `data:` URI from the previous step, the pipeline executor decodes it and injects the decoded text into `AgentRequest.context["text"]`.
 
-## A) deterministic multi-agent systems
-
-* fintech workflows
-* ETL
-* compliance pipelines
-
-## B) tool-using agents (LLM-style)
-
-* RAG pipelines
-* research agents
-* document processing agents
-
-## C) enterprise orchestration
-
-* CQRS + workflow + audit trace (już masz!)
+A full "shared blackboard / memory store" is sketched (the `memory_uri` field exists in the schema) but not yet wired to a persistent backend.
 
 ---
 
-# 10. Najważniejszy insight
+# 9. Test harness
 
-Twój system już NIE jest:
+`api/test_all_agents.py` exercises all backends end-to-end:
 
-> "pipeline engine"
+1. **MCP stdio** — talks to `mcp_servers/summary_server.py`
+2. **Bash CLI** — runs `echo hello_from_bash`
+3. **LiteLLM** — spins up a mock HTTP server and queries it
+4. **Pipeline + agent** — runs a two-step pipeline where step 2 is an MCP agent
 
-On już jest:
+Run it:
 
-> **deterministic multi-agent execution runtime with CQRS tool layer**
-
----
-
-# 11. Co bym zrobił dalej (najważniejsze kroki)
-
-Jeśli chcesz iść w multi-agenty:
-
-### 1. dodać "agent node type"
-
-* role
-* goal
-* tools
-* memory
-
-### 2. dodać "shared state store"
-
-* blackboard / event log
-
-### 3. dodać "agent execution log"
-
-* reasoning trace (bardzo ważne)
-
-### 4. rozdzielić:
-
-* command execution layer
-* agent orchestration layer
+```bash
+cd api && python3 test_all_agents.py
+```
 
 ---
 
-# TL;DR
+# 10. What comes next
 
-Twój system już dziś może być:
-
-> **multi-agent orchestration runtime**
-
-ale musisz tylko zmienić:
-
-* node = command → node = agent
-* pipeline → DAG of agents
-* previous.output → shared state / blackboard
-
----
-
-Jeśli chcesz, mogę Ci narysować:
-
-* architekturę "Agent Runtime v2"
-* albo jak zrobić LLM-agent layer na Twoim CQRS (to będzie bardzo naturalne rozszerzenie)
+- **Agent memory** — wire `memory_uri` to a real store (Redis, Postgres, S3)
+- **Swarm / branching** — currently linear pipeline; add conditional branching and parallel agent execution
+- **More MCP servers** — integrate real-world MCP servers (filesystem, GitHub, databases)
+- **LLM-agent layer** — hook a real LiteLLM/OpenAI backend for goal-driven agents that choose their own tools

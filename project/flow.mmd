@@ -19,6 +19,7 @@ flowchart TD
     end
 
     subgraph Core
+        codot_run__main["main"]
         frontend__html__js__api__API["API"]
         frontend__html__js__api__clearToken["clearToken"]
         frontend__html__js__api__getRole["getRole"]
@@ -33,11 +34,10 @@ flowchart TD
         frontend__html__js__app__showAuthed["showAuthed"]
         frontend__html__js__app__showAnonymous["showAnonymous"]
         frontend__html__js__app__r["r"]
-        frontend__html__js__app__loadCatalog["loadCatalog"]
-        ...["+512 more"]
+        ...["+518 more"]
     end
 
     subgraph Exporters
     end
 
-    class frontend__html__js__api__API,frontend__html__js__api__clearToken,frontend__html__js__api__getRole,frontend__html__js__api__resp,frontend__html__js__api__ct,frontend__html__js__api__err,frontend__html__js__api__login,frontend__html__js__api__data,frontend__html__js__api__catalog,frontend__html__js__api__runCommand entry
+    class codot_run__main,frontend__html__js__api__API,frontend__html__js__api__clearToken,frontend__html__js__api__getRole,frontend__html__js__api__resp,frontend__html__js__api__ct,frontend__html__js__api__err,frontend__html__js__api__login,frontend__html__js__api__data,frontend__html__js__api__catalog entry

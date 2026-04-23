@@ -1,10 +1,10 @@
-# codot | 64f 5611L | python:45,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
-# stats: 118 func | 62 cls | 64 mod | CC̄=2.9 | critical:2 | cycles:0
-# alerts[5]: CC _mcp_execute=10; CC _path_item=10; CC cmd_compile=9; CC _substitute=8; CC run_workflow=8
+# codot | 65f 5795L | python:46,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
+# stats: 122 func | 62 cls | 65 mod | CC̄=3.0 | critical:3 | cycles:0
+# alerts[5]: CC _mcp_execute=10; CC main=10; CC _path_item=10; CC cmd_compile=9; CC _substitute=8
 # hotspots[5]: cmd_compile fan=15; test_litellm_mock fan=14; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[64]:
+M[65]:
   api/agent.py,363
   api/app.doql.less,60
   api/auth/__init__.py,103
@@ -14,11 +14,11 @@ M[64]:
   api/commands/converttojson.py,81
   api/commands/converttoxml.py,52
   api/commands/fetch.py,28
-  api/commands/pipeline.py,98
+  api/commands/pipeline.py,112
   api/commands/render.py,98
   api/config.py,35
   api/main.py,235
-  api/mcp_client.py,165
+  api/mcp_client.py,174
   api/models.py,126
   api/policy/__init__.py,150
   api/protocols/__init__.py,70
@@ -28,11 +28,12 @@ M[64]:
   api/queries/__init__.py,57
   api/queries/from_url.py,46
   api/queries/introspect.py,23
-  api/test_all_agents.py,141
+  api/test_all_agents.py,144
   api/test_mcp_agent.py,42
   api/tests/test_api.py,12
   api/validators/__init__.py,49
-  app.doql.less,104
+  app.doql.less,114
+  codot_run.py,148
   cqrs-backend-workflows/app.doql.less,60
   cqrs-backend-workflows/server.py,400
   cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py,16
@@ -209,6 +210,12 @@ D:
     e: validate_against_schema_uri,SchemaValidationError
     SchemaValidationError: __init__(2)
     validate_against_schema_uri(instance;schema_uri)
+  codot_run.py:
+    e: _get_token,run_pipeline,run_agent,main
+    _get_token(base;username;password)
+    run_pipeline(base;token;workflow_path)
+    run_agent(base;token;agent_path)
+    main()
   cqrs-backend-workflows/server.py:
     e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,list_examples,get_example,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
     WorkflowNode:

@@ -17,7 +17,7 @@
       "tools": ["summarize"],
       "backend": "mcp",
       "backend_config": {
-        "stdio_command": ["python3", "mcp_servers/summary_server.py"]
+        "stdio_command": ["python3", "/home/tom/github/semcod/codot/mcp_servers/summary_server.py"]
       },
       "input": "fetch1"
     }

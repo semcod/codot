@@ -21,7 +21,7 @@ That's it. No proto regeneration, no frontend DTOs, no migrations.
 
 ## Status — April 2026
 
-The platform is **runnable end-to-end** and covers the full loop described in the design notes. A single `make up` brings up four containers (API, schema server, sample-data server, frontend playground) and a `make test` runs eleven curl-level checks against the running stack, including path-traversal blocking and role-based denials.
+The platform is **runnable end-to-end** and covers the full loop described in the design notes. A single `make up` brings up four containers (API, schema server, sample-data server, frontend playground) and a `make test` runs fourteen curl-level checks against the running stack, including path-traversal blocking, role-based denials, agent backends, and pipeline with agent nodes.
 
 What works today:
 
@@ -31,6 +31,10 @@ What works today:
 - **Policy engine** — RBAC with shell-style glob patterns over command names, URIs, and schema URIs. Rules live in a YAML file that's mounted into the API container, so they can be changed without rebuilding the image.
 - **JWT auth** with three demo roles — `admin`, `analyst`, `user` — each mapped to a different slice of the policy space.
 - **Runtime JSON Schema validation** where the schema is fetched from any protocol (so the schema itself can live in a file, at an HTTP URL, or inline as a `data:` URI).
+- **Agent execution layer** — multi-backend agent runtime with support for MCP (Model Context Protocol via JSON-RPC 2.0 over stdio/SSE), LiteLLM, Bash CLI, HTTP API, and WebSocket. Agents are defined by `role`, `goal`, `tools`, and `backend_config`.
+- **MCP client** — lightweight JSON-RPC 2.0 client (`api/mcp_client.py`) with `MCPStdioClient` and `MCPSseClient`, handling `initialize`, `tools/list`, and `tools/call`.
+- **Pipeline with agent nodes** — `PipelineStep` accepts an optional `agent_node`, so a workflow can mix deterministic commands and autonomous agents. The pipeline decodes `data:` URIs from `$previous.output` and injects them into the agent context automatically.
+- **CLI runner** — `codot_run.py` lets you execute workflows and agents from shell without writing curl: `python3 codot_run.py workflow.json --url http://localhost:18080`.
 
 What doesn't exist yet, and what would come next:
 
@@ -38,6 +42,7 @@ What doesn't exist yet, and what would come next:
 - **Horizontal scaling story** — the service is stateless, but there's no queue in front of long-running commands. `converttobase64` on a 40 MB PDF is fine; anything heavier should be backgrounded.
 - **Better error taxonomy** — validation errors, policy denials and fetch failures all currently land as generic 400/403/404 JSON. A typed error body with `error_code` strings would make clients happier.
 - **No write-side commands yet** — `store`, `publish`, `enqueue` are sketched in the design doc but not implemented. We want to get the policy story airtight for writes before shipping them.
+- **Agent memory / shared blackboard** — agents have `memory_uri` in the schema but no persistent memory store is wired up yet.
 
 ## Why we're happy with it
 
@@ -49,6 +54,8 @@ Three things we learned that we didn't expect:
 
 ## How to try it
 
+### Basic stack
+
 ```bash
 git clone <this-repo>
 cd cqrs-url-platform
@@ -59,8 +66,33 @@ open http://localhost:8000      # playground
 
 Sign in as `bob/bob` (role: user) and try to hit `file:///data/products.csv` — you'll get a 403. Sign in as `alice/alice` (role: analyst) and the same call succeeds. That's the policy engine earning its keep.
 
+### Run an MCP agent from CLI
+
+```bash
+# Start the API server
+cd api && python3 -m uvicorn main:app --host 0.0.0.0 --port 18080
+
+# Run a standalone MCP agent
+python3 codot_run.py examples/agent_mcp.json --url http://localhost:18080 --agent
+
+# Run a workflow with an MCP agent step
+python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080
+```
+
+The CLI (`codot_run.py`) reads a JSON workflow or agent definition, authenticates, and dispatches to the API. For workflows it converts the DAG JSON into a `pipeline` command with `$previous.output` wiring. For agents it hits `POST /agents/{id}/run`.
+
+### Run the integration test suite
+
+```bash
+pytest api/test_all_agents.py -v
+```
+
+This exercises all backends: MCP stdio, Bash CLI, LiteLLM (mock), and pipeline with an agent node.
+
 ## Links
 
 - Repository layout and adding-a-command guide: `README.md`
 - Policy rules: `api/policy/rules.yaml`
+- Agent design notes: `docs/03-multi-agent-architecture.md`
+- Workflow editor spec: `docs/04-workflow-editor-spec.md`
 - Design notes: `articles/` (four Markdown posts covering decoupling DTOs, Command-as-URL, required schemas, and access control)

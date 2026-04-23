@@ -20,7 +20,7 @@ The engine is simple, fast, and tested. What's in:
 - **RBAC with glob patterns.** Rules live in a YAML file keyed by role. Each rule lists `allowed_commands`, `allowed_queries`, `allowed_uris`, and `allowed_schemas` as shell-style globs (`*` matches anything, `?` matches one). First matching rule wins.
 - **Enforcement in one place.** The FastAPI dispatcher calls `policy.can_execute_command(...)` or `policy.can_execute_query(...)` immediately after auth, before the command handler runs. That's the only enforcement point; there is no second-guessing inside handlers.
 - **Denials carry a reason.** `PolicyDecision.deny("no rule matched role=user command=converttojson uri=file:///data/products.csv")` — the reason goes into the 403 response body and the API log. This has saved us a lot of "why is this failing?" time in smoke tests.
-- **Three demo roles with wildly different reach:** `admin` gets everything; `analyst` gets all commands/queries but only against `http(s)://` and the mounted `/data`, `/schemas` roots; `user` is locked to a specific public prefix.
+- **Three demo roles with wildly different reach:** `admin` gets everything (including `agent_run`); `analyst` gets all commands/queries plus `agent_run` but only against `http(s)://` and the mounted `/data`, `/schemas` roots; `user` is locked to a specific public prefix.
 
 What isn't in:
 
@@ -47,12 +47,12 @@ To add a role:
 
 ```yaml
 - role: editor
-  allowed_commands: ["fetch", "converttojson", "render"]
+  allowed_commands: ["fetch", "converttojson", "render", "agent_run"]
   allowed_queries:  ["*"]
   allowed_uris:     ["http://cms/*", "file:///data/editorial/*"]
   allowed_schemas:  ["http://schemas/editorial-*"]
 ```
 
-Mint a JWT with `"role": "editor"` and that's it. No code change.
+Mint a JWT with `"role": "editor"` and that's it. No code change. Note that `agent_run` must be listed in `allowed_commands` for a role to execute agents through the pipeline or the `/agents/{id}/run` endpoint.
 
 To add attribute-based logic (not yet in): subclass `PolicyEngine`, override `can_execute_command` to consult `user.claims` or request context, and swap the instance via `reload_engine` at startup.

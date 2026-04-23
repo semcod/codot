@@ -2,7 +2,7 @@
 
 app {
   name: codot;
-  version: 0.1.6;
+  version: 0.1.7;
 }
 
 dependencies {
@@ -83,6 +83,16 @@ workflow[name="token-user"] {
 workflow[name="test"] {
   trigger: manual;
   step-1: run cmd=bash tests/smoke.sh;
+}
+
+workflow[name="test-agent"] {
+  trigger: manual;
+  step-1: run cmd=cd api && python3 test_all_agents.py;
+}
+
+workflow[name="workflow"] {
+  trigger: manual;
+  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080;
 }
 
 workflow[name="clean"] {

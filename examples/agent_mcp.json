@@ -1,0 +1,13 @@
+{
+  "id": "cli-agent",
+  "role": "summarizer",
+  "goal": "Summarize the provided text",
+  "tools": ["summarize"],
+  "backend": "mcp",
+  "backend_config": {
+    "stdio_command": ["python3", "/home/tom/github/semcod/codot/mcp_servers/summary_server.py"]
+  },
+  "context": {
+    "text": "Quantum computing is revolutionizing cryptography and drug discovery worldwide."
+  }
+}

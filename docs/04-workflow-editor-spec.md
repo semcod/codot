@@ -1,10 +1,7 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
+# Workflow Editor Specification
 
-# tak, a potem stworz rozwiażanie pozwlajaące na edycje tych workflows w sposob wizualny
+Visual editor for CQRS-URL workflows: drag-and-drop nodes + edges → export/import JSON.
 
-Masz już „język”: DAG‑JSON CQRS‑workflow‑u; teraz potrzebujesz **wizualnego edytora** (drag‑and‑drop nodes + edges → export/import JSON).
-
-Poniżej przedstawiam **konkretny projekt‑szablon**:
 
 1. **Format workflow‑u** (jako JSON),
 2. **JSON Schema** dla tego formatu,
@@ -357,7 +354,7 @@ export default function App() {
   };
 
   const onUploadWorkflow = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[^0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
@@ -533,9 +530,6 @@ curl -X PUT http://localhost:18080/commands/pipeline \
     }
   }'
 ```
-            - API‑MCP,
-            - internal‑DB,
-            - lakehouse‑plikami.
 
 ***
 
