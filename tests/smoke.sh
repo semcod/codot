@@ -112,4 +112,12 @@ curl -fsS -X PUT "$API/commands/pipeline" \
   | python3 -c "import json,sys; r=json.load(sys.stdin); trace=r['meta']['pipeline_trace']; assert len(trace)==2, trace; assert trace[1]['command']=='agent', trace; print('agent step ok')" \
   && ok "pipeline with agent_node works"
 
+say "15. compile_service generates artifacts"
+curl -fsS -X PUT "$API/commands/compile_service" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"input_uri":"file:///home/tom/github/semcod/codot/examples/view-bundle-protocol-dashboard.json","meta":{"targets":"view/php-standalone"}}' \
+  | python3 -c "import json,sys; r=json.load(sys.stdin); files=r.get('meta',{}).get('files',[]); assert any('view/php-standalone/index.php' in f for f in files), files; print('files:', files)" \
+  && ok "compile_service produced view/php-standalone/index.php"
+
 printf "\n\033[32m✓ all smoke tests passed\033[0m\n"

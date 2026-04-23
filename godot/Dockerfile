@@ -1,19 +1,4 @@
-# Build stage
-FROM golang:1.21-alpine AS builder
-
-WORKDIR /app
-
-# Copy go mod files
-COPY go.mod go.sum* ./
-RUN go mod download
-
-# Copy source code
-COPY src/ ./src/
-
-# Build the application
-RUN cd src && go build -o /app/bundle-runner bundle.go
-
-# Runtime stage
+# Runtime stage with Go for building and running
 FROM golang:1.21-alpine
 
 WORKDIR /app
@@ -26,10 +11,8 @@ RUN apk add --no-cache \
     curl \
     bash
 
-# Copy built binary from builder
-COPY --from=builder /app/bundle-runner /app/bundle-runner
-
-# Copy source code for runtime
+# Copy source code
+COPY go.mod ./
 COPY src/ ./src/
 COPY scripts/ ./scripts/
 COPY bundles/ ./bundles/
