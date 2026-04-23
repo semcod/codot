@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/xeipuuv/gojsonschema"
@@ -71,6 +72,21 @@ func (b *Bundle) LoadSchema() error {
 
 // Run executes the bundle using the specified runner
 func (b *Bundle) Run(ctx context.Context) error {
+	// Check if we should validate (skip in debug mode if schema_uri is empty)
+	debugMode := os.Getenv("DEBUG") == "true" || os.Getenv("BUNDLE_SKIP_VALIDATION") == "true"
+	
+	if b.SchemaURI != "" || !debugMode {
+		if err := b.LoadSchema(); err != nil {
+			if debugMode {
+				log.Printf("WARNING: bundle %s validation failed (DEBUG mode, continuing): %v", b.Bundle, err)
+			} else {
+				return fmt.Errorf("validation failed: %w", err)
+			}
+		}
+	} else {
+		log.Printf("WARNING: bundle %s has no schema_uri and DEBUG mode is enabled, skipping schema validation", b.Bundle)
+	}
+
 	switch b.Runner {
 	case "go_temporal":
 		return b.runGoTemporal(ctx)
@@ -129,6 +145,13 @@ func (b *Bundle) runPythonFastAPI(ctx context.Context) error {
 
 // fetchSchema downloads the JSON schema from the given URI
 func fetchSchema(uri string) ([]byte, error) {
+	// Handle file:// URIs
+	if len(uri) >= 7 && uri[:7] == "file://" {
+		filePath := uri[7:]
+		return os.ReadFile(filePath)
+	}
+
+	// Handle HTTP/HTTPS URIs
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}

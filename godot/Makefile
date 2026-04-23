@@ -1,15 +1,17 @@
-.PHONY: all build run deploy validate clean help
+.PHONY: all build run deploy validate validate-all test clean help
 
 BUNDLE := bundles/protocol-dashboard.json
 PORT   := $(shell python3 -c "import json; print(json.load(open('$(BUNDLE)'))['output']['port'])")
 
 help:
 	@echo "Targets:"
-	@echo "  build    - validate bundle + check Go structs"
-	@echo "  run      - start PHP dev server (generated/dashboard.php)"
-	@echo "  deploy   - start Temporal worker + deploy bundle"
-	@echo "  validate - validate JSON bundle only"
-	@echo "  clean    - kill running processes"
+	@echo "  build        - validate bundle + check Go structs"
+	@echo "  run          - start PHP dev server (generated/dashboard.php)"
+	@echo "  deploy       - start Temporal worker + deploy bundle"
+	@echo "  validate     - validate single JSON bundle"
+	@echo "  validate-all - validate all bundle JSONs"
+	@echo "  test         - run Go tests for bundle validation"
+	@echo "  clean        - kill running processes"
 
 all: build run
 
@@ -17,11 +19,20 @@ build:
 	bash scripts/build.sh
 
 validate:
-	python3 -c "import json; json.load(open('$(BUNDLE)')); print('JSON valid')"
+	bash scripts/validate-bundle.sh $(BUNDLE)
+
+validate-all:
+	bash scripts/validate-all.sh
+
+test:
+	cd src && go test -v -run TestBundle
 
 run:
 	@echo "Starting PHP server on port $(PORT)..."
 	cd generated && php -S 0.0.0.0:$(PORT) dashboard.php
+
+run-bundle:
+	bash scripts/run-bundle.sh $(BUNDLE)
 
 deploy:
 	@echo "Starting Temporal worker (background)..."

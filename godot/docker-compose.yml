@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Bundle validation and execution service
+  godot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: godot-bundle-service
+    volumes:
+      - ./bundles:/app/bundles
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+      - ./generated:/app/generated
+      - ./logs:/app/logs
+    environment:
+      - BUNDLE_SCHEMA_URI=file:///app/bundle.schema.json
+      - TEMPORAL_HOST=temporal:7233
+      - LOG_LEVEL=info
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+    networks:
+      - bundle-network
+    command: tail -f /dev/null
+
+  # Temporal server for workflow orchestration
+  temporal:
+    image: temporalio/auto-setup:latest
+    container_name: temporal-server
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgres
+    networks:
+      - bundle-network
+    depends_on:
+      - postgres
+
+  # PostgreSQL for Temporal
+  postgres:
+    image: postgres:13-alpine
+    container_name: temporal-postgres
+    environment:
+      - POSTGRES_USER=temporal
+      - POSTGRES_PASSWORD=temporal
+      - POSTGRES_DB=temporal
+    ports:
+      - "5432:5432"
+    networks:
+      - bundle-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # Schema server (Caddy for serving bundle schema)
+  schema-server:
+    image: caddy:latest
+    container_name: schema-server
+    volumes:
+      - ./bundle.schema.json:/srv/bundle.schema.json
+      - ./caddy.conf:/etc/caddy/Caddyfile
+    ports:
+      - "80:80"
+    networks:
+      - bundle-network
+
+networks:
+  bundle-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
