@@ -1,0 +1,30 @@
+{
+  "bundle": "data-pipeline",
+  "kind": "WORKFLOW_BUNDLE",
+  "version": "1.0.0",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "go_temporal",
+  "nodes": [
+    {
+      "id": "fetch_csv",
+      "type": "http_get",
+      "uri": "https://example.com/data.csv"
+    },
+    {
+      "id": "parse_json",
+      "type": "transform",
+      "input": "fetch_csv",
+      "script": "pandas.read_csv"
+    },
+    {
+      "id": "store_pg",
+      "type": "postgres_insert",
+      "input": "parse_json",
+      "table": "data"
+    }
+  ],
+  "output": {
+    "format": "temporal_workflow",
+    "language": "go"
+  }
+}

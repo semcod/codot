@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11] - 2026-04-23
+
+### Docs
+- Update README.md
+- Update godot/README.md
+- Update godot/output/README.md
+
+### Other
+- Update godot/Makefile
+- Update godot/bundle.schema.json
+- Update godot/bundles/protocol-dashboard.json
+- Update godot/bundles/service_bundle.json
+- Update godot/bundles/static_bundle.json
+- Update godot/bundles/view_bundle_sse.json
+- Update godot/bundles/workflow_bundle.json
+- Update godot/generated/dashboard.php
+- Update godot/go.mod
+- Update godot/scripts/build.sh
+- ... and 6 more files
+
 ## [0.1.10] - 2026-04-23
 
 ### Docs

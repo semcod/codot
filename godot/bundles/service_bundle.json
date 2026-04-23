@@ -1,0 +1,33 @@
+{
+  "bundle": "connect-test-service",
+  "kind": "SERVICE_BUNDLE",
+  "version": "1.0.0",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "go_temporal",
+  "contracts": [
+    {
+      "name": "GetLiveProtocol",
+      "kind": "CQRS_QUERY",
+      "input": {
+        "protocol_id": {
+          "type": "string"
+        }
+      },
+      "output": {
+        "protocol_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    }
+  ],
+  "output": {
+    "format": "python_fastapi",
+    "runtime": {
+      "port": 8080
+    }
+  },
+  "storage": "postgres"
+}

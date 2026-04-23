@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/bundle.schema.json",
+  "title": "Bundle Schema",
+  "description": "Schema for service, view, and workflow bundles",
+  "type": "object",
+  "required": ["bundle", "kind", "schema_uri", "runner"],
+  "properties": {
+    "bundle": {
+      "type": "string",
+      "description": "Unique bundle identifier"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["SERVICE_BUNDLE", "VIEW_BUNDLE", "WORKFLOW_BUNDLE"],
+      "description": "Type of bundle"
+    },
+    "version": {
+      "type": "string",
+      "description": "Bundle version"
+    },
+    "description": {
+      "type": "string",
+      "description": "Bundle description"
+    },
+    "schema_uri": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI to the JSON schema for validation"
+    },
+    "runner": {
+      "type": "string",
+      "description": "Runner to execute the bundle (e.g., go_temporal, python_fastapi)"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "uri"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "refresh_sec": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string"
+        },
+        "runtime": {
+          "type": "object",
+          "properties": {
+            "port": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "lang": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

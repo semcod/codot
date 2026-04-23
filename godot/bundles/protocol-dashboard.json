@@ -4,6 +4,8 @@
   "kind": "VIEW_BUNDLE",
   "version": "1.0.0",
   "description": "Live protocol dashboard",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "go_temporal",
   "sources": [
     {
       "name": "protocol",

@@ -1,0 +1,29 @@
+{
+  "bundle": "device-metrics-dashboard",
+  "kind": "VIEW_BUNDLE",
+  "version": "1.0.0",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "go_temporal",
+  "sources": [
+    {
+      "name": "metrics",
+      "uri": "http://metrics:9090/api/v1/query?query=up",
+      "refresh": "10s"
+    },
+    {
+      "name": "alerts",
+      "uri": "http://alertmanager:9093/api/v1/alerts",
+      "refresh": "30s"
+    }
+  ],
+  "template": {
+    "engine": "handlebars",
+    "source_uri": "file:///templates/metrics.hbs"
+  },
+  "output": {
+    "format": "fastapi_sse",
+    "runtime": {
+      "port": 8083
+    }
+  }
+}

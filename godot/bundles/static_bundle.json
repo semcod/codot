@@ -1,0 +1,22 @@
+{
+  "bundle": "report-static",
+  "kind": "VIEW_BUNDLE",
+  "version": "1.0.0",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "go_temporal",
+  "sources": [
+    {
+      "name": "summary",
+      "uri": "http://reports:8080/api/summary",
+      "refresh": "1h"
+    }
+  ],
+  "template": {
+    "engine": "ejs",
+    "source_uri": "file:///report.ejs"
+  },
+  "output": {
+    "format": "static_html",
+    "runtime": "lighttpd"
+  }
+}
