@@ -1,0 +1,31 @@
+
+{
+  "bundle": "protocol-dashboard",
+  "kind": "VIEW_BUNDLE",
+  "version": "1.0.0",
+  "description": "Live protocol dashboard",
+  "sources": [
+    {
+      "name": "protocol",
+      "uri": "http://localhost:8080/api/v3/protocols/123",
+      "refresh": "1s",
+      "type": "cqrs_query"
+    },
+    {
+      "name": "devices",
+      "uri": "http://localhost:8081/api/v3/devices",
+      "refresh": "5s",
+      "depends_on": ["protocol"],
+      "type": "http_get"
+    }
+  ],
+  "template": {
+    "engine": "jinja2",
+    "source_uri": "file:///templates/dashboard.html"
+  },
+  "output": {
+    "format": "php",
+    "runtime": "standalone",
+    "port": 8082
+  }
+}
