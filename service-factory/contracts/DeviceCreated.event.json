@@ -1,0 +1,23 @@
+{
+  "event": "DeviceCreated",
+  "kind": "DOMAIN_EVENT",
+  "version": "1.0.0",
+  "description": "Emitted when a new device is created",
+  "module": "connect-test",
+  "payload": {
+    "aggregate_id": { "type": "string", "description": "Device aggregate id" },
+    "serial_number": { "type": "string", "description": "Device serial number" },
+    "type_code": { "type": "string", "description": "Device type" },
+    "status": { "type": "string", "description": "Initial status" }
+  },
+  "producers": {
+    "python": "backend/app/domain/device/events.py::DeviceCreatedEvent"
+  },
+  "consumers": {
+    "projection": "backend/app/cqrs/projections/device_list.py"
+  },
+  "transport": {
+    "event_store": { "stream": "device" },
+    "ws": { "channel": "/ws/events/device" }
+  }
+}

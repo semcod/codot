@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-04-23
+
+### Docs
+- Update README.md
+- Update service-factory/README.md
+- Update service-factory/articles/01-service-factory-status.md
+
+### Other
+- Update service-factory/bundles/connect-test-service-node.bundle.json
+- Update service-factory/bundles/connect-test-service.bundle.json
+- Update service-factory/contracts/CompleteProtocol.command.json
+- Update service-factory/contracts/DemoLogin.command.json
+- Update service-factory/contracts/DeviceCreated.event.json
+- Update service-factory/contracts/DeviceUpdated.event.json
+- Update service-factory/factory/__init__.py
+- Update service-factory/factory/cli.py
+- Update service-factory/factory/generators/__init__.py
+- Update service-factory/factory/generators/code/__init__.py
+- ... and 11 more files
+
 ## [0.1.5] - 2026-04-23
 
 ### Docs

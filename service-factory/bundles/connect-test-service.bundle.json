@@ -1,0 +1,47 @@
+{
+  "bundle": "connect-test-service",
+  "kind": "SERVICE_BUNDLE",
+  "version": "1.0.0",
+  "description": "Test protocol and device lifecycle service",
+
+  "runtime": {
+    "language": "python",
+    "version": "3.12",
+    "framework": "fastapi"
+  },
+
+  "contracts": [
+    "CompleteProtocol.command.json",
+    "DemoLogin.command.json",
+    "DeviceCreated.event.json",
+    "DeviceUpdated.event.json"
+  ],
+
+  "storage": {
+    "kind": "postgres",
+    "database": "IdentificationDb",
+    "tables": ["protocols", "devices"]
+  },
+
+  "companions": [
+    {
+      "name": "llm-proxy",
+      "kind": "litellm",
+      "config": {
+        "model": "openrouter/qwen/qwen3-coder-next"
+      }
+    }
+  ],
+
+  "resources": {
+    "cpu": "500m",
+    "memory": "512Mi"
+  },
+
+  "ttl": "24h",
+
+  "exposure": {
+    "port": 8080,
+    "health_path": "/health"
+  }
+}

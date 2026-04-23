@@ -1,0 +1,22 @@
+{
+  "event": "DeviceUpdated",
+  "kind": "DOMAIN_EVENT",
+  "version": "1.0.0",
+  "description": "Emitted when device data changes",
+  "module": "connect-test",
+  "payload": {
+    "aggregate_id": { "type": "string", "description": "Device aggregate id" },
+    "changes": { "type": "object", "description": "Changed fields" },
+    "previous_values": { "type": "object", "description": "Old values" }
+  },
+  "producers": {
+    "python": "backend/app/domain/device/events.py::DeviceUpdatedEvent"
+  },
+  "consumers": {
+    "projection": "backend/app/cqrs/projections/device_list.py"
+  },
+  "transport": {
+    "event_store": { "stream": "device" },
+    "ws": { "channel": "/ws/events/device" }
+  }
+}

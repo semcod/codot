@@ -1,0 +1,39 @@
+{
+  "bundle": "connect-test-service",
+  "kind": "SERVICE_BUNDLE",
+  "version": "1.0.0",
+  "description": "Test protocol and device lifecycle service (Node variant)",
+
+  "runtime": {
+    "language": "node",
+    "version": "20",
+    "framework": "fastify"
+  },
+
+  "contracts": [
+    "CompleteProtocol.command.json",
+    "DemoLogin.command.json",
+    "DeviceCreated.event.json",
+    "DeviceUpdated.event.json"
+  ],
+
+  "storage": {
+    "kind": "none",
+    "database": "",
+    "tables": []
+  },
+
+  "companions": [],
+
+  "resources": {
+    "cpu": "250m",
+    "memory": "256Mi"
+  },
+
+  "ttl": "24h",
+
+  "exposure": {
+    "port": 3000,
+    "health_path": "/health"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "command": "CompleteProtocol",
+  "kind": "CQRS_COMMAND",
+  "version": "1.0.0",
+  "description": "Complete a test protocol with final results",
+  "module": "connect-test-protocol",
+  "input": {
+    "protocol_id":        { "type": "string", "required": true },
+    "final_status":       { "type": "string", "required": true, "enum": ["passed", "failed", "cancelled"] },
+    "completion_notes":   { "type": "string", "required": false },
+    "test_results":       { "type": "object", "required": false },
+    "recommendations":    { "type": "array", "required": false },
+    "completed_by":       { "type": "string", "required": false }
+  },
+  "output": {
+    "protocol_id":   { "type": "string" },
+    "final_status":  { "type": "string" },
+    "completed_at":  { "type": "string", "format": "datetime" }
+  },
+  "storage": {
+    "database": "IdentificationDb",
+    "table": "protocols",
+    "mapping": {
+      "final_status":    "protocols.final_status",
+      "completion_notes":"protocols.completion_notes",
+      "completed_by":    "protocols.completed_by",
+      "completed_at":    "protocols.completed_at"
+    }
+  },
+  "transport": {
+    "http": { "method": "POST", "endpoint": "/api/v3/protocols/{protocol_id}/complete" },
+    "ws":   { "command": true, "channel": "/ws/command/CompleteProtocol" }
+  },
+  "layers": {
+    "python": "backend/api/routes/v3/protocols.py",
+    "handler": "backend/app/cqrs/testing/commands.py::CompleteProtocolCommand",
+    "frontend": "frontend/src/modules/connect-test-protocol/"
+  },
+  "events": {
+    "success": "ProtocolCompleted",
+    "failure": "ProtocolCompletionFailed"
+  }
+}

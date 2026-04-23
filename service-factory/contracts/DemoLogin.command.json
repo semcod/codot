@@ -1,0 +1,30 @@
+{
+  "command": "DemoLogin",
+  "kind": "CQRS_COMMAND",
+  "version": "1.0.0",
+  "description": "Start a demo session for a selected user without password verification",
+  "module": "connect-id",
+  "input": {
+    "username": { "type": "string", "required": true }
+  },
+  "output": {
+    "user": { "type": "object" },
+    "authenticated": { "type": "boolean" }
+  },
+  "transport": {
+    "http": { "method": "POST", "endpoint": "/api/v3/auth/demo-login" },
+    "ws": { "command": true, "channel": "/ws/command/DemoLogin" }
+  },
+  "layers": {
+    "python": "backend/api/routes/v3/auth.py",
+    "frontend": "frontend/src/modules/connect-id/"
+  },
+  "permissions": {
+    "roles": ["admin", "manager", "operator", "viewer"],
+    "action": "session:demo-login"
+  },
+  "events": {
+    "success": "UserSessionSelected",
+    "failure": "DemoLoginFailed"
+  }
+}
