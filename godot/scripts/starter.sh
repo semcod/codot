@@ -13,4 +13,4 @@ fi
 
 cd src
 BUNDLE=$(cat "../$BUNDLE_FILE")
-go run starter.go "$BUNDLE"
+GOFLAGS=-mod=mod go run starter.go "$BUNDLE"

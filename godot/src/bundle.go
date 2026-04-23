@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -21,6 +22,7 @@ type Bundle struct {
 	Description string   `json:"description,omitempty"`
 	SchemaURI   string   `json:"schema_uri"`
 	Runner      string   `json:"runner"`
+	Targets     []string `json:"targets,omitempty"`
 	Sources     []Source `json:"sources,omitempty"`
 	Output      Output   `json:"output,omitempty"`
 }
@@ -97,6 +99,19 @@ func (b *Bundle) Run(ctx context.Context) error {
 	}
 }
 
+func workflowNameForKindInBundle(kind string) string {
+	switch kind {
+	case "SERVICE_BUNDLE":
+		return "DeployServiceBundle"
+	case "WORKFLOW_BUNDLE":
+		return "DeployWorkflowBundle"
+	case "APPLICATION_BUNDLE":
+		return "DeployApplicationBundle"
+	default:
+		return "DeployViewBundle"
+	}
+}
+
 // runGoTemporal executes the bundle using Temporal workflow
 func (b *Bundle) runGoTemporal(ctx context.Context) error {
 	log.Printf("Running bundle %s with Temporal runner", b.Bundle)
@@ -109,17 +124,16 @@ func (b *Bundle) runGoTemporal(ctx context.Context) error {
 	defer c.Close()
 
 	// Execute workflow based on bundle kind
-	workflowName := "DeployViewBundle"
-	if b.Kind == "SERVICE_BUNDLE" {
-		workflowName = "DeployServiceBundle"
-	} else if b.Kind == "WORKFLOW_BUNDLE" {
-		workflowName = "DeployWorkflowBundle"
+	workflowName := workflowNameForKindInBundle(b.Kind)
+	bundleJSON, err := json.Marshal(b)
+	if err != nil {
+		return fmt.Errorf("marshal bundle: %w", err)
 	}
 
 	w, err := c.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
 		ID:        fmt.Sprintf("deploy-%s", b.Bundle),
-		TaskQueue: "bundle-queue",
-	}, workflowName, b)
+		TaskQueue: "view-bundle-queue",
+	}, workflowName, bundleJSON)
 	if err != nil {
 		return fmt.Errorf("start workflow: %w", err)
 	}

@@ -1,0 +1,464 @@
+project: /home/tom/github/semcod/codot/godot
+generated_from: code2llm call graph analysis
+stats:
+  total_nodes: 37
+  total_edges: 31
+  modules_count: 5
+nodes:
+  src.bundle.runGoTemporal:
+    name: runGoTemporal
+    module: src.bundle
+    line: 115
+    cyclomatic_complexity: 5
+    calls_out: 9
+    calls_in: 1
+  src.bundle_test.TestBundleSchemaValidation:
+    name: TestBundleSchemaValidation
+    module: src.bundle_test
+    line: 111
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 0
+  src.bundle.Run:
+    name: Run
+    module: src.bundle
+    line: 75
+    cyclomatic_complexity: 11
+    calls_out: 9
+    calls_in: 0
+  llm.app.normalize_bundle:
+    name: normalize_bundle
+    module: llm.app
+    line: 332
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 2
+  llm.app.maybe_refine_bundle:
+    name: maybe_refine_bundle
+    module: llm.app
+    line: 339
+    cyclomatic_complexity: 8
+    calls_out: 7
+    calls_in: 1
+  src.bundle.runPythonFastAPI:
+    name: runPythonFastAPI
+    module: src.bundle
+    line: 146
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  src.bundle_test.collectBundleFiles:
+    name: collectBundleFiles
+    module: src.bundle_test
+    line: 27
+    cyclomatic_complexity: 5
+    calls_out: 6
+    calls_in: 1
+  llm.app.ACLPolicy.allows:
+    name: allows
+    module: llm.app
+    line: 158
+    cyclomatic_complexity: 13
+    calls_out: 12
+    calls_in: 0
+  src.starter.main:
+    name: main
+    module: src.starter
+    line: 32
+    cyclomatic_complexity: 16
+    calls_out: 18
+    calls_in: 0
+  llm.app.fetch_single:
+    name: fetch_single
+    module: llm.app
+    line: 515
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 0
+  llm.app.fetch_many:
+    name: fetch_many
+    module: llm.app
+    line: 431
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 2
+  llm.app.is_private_host:
+    name: is_private_host
+    module: llm.app
+    line: 91
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  llm.app.infer_runner:
+    name: infer_runner
+    module: llm.app
+    line: 268
+    cyclomatic_complexity: 6
+    calls_out: 1
+    calls_in: 1
+  llm.app.validate_bundle:
+    name: validate_bundle
+    module: llm.app
+    line: 373
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 1
+  src.deploy_workflow.DeployApplicationBundle:
+    name: DeployApplicationBundle
+    module: src.deploy_workflow
+    line: 75
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  llm.app.build_bundle_from_prompt:
+    name: build_bundle_from_prompt
+    module: llm.app
+    line: 441
+    cyclomatic_complexity: 5
+    calls_out: 12
+    calls_in: 1
+  llm.app.write_bundle:
+    name: write_bundle
+    module: llm.app
+    line: 475
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  llm.app.infer_kind:
+    name: infer_kind
+    module: llm.app
+    line: 242
+    cyclomatic_complexity: 8
+    calls_out: 4
+    calls_in: 1
+  llm.app.slugify:
+    name: slugify
+    module: llm.app
+    line: 68
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  llm.app.compact:
+    name: compact
+    module: llm.app
+    line: 83
+    cyclomatic_complexity: 7
+    calls_out: 5
+    calls_in: 3
+  src.starter.workflowNameForKind:
+    name: workflowNameForKind
+    module: src.starter
+    line: 19
+    cyclomatic_complexity: 5
+    calls_out: 0
+    calls_in: 1
+  src.deploy_workflow.DeployServiceBundle:
+    name: DeployServiceBundle
+    module: src.deploy_workflow
+    line: 67
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  llm.app.dedupe:
+    name: dedupe
+    module: llm.app
+    line: 73
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 2
+  llm.app.source_name_from_uri:
+    name: source_name_from_uri
+    module: llm.app
+    line: 307
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 1
+  src.bundle.fetchSchema:
+    name: fetchSchema
+    module: src.bundle
+    line: 156
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 1
+  src.bundle.workflowNameForKind:
+    name: workflowNameForKind
+    module: src.bundle
+    line: 101
+    cyclomatic_complexity: 5
+    calls_out: 0
+    calls_in: 1
+  llm.app.infer_output_format:
+    name: infer_output_format
+    module: llm.app
+    line: 278
+    cyclomatic_complexity: 9
+    calls_out: 3
+    calls_in: 1
+  src.deploy_workflow.DeployViewBundle:
+    name: DeployViewBundle
+    module: src.deploy_workflow
+    line: 38
+    cyclomatic_complexity: 7
+    calls_out: 5
+    calls_in: 3
+  llm.app.infer_targets:
+    name: infer_targets
+    module: llm.app
+    line: 255
+    cyclomatic_complexity: 6
+    calls_out: 4
+    calls_in: 1
+  llm.app.generate_bundles:
+    name: generate_bundles
+    module: llm.app
+    line: 542
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 0
+  src.bundle_test.validateBundleData:
+    name: validateBundleData
+    module: src.bundle_test
+    line: 47
+    cyclomatic_complexity: 18
+    calls_out: 8
+    calls_in: 1
+  llm.app.generate_bundle:
+    name: generate_bundle
+    module: llm.app
+    line: 525
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 1
+  src.deploy_workflow.DeployWorkflowBundle:
+    name: DeployWorkflowBundle
+    module: src.deploy_workflow
+    line: 71
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.bundle.LoadSchema:
+    name: LoadSchema
+    module: src.bundle
+    line: 47
+    cyclomatic_complexity: 4
+    calls_out: 9
+    calls_in: 1
+  llm.app.fetch_uri:
+    name: fetch_uri
+    module: llm.app
+    line: 383
+    cyclomatic_complexity: 10
+    calls_out: 25
+    calls_in: 2
+  llm.app.fetch_context:
+    name: fetch_context
+    module: llm.app
+    line: 520
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  llm.app.build_sources:
+    name: build_sources
+    module: llm.app
+    line: 315
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 1
+edges:
+- caller: src.bundle_test.TestBundleSchemaValidation
+  callee: src.bundle_test.collectBundleFiles
+  call_type: resolved
+- caller: src.bundle_test.TestBundleSchemaValidation
+  callee: src.bundle_test.validateBundleData
+  call_type: resolved
+- caller: src.starter.main
+  callee: src.starter.workflowNameForKind
+  call_type: resolved
+- caller: src.bundle.LoadSchema
+  callee: src.bundle.fetchSchema
+  call_type: resolved
+- caller: src.bundle.Run
+  callee: src.bundle.LoadSchema
+  call_type: resolved
+- caller: src.bundle.Run
+  callee: src.bundle.runGoTemporal
+  call_type: resolved
+- caller: src.bundle.Run
+  callee: src.bundle.runPythonFastAPI
+  call_type: resolved
+- caller: src.bundle.runGoTemporal
+  callee: src.bundle.workflowNameForKind
+  call_type: resolved
+- caller: src.deploy_workflow.DeployServiceBundle
+  callee: src.deploy_workflow.DeployViewBundle
+  call_type: resolved
+- caller: src.deploy_workflow.DeployWorkflowBundle
+  callee: src.deploy_workflow.DeployViewBundle
+  call_type: resolved
+- caller: src.deploy_workflow.DeployApplicationBundle
+  callee: src.deploy_workflow.DeployViewBundle
+  call_type: resolved
+- caller: llm.app.ACLPolicy.allows
+  callee: llm.app.is_private_host
+  call_type: resolved
+- caller: llm.app.infer_targets
+  callee: llm.app.dedupe
+  call_type: resolved
+- caller: llm.app.build_sources
+  callee: llm.app.source_name_from_uri
+  call_type: resolved
+- caller: llm.app.normalize_bundle
+  callee: llm.app.compact
+  call_type: resolved
+- caller: llm.app.maybe_refine_bundle
+  callee: llm.app.normalize_bundle
+  call_type: resolved
+- caller: llm.app.fetch_many
+  callee: llm.app.fetch_uri
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.infer_kind
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.infer_targets
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.infer_runner
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.build_sources
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.normalize_bundle
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.validate_bundle
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.slugify
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.infer_output_format
+  call_type: resolved
+- caller: llm.app.build_bundle_from_prompt
+  callee: llm.app.maybe_refine_bundle
+  call_type: resolved
+- caller: llm.app.fetch_single
+  callee: llm.app.fetch_uri
+  call_type: resolved
+- caller: llm.app.fetch_context
+  callee: llm.app.fetch_many
+  call_type: resolved
+- caller: llm.app.generate_bundle
+  callee: llm.app.build_bundle_from_prompt
+  call_type: resolved
+- caller: llm.app.generate_bundle
+  callee: llm.app.write_bundle
+  call_type: resolved
+- caller: llm.app.generate_bundles
+  callee: llm.app.generate_bundle
+  call_type: resolved
+modules:
+  llm.app:
+  - llm.app.ACLPolicy.allows
+  - llm.app.build_bundle_from_prompt
+  - llm.app.build_sources
+  - llm.app.compact
+  - llm.app.dedupe
+  - llm.app.fetch_context
+  - llm.app.fetch_many
+  - llm.app.fetch_single
+  - llm.app.fetch_uri
+  - llm.app.generate_bundle
+  - llm.app.generate_bundles
+  - llm.app.infer_kind
+  - llm.app.infer_output_format
+  - llm.app.infer_runner
+  - llm.app.infer_targets
+  - llm.app.is_private_host
+  - llm.app.maybe_refine_bundle
+  - llm.app.normalize_bundle
+  - llm.app.slugify
+  - llm.app.source_name_from_uri
+  - llm.app.validate_bundle
+  - llm.app.write_bundle
+  src.bundle:
+  - src.bundle.LoadSchema
+  - src.bundle.Run
+  - src.bundle.fetchSchema
+  - src.bundle.runGoTemporal
+  - src.bundle.runPythonFastAPI
+  - src.bundle.workflowNameForKind
+  src.bundle_test:
+  - src.bundle_test.TestBundleSchemaValidation
+  - src.bundle_test.collectBundleFiles
+  - src.bundle_test.validateBundleData
+  src.deploy_workflow:
+  - src.deploy_workflow.DeployApplicationBundle
+  - src.deploy_workflow.DeployServiceBundle
+  - src.deploy_workflow.DeployViewBundle
+  - src.deploy_workflow.DeployWorkflowBundle
+  src.starter:
+  - src.starter.main
+  - src.starter.workflowNameForKind
+entry_points:
+- README.CleanupActivity
+- README.DeployServiceActivity
+- README.DeployViewBundle
+- README.GenerateCodeActivity
+- README.HealthcheckActivity
+- README.TestBundleSchemaValidation
+- README.TestBundleUnmarshal
+- README.TestOutputValidation
+- README.TestSourceValidation
+- README.collectBundleFiles
+- README.fetchData
+- README.fetchSchema
+- README.main
+- README.print
+- README.updateData
+- README.validateBundleData
+- README.wait_for_http
+- README.wait_for_port
+- README.workflowNameForKind
+- generated.dashboard.fetchData
+- generated.dashboard.updateData
+- llm.app.ACLPolicy._matches_any
+- llm.app.ACLPolicy.allows
+- llm.app.ACLPolicy.describe
+- llm.app.ACLPolicy.from_file
+- llm.app.build_state
+- llm.app.describe_acl
+- llm.app.env_bool
+- llm.app.env_float
+- llm.app.env_int
+- llm.app.fetch_context
+- llm.app.fetch_single
+- llm.app.generate_bundles
+- llm.app.health
+- llm.app.list_bundles
+- llm.app.mock_catalog
+- llm.app.mock_devices
+- llm.app.mock_health
+- llm.app.mock_posts
+- llm.app.mock_protocol
+- scripts.test-llm.assert_json_field
+- scripts.test-llm.print
+- scripts.test-llm.wait_for_http
+- scripts.test-services.wait_for_http
+- scripts.test-services.wait_for_port
+- scripts.validate-bundle.print
+- src.bundle.Run
+- src.bundle_test.TestBundleSchemaValidation
+- src.bundle_test.TestBundleUnmarshal
+- src.bundle_test.TestOutputValidation
+- src.bundle_test.TestSourceValidation
+- src.deploy_workflow.CleanupActivity
+- src.deploy_workflow.DeployApplicationBundle
+- src.deploy_workflow.DeployServiceActivity
+- src.deploy_workflow.DeployServiceBundle
+- src.deploy_workflow.DeployWorkflowBundle
+- src.deploy_workflow.GenerateCodeActivity
+- src.deploy_workflow.HealthcheckActivity
+- src.deploy_workflow.main
+- src.starter.main

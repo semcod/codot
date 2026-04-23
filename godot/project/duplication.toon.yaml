@@ -1,0 +1,33 @@
+# redup/duplication | 1 groups | 1f 595L | 2026-04-23
+
+SUMMARY:
+  files_scanned: 1
+  total_lines:   595
+  dup_groups:    1
+  dup_fragments: 2
+  saved_lines:   8
+  scan_ms:       4765
+
+HOTSPOTS[1] (files with most duplication):
+  llm/app.py  dup=16L  groups=1  frags=2  (2.7%)
+
+DUPLICATES[1] (ranked by impact):
+  [07c2810340de43fb]   STRU  env_int  L=8 N=2 saved=8 sim=1.00
+      llm/app.py:48-55  (env_int)
+      llm/app.py:58-65  (env_float)
+
+REFACTOR[1] (ranked by priority):
+  [1] ○ extract_function   → llm/utils/env_int.py
+      WHY: 2 occurrences of 8-line block across 1 files — saves 8 lines
+      FILES: llm/app.py
+
+QUICK_WINS[1] (low risk, high savings — do first):
+  [1] extract_function   saved=8L  → llm/utils/env_int.py
+      FILES: app.py
+
+EFFORT_ESTIMATE (total ≈ 0.3h):
+  easy   env_int                             saved=8L  ~16min
+
+METRICS-TARGET:
+  dup_groups:  1 → 0
+  saved_lines: 8 lines recoverable

@@ -7,7 +7,7 @@ bash scripts/validate-all.sh
 echo "=== Checking Go structs ==="
 if command -v go &> /dev/null; then
     cd src
-    go build -o /dev/null bundle.go 2>/dev/null || true
+    GOFLAGS=-mod=mod go test bundle.go bundle_test.go >/dev/null
     echo "Go structs OK"
 else
     echo "Go not installed — skipping Go build"

@@ -8,12 +8,12 @@
     {
       "name": "metrics",
       "uri": "http://metrics:9090/api/v1/query?query=up",
-      "refresh": "10s"
+      "refresh_sec": 10
     },
     {
       "name": "alerts",
       "uri": "http://alertmanager:9093/api/v1/alerts",
-      "refresh": "30s"
+      "refresh_sec": 30
     }
   ],
   "template": {

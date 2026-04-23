@@ -8,7 +8,7 @@
     {
       "name": "summary",
       "uri": "http://reports:8080/api/summary",
-      "refresh": "1h"
+      "refresh_sec": 3600
     }
   ],
   "template": {
@@ -17,6 +17,9 @@
   },
   "output": {
     "format": "static_html",
-    "runtime": "lighttpd"
+    "runtime": {
+      "port": 8082,
+      "lang": "php"
+    }
   }
 }

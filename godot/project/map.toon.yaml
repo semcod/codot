@@ -1,0 +1,69 @@
+# godot | 19f 2152L | shell:11,go:5,less:2,python:1 | 2026-04-23
+# stats: 34 func | 6 cls | 19 mod | CC̄=3.6 | critical:1 | cycles:0
+# alerts[5]: CC fetch_uri=10; CC infer_output_format=9; CC infer_kind=8; CC maybe_refine_bundle=8; CC compact=7
+# hotspots[5]: fetch_uri fan=20; build_bundle_from_prompt fan=12; list_bundles fan=8; maybe_refine_bundle fan=7; validate_bundle fan=7
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[19]:
+  app.doql.less,178
+  llm/app.doql.less,60
+  llm/app.py,596
+  project.sh,40
+  scripts/build.sh,17
+  scripts/install.sh,101
+  scripts/quickstart.sh,22
+  scripts/run-bundle.sh,35
+  scripts/run.sh,7
+  scripts/starter.sh,17
+  scripts/test-llm.sh,196
+  scripts/test-services.sh,138
+  scripts/validate-all.sh,32
+  scripts/validate-bundle.sh,66
+  src/bundle.go,180
+  src/bundle_test.go,231
+  src/deploy_workflow.go,118
+  src/starter.go,85
+  src/structs.go,33
+D:
+  llm/app.py:
+    e: env_bool,env_int,env_float,slugify,dedupe,compact,is_private_host,build_state,infer_kind,infer_targets,infer_runner,infer_output_format,infer_runtime,source_name_from_uri,build_sources,normalize_bundle,maybe_refine_bundle,validate_bundle,fetch_uri,fetch_many,build_bundle_from_prompt,write_bundle,health,list_bundles,describe_acl,fetch_single,fetch_context,generate_bundle,generate_bundles,mock_health,mock_devices,mock_protocol,mock_posts,mock_catalog,Settings,ACLPolicy,FetchRequest,FetchManyRequest,GenerateBundleRequest,AppState
+    Settings:
+    ACLPolicy: from_file(2),_matches_any(2),allows(1),describe(0)
+    FetchRequest:
+    FetchManyRequest:
+    GenerateBundleRequest:
+    AppState:
+    env_bool(name;default)
+    env_int(name;default)
+    env_float(name;default)
+    slugify(value)
+    dedupe(values)
+    compact(value)
+    is_private_host(hostname)
+    build_state()
+    infer_kind(prompt;explicit)
+    infer_targets(prompt;explicit;kind)
+    infer_runner(kind;targets;explicit)
+    infer_output_format(kind;targets;prompt;runner)
+    infer_runtime(kind;targets;runner)
+    source_name_from_uri(uri;index)
+    build_sources(uris)
+    normalize_bundle(bundle)
+    maybe_refine_bundle(prompt;base_bundle)
+    validate_bundle(bundle)
+    fetch_uri(request)
+    fetch_many(uris)
+    build_bundle_from_prompt(request)
+    write_bundle(bundle;output_dir)
+    health()
+    list_bundles()
+    describe_acl()
+    fetch_single(request)
+    fetch_context(request)
+    generate_bundle(request)
+    generate_bundles(requests)
+    mock_health()
+    mock_devices()
+    mock_protocol(protocol_id)
+    mock_posts()
+    mock_catalog()

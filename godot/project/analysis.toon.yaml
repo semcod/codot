@@ -1,0 +1,86 @@
+# code2llm | 34f 4656L | shell:10,json:6,go:5,md:3,yaml:2,conf:1,yml:1,php:1,txt:1,python:1 | 2026-04-23
+# CC̄=3.1 | critical:2/88 | dups:0 | cycles:1
+
+HEALTH[4]:
+  🔴 GOD   README.md = 2073L, 5 classes, 19m, max CC=0.0
+  🔴 GOD   llm/app.py = 595L, 6 classes, 38m, max CC=13
+  🟡 CC    validateBundleData CC=18 (limit:15)
+  🟡 CC    main CC=16 (limit:15)
+
+REFACTOR[4]:
+  1. split README.md  (god module)
+  2. split llm/app.py  (god module)
+  3. split 2 high-CC methods  (CC>15)
+  4. break 1 circular dependencies
+
+PIPELINES[33]:
+  [1] Src [fetchData]: fetchData
+      PURITY: 100% pure
+  [2] Src [updateData]: updateData
+      PURITY: 100% pure
+  [3] Src [TestBundleSchemaValidation]: TestBundleSchemaValidation → collectBundleFiles
+      PURITY: 100% pure
+  [4] Src [TestSourceValidation]: TestSourceValidation
+      PURITY: 100% pure
+  [5] Src [TestOutputValidation]: TestOutputValidation
+      PURITY: 100% pure
+
+LAYERS:
+  src/                            CC̄=5.3    ←in:0  →out:0
+  │ !! bundle_test.go             230L  0C    6m  CC=18     ←0
+  │ bundle.go                  179L  3C    6m  CC=11     ←0
+  │ deploy_workflow.go         117L  3C    9m  CC=7      ←0
+  │ !! starter.go                  84L  1C    2m  CC=16     ←0
+  │ structs.go                  32L  4C    0m  CC=0.0    ←0
+  │
+  llm/                            CC̄=3.9    ←in:0  →out:0
+  │ !! app                        595L  6C   38m  CC=13     ←0
+  │ acl.yaml                    31L  0C    0m  CC=0.0    ←0
+  │ requirements.txt             7L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
+  │
+  generated/                      CC̄=1.0    ←in:0  →out:0
+  │ dashboard.php               34L  0C    2m  CC=1      ←0
+  │
+  scripts/                        CC̄=0.0    ←in:0  →out:0
+  │ test-llm.sh                195L  0C    3m  CC=0.0    ←0
+  │ test-services.sh           137L  0C    2m  CC=0.0    ←0
+  │ install.sh                 100L  0C    0m  CC=0.0    ←0
+  │ validate-bundle.sh          65L  0C    1m  CC=0.0    ←0
+  │ run-bundle.sh               34L  0C    0m  CC=0.0    ←0
+  │ validate-all.sh             31L  0C    0m  CC=0.0    ←0
+  │ quickstart.sh               21L  0C    0m  CC=0.0    ←0
+  │ starter.sh                  16L  0C    0m  CC=0.0    ←0
+  │ run.sh                       6L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ !! README.md                 2073L  5C   19m  CC=0.0    ←0
+  │ SUMD.md                    203L  0C    0m  CC=0.0    ←0
+  │ docker-compose.yml         122L  0C    0m  CC=0.0    ←0
+  │ bundle.schema.json          91L  0C    0m  CC=0.0    ←0
+  │ project.sh                  40L  0C    0m  CC=0.0    ←0
+  │ TODO.md                     21L  0C    0m  CC=0.0    ←0
+  │ caddy.conf                  16L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
+  │ Makefile                     0L  0C    0m  CC=0.0    ←0
+  │
+  bundles/                        CC̄=0.0    ←in:0  →out:0
+  │ service_bundle.json         33L  0C    0m  CC=0.0    ←0
+  │ workflow_bundle.json        33L  0C    0m  CC=0.0    ←0
+  │ protocol-dashboard.json     33L  0C    0m  CC=0.0    ←0
+  │ view_bundle_sse.json        29L  0C    0m  CC=0.0    ←0
+  │ static_bundle.json          25L  0C    0m  CC=0.0    ←0
+  │
+  project/                        CC̄=0.0    ←in:0  →out:0
+  │ map.toon.yaml               23L  0C    0m  CC=0.0    ←0
+  │
+  ── zero ──
+     Dockerfile                                0L
+     Makefile                                  0L
+     llm/Dockerfile                            0L
+
+COUPLING: no cross-package imports detected
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

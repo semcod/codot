@@ -21,7 +21,7 @@ case "$RUNNER" in
         echo "Starting Temporal runner..."
         cd src
         BUNDLE=$(cat "../$BUNDLE_FILE")
-        go run starter.go "$BUNDLE"
+        GOFLAGS=-mod=mod go run starter.go "$BUNDLE"
         ;;
     python_fastapi)
         echo "Python FastAPI runner not yet implemented"

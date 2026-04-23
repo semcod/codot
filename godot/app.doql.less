@@ -1,0 +1,177 @@
+// LESS format — define @variables here as needed
+
+app {
+  name: godot;
+  version: 0.1.0;
+}
+
+database[name="postgres"] {
+  type: postgresql;
+  url: env.DATABASE_URL;
+}
+
+interface[type="api"] {
+  type: rest;
+  framework: fastapi;
+}
+
+workflow[name="build"] {
+  trigger: manual;
+  step-1: run cmd=bash scripts/build.sh;
+}
+
+workflow[name="validate"] {
+  trigger: manual;
+  step-1: run cmd=bash scripts/validate-bundle.sh $(BUNDLE);
+}
+
+workflow[name="validate-all"] {
+  trigger: manual;
+  step-1: run cmd=bash scripts/validate-all.sh;
+}
+
+workflow[name="test"] {
+  trigger: manual;
+  step-1: run cmd=cd src && GOFLAGS=-mod=mod go test -v bundle.go bundle_test.go;
+}
+
+workflow[name="docker-build"] {
+  trigger: manual;
+  step-1: run cmd=docker build -t godot-bundle-service .;
+}
+
+workflow[name="docker-test"] {
+  trigger: manual;
+  step-1: run cmd=docker run --rm godot-bundle-service bash scripts/validate-all.sh;
+}
+
+workflow[name="docker-up"] {
+  trigger: manual;
+  step-1: run cmd=docker-compose up -d;
+}
+
+workflow[name="docker-down"] {
+  trigger: manual;
+  step-1: run cmd=docker-compose down;
+}
+
+workflow[name="stop"] {
+  trigger: manual;
+  step-1: run cmd=echo "=== Stopping Godot Bundle System ===";
+  step-2: run cmd=-docker-compose down 2>/dev/null;
+  step-3: run cmd=-docker rm -f godot-bundle-service godot-llm godot-mock-api temporal-server temporal-postgres schema-server 2>/dev/null;
+  step-4: run cmd=echo "Killing processes on ports...";
+  step-5: run cmd=-for port in 9000 9001 9002 9003 18094 18095 5433 8084; do \;
+  step-6: run cmd=pid=$$(lsof -t -i:$$port 2>/dev/null) && kill -9 $$pid 2>/dev/null || true; \;
+  step-7: run cmd=done;
+  step-8: run cmd=echo "✓ Stopped";
+}
+
+workflow[name="restart"] {
+  trigger: manual;
+  step-1: depend target=stop;
+  step-2: depend target=start;
+}
+
+workflow[name="status"] {
+  trigger: manual;
+  step-1: run cmd=echo "=== Godot Bundle System Status ===";
+  step-2: run cmd=echo "Docker containers:";
+  step-3: run cmd=docker ps --filter name=godot --filter name=temporal --filter name=schema --filter name=mock-api --filter name=godot-llm --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || echo "No containers running";
+  step-4: run cmd=echo "";
+  step-5: run cmd=echo "Port status:";
+  step-6: run cmd=for port in 9000 9001 9002 9003 18094 18095 5433 7233 8084; do \;
+  step-7: run cmd=if lsof -i:$$port >/dev/null 2>&1; then \;
+  step-8: run cmd=echo "  Port $$port: ✓ in use"; \;
+  step-9: run cmd=else \;
+  step-10: run cmd=echo "  Port $$port: - free"; \;
+  step-11: run cmd=fi \;
+  step-12: run cmd=done;
+  step-13: run cmd=echo "";
+  step-14: run cmd=echo "Logs: docker-compose logs -f";
+}
+
+workflow[name="start"] {
+  trigger: manual;
+  step-1: run cmd=echo "=== Starting Godot Bundle System ===";
+  step-2: run cmd=echo "Step 1: Cleaning up existing containers and ports...";
+  step-3: run cmd=$(MAKE) stop;
+  step-4: run cmd=echo "";
+  step-5: run cmd=echo "Step 2: Building Docker image...";
+  step-6: run cmd=$(MAKE) docker-build;
+  step-7: run cmd=echo "";
+  step-8: run cmd=echo "Step 3: Starting Docker services...";
+  step-9: run cmd=docker-compose up -d;
+  step-10: run cmd=echo "";
+  step-11: run cmd=echo "Waiting for services to start...";
+  step-12: run cmd=sleep 5;
+  step-13: run cmd=echo "";
+  step-14: run cmd=echo "Step 4: Running service tests...";
+  step-15: run cmd=$(MAKE) test-services;
+  step-16: run cmd=echo "";
+  step-17: run cmd=echo "=== Godot Bundle System is running ===";
+  step-18: run cmd=echo "";
+  step-19: run cmd=bash -c 'source .env && echo "Service URLs:" && \;
+  step-20: run cmd=echo "  Schema Server:  http://localhost:$${SCHEMA_SERVER_PORT:-8084}/bundle.schema.json" && \;
+  step-21: run cmd=echo "  Temporal Web:   http://localhost:$${TEMPORAL_PORT:-7233}" && \;
+  step-22: run cmd=echo "  PostgreSQL:     localhost:$${POSTGRES_PORT:-5433}" && \;
+  step-23: run cmd=echo "  LLM API:        http://localhost:$${LLM_PORT:-18094}/health" && \;
+  step-24: run cmd=echo "  Mock API:       http://localhost:$${MOCK_API_PORT:-18095}/health"';
+  step-25: run cmd=echo "";
+  step-26: run cmd=echo "Useful commands:";
+  step-27: run cmd=echo "  make stop     - Stop all services";
+  step-28: run cmd=echo "  make restart  - Restart all services";
+  step-29: run cmd=echo "  make status   - Check service status";
+}
+
+workflow[name="quickstart"] {
+  trigger: manual;
+  step-1: run cmd=$(MAKE) start;
+}
+
+workflow[name="test-services"] {
+  trigger: manual;
+  step-1: run cmd=bash scripts/test-services.sh;
+  step-2: run cmd=bash scripts/test-llm.sh;
+}
+
+workflow[name="llm-test"] {
+  trigger: manual;
+  step-1: run cmd=bash scripts/test-llm.sh;
+}
+
+workflow[name="run"] {
+  trigger: manual;
+  step-1: run cmd=echo "Starting PHP server on port $(PORT)...";
+  step-2: run cmd=cd generated && php -S 0.0.0.0:$(PORT) dashboard.php;
+}
+
+workflow[name="run-bundle"] {
+  trigger: manual;
+  step-1: run cmd=bash scripts/run-bundle.sh $(BUNDLE);
+}
+
+workflow[name="deploy"] {
+  trigger: manual;
+  step-1: run cmd=echo "Starting Temporal worker (background)...";
+  step-2: run cmd=cd src && GOFLAGS=-mod=mod go run deploy_workflow.go &;
+  step-3: run cmd=echo "Starting workflow with bundle $(BUNDLE)...";
+  step-4: run cmd=cd src && GOFLAGS=-mod=mod go run starter.go @../$(BUNDLE);
+}
+
+workflow[name="clean"] {
+  trigger: manual;
+  step-1: run cmd=-pkill -f "php -S 0.0.0.0";
+  step-2: run cmd=-pkill -f "go run deploy_workflow.go";
+  step-3: run cmd=echo "Cleaned up";
+}
+
+deploy {
+  target: docker-compose;
+  compose_file: docker-compose.yml;
+}
+
+environment[name="local"] {
+  runtime: docker-compose;
+  env_file: .env;
+}

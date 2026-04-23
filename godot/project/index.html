@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>code2llm Analysis Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --border: #475569;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #eab308;
+            --error: #ef4444;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f8fafc;
+                --surface: #ffffff;
+                --surface-hover: #f1f5f9;
+                --border: #e2e8f0;
+                --text: #1e293b;
+                --text-muted: #64748b;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .search {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        .search input:focus {
+            border-color: var(--accent);
+        }
+
+        .search input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .file-group {
+            margin-bottom: 1rem;
+        }
+
+        .file-group-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            margin-bottom: 0.125rem;
+        }
+
+        .file-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .file-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .file-item.active .file-meta {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .file-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* Content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .content-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .content-title h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface-hover);
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .content-body {
+            flex: 1;
+            overflow: auto;
+            padding: 1.5rem;
+        }
+
+        /* Welcome */
+        .welcome {
+            max-width: 800px;
+        }
+
+        .welcome h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .welcome p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Content Display */
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+        }
+
+        .markdown-content {
+            line-height: 1.7;
+        }
+
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .markdown-content h1 {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content code {
+            background: var(--surface);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+
+        .markdown-content pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        .markdown-content ul,
+        .markdown-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content li {
+            margin-bottom: 0.25rem;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+            margin-left: 0;
+            color: var(--text-muted);
+        }
+
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content th,
+        .markdown-content td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        .markdown-content th {
+            background: var(--surface);
+        }
+
+        .markdown-content img {
+            max-width: 100%;
+            border-radius: 0.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        /* Mermaid */
+        .mermaid-content {
+            background: var(--surface);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .mermaid-content pre {
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background: var(--surface);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .sidebar.open {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .file-size {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="header">
+                <h1>🔍 code2llm</h1>
+                <p>Analysis Results Browser</p>
+            </div>
+            <div class="search">
+                <input type="text" id="search" placeholder="Search files..." oninput="filterFiles(this.value)">
+            </div>
+            <div class="file-list" id="fileList">
+                <!-- Files will be rendered here -->
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="content-header">
+                <div class="content-title">
+                    <span id="contentIcon">📁</span>
+                    <h2 id="contentTitle">Welcome</h2>
+                </div>
+                <div class="content-actions" id="contentActions">
+                    <!-- Actions will be rendered here -->
+                </div>
+            </div>
+            <div class="content-body" id="contentBody">
+                <div class="welcome">
+                    <h2>Analysis Results</h2>
+                    <p>Select a file from the sidebar to view its contents. This interface works on GitHub Pages without any server required.</p>
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Stats will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize mermaid
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+
+        const files = [{"name": "calls.png", "rel_path": "calls.png", "path": "calls.png", "size": "132.6KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "compact_flow.png", "rel_path": "compact_flow.png", "path": "compact_flow.png", "size": "19.5KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "flow.png", "rel_path": "flow.png", "path": "flow.png", "size": "18.7KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "README.md", "rel_path": "README.md", "path": "README.md", "size": "9.3KB", "icon": "📝", "type": "markdown", "type_name": "Markdown", "content": "# code2llm - Generated Analysis Files\n\nThis directory contains the complete analysis of your project generated by `code2llm`. Each file serves a specific purpose for understanding, refactoring, and documenting your codebase.\n\n## 📁 Generated Files Overview\n\nWhen you run `code2llm ./ -f all`, the following files are created:\n\n### 🎯 Core Analysis Files\n\n| File | Format | Purpose | Key Insights |\n|------|--------|---------|--------------|\n| `evolution.toon.yaml` | **YAML** | **📋 Refactoring queue** - Prioritized improvements | 0 refactoring actions needed |\n| `map.toon.yaml` | **YAML** | **🗺️ Structural map + project header** - Modules, imports, exports, signatures, stats, alerts, hotspots, trend | Project architecture overview |\n\n### 🤖 LLM-Ready Documentation\n\n| File | Format | Purpose | Use Case |\n|------|--------|---------|----------|\n| `prompt.txt` | **Text** | **📝 Ready-to-send prompt** - Lists all files with instructions | Attach to LLM conversation as context guide |\n| `context.md` | **Markdown** | **📖 LLM narrative** - Architecture summary | Paste into ChatGPT/Claude for code analysis |\n\n### 📊 Visualizations\n\n| File | Format | Purpose | Description |\n|------|--------|---------|-------------|\n| `flow.mmd` | **Mermaid** | **🔄 Control flow diagram** | Function call paths with complexity styling |\n| `calls.mmd` | **Mermaid** | **📞 Call graph** | Function dependencies (edges only) |\n| `compact_flow.mmd` | **Mermaid** | **📦 Module overview** | Aggregated module-level view |\n\n## 🚀 Quick Start Commands\n\n### Basic Analysis\n```bash\n# Quick health check (TOON format only)\ncode2llm ./ -f toon\n\n# Generate all formats (what created these files)\ncode2llm ./ -f all\n\n# LLM-ready context only\ncode2llm ./ -f context\n```\n\n### Performance Options\n```bash\n# Fast analysis for large projects\ncode2llm ./ -f toon --strategy quick\n\n# Memory-limited analysis\ncode2llm ./ -f all --max-memory 500\n\n# Skip PNG generation (faster)\ncode2llm ./ -f all --no-png\n```\n\n### Refactoring Focus\n```bash\n# Get refactoring recommendations\ncode2llm ./ -f evolution\n\n# Focus on specific code smells\ncode2llm ./ -f toon --refactor --smell god_function\n\n# Data flow analysis\ncode2llm ./ -f flow --data-flow\n```\n\n## 📖 Understanding Each File\n\n### `analysis.toon` - Health Diagnostics\n**Purpose**: Quick overview of code health issues\n**Key sections**:\n- **HEALTH**: Critical issues (🔴) and warnings (🟡)\n- **REFACTOR**: Prioritized refactoring actions\n- **COUPLING**: Module dependencies and potential cycles\n- **LAYERS**: Package complexity metrics\n- **FUNCTIONS**: High-complexity functions (CC ≥ 10)\n- **CLASSES**: Complex classes needing attention\n\n**Example usage**:\n```bash\n# View health issues\ncat analysis.toon | head -30\n\n# Check refactoring priorities\ngrep \"REFACTOR\" analysis.toon\n```\n\n### `evolution.toon.yaml` - Refactoring Queue\n**Purpose**: Step-by-step refactoring plan\n**Key sections**:\n- **NEXT**: Immediate actions to take\n- **RISKS**: Potential breaking changes\n- **METRICS-TARGET**: Success criteria\n\n**Example usage**:\n```bash\n# Get refactoring plan\ncat evolution.toon.yaml\n\n# Track progress\ngrep \"NEXT\" evolution.toon.yaml\n```\n\n### `flow.toon` - Legacy Data Flow Analysis\n**Purpose**: Understand data movement through the system (legacy / explicit opt-in)\n**Key sections**:\n- **PIPELINES**: Data processing chains\n- **CONTRACTS**: Function input/output contracts\n- **SIDE_EFFECTS**: Functions with external impacts\n\n**Example usage**:\n```bash\n# Find data pipelines\ngrep \"PIPELINES\" flow.toon\n\n# Identify side effects\ngrep \"SIDE_EFFECTS\" flow.toon\n```\n\n### `map.toon.yaml` - Structural Map + Project Header\n**Purpose**: High-level architecture overview plus compact project header\n**Key sections**:\n- **MODULES**: All modules with basic stats\n- **IMPORTS**: Dependency relationships\n- **EXPORTS**: Public API surface and signatures\n- **HEADER**: Stats, alerts, hotspots, evolution trend\n\n**Example usage**:\n```bash\n# See project structure\ncat map.toon.yaml | head -50\n\n# Find public APIs\ngrep \"SIGNATURES\" map.toon.yaml\n```\n\n### `project.toon.yaml` - Compact Analysis View\n**Purpose**: Compact module view generated from project.yaml data\n**Status**: Legacy view generated on demand from unified project.yaml\n\n**Example usage**:\n```bash\n# View compact project structure\ncat project.toon.yaml | head -30\n\n# Find largest files\ngrep -E \"^  .*[0-9]{3,}$\" project.toon.yaml | sort -t',' -k2 -n -r | head -10\n```\n\n### `prompt.txt` - Ready-to-Send LLM Prompt\n**Purpose**: Pre-formatted prompt listing all generated files for LLM conversation\n**Generation**: Written when `code2llm` runs with a source path and requests `-f all` (including `--no-chunk`) or `code2logic`\n**Contents**:\n- **Files section**: Lists all existing generated files with descriptions, including `project.toon.yaml` when generated by `-f all`\n- **Source files section**: Highlights important source files such as `cli_exports/orchestrator.py`\n- **Missing section**: Shows which files weren't generated (if any)\n- **Task section**: Refactoring brief with concrete execution instructions, not just analysis\n- **Priority Order section**: State-dependent refactoring priorities, starting with blockers and then architecture cleanup\n- **Requirements section**: Guidelines for suggested changes\n\n**Example usage**:\n```bash\n# View the prompt\ncat prompt.txt\n\n# Copy to clipboard and paste into ChatGPT/Claude\ncat prompt.txt | pbcopy  # macOS\ncat prompt.txt | xclip -sel clip  # Linux\n```\n\n### `context.md` - LLM Narrative\n**Purpose**: Ready-to-paste context for AI assistants\n**Key sections**:\n- **Overview**: Project statistics\n- **Architecture**: Module breakdown\n- **Entry Points**: Public interfaces\n- **Patterns**: Design patterns detected\n\n**Example usage**:\n```bash\n# Copy to clipboard for LLM\ncat context.md | pbcopy  # macOS\ncat context.md | xclip -sel clip  # Linux\n\n# Use with Claude/ChatGPT for code analysis\n```\n\n### Visualization Files (`*.mmd`, `*.png`)\n**Purpose**: Visual understanding of code structure\n**Files**:\n- `flow.mmd` - Detailed control flow with complexity colors\n- `calls.mmd` - Simple call graph\n- `compact_flow.mmd` - High-level module view\n- `*.png` - Pre-rendered images\n\n**Example usage**:\n```bash\n# View diagrams\nopen flow.png  # macOS\nxdg-open flow.png  # Linux\n\n# Edit in Mermaid Live Editor\n# Copy content of .mmd files to https://mermaid.live\n```\n\n## 🔍 Common Analysis Patterns\n\n### 1. Code Health Assessment\n```bash\n# Quick health check\ncode2llm ./ -f toon\ncat analysis.toon | grep -E \"(HEALTH|REFACTOR)\"\n```\n\n### 2. Refactoring Planning\n```bash\n# Get refactoring queue\ncode2llm ./ -f evolution\ncat evolution.toon.yaml\n\n# Focus on specific issues\ncode2llm ./ -f toon --refactor --smell god_function\n```\n\n### 3. LLM Assistance\n```bash\n# Generate context for AI\ncode2llm ./ -f context\ncat context.md\n\n# Use with Claude: \"Based on this context, help me refactor the god modules\"\n```\n\n### 4. Team Documentation\n```bash\n# Generate all docs for team\ncode2llm ./ -f all -o ./docs/\n\n# Create visual diagrams\nopen docs/flow.png\n```\n\n## 📊 Interpreting Metrics\n\n### Complexity Metrics (CC)\n- **🔴 Critical (≥5.0)**: Immediate refactoring needed\n- **🟠 High (3.0-4.9)**: Consider refactoring\n- **🟡 Medium (1.5-2.9)**: Monitor complexity\n- **🟢 Low (0.1-1.4)**: Acceptable\n- **⚪ Basic (0.0)**: Simple functions\n\n### Module Health\n- **GOD Module**: Too large (>500 lines, >20 methods)\n- **HUB**: High fan-out (calls many modules)\n- **FAN-IN**: High incoming dependencies\n- **CYCLES**: Circular dependencies\n\n### Data Flow Indicators\n- **PIPELINE**: Sequential data processing\n- **CONTRACT**: Clear input/output specification\n- **SIDE_EFFECT**: External state modification\n\n## 🛠️ Integration Examples\n\n### CI/CD Pipeline\n```bash\n#!/bin/bash\n# Analyze code quality in CI\ncode2llm ./ -f toon -o ./analysis\nif grep -q \"🔴 GOD\" ./analysis/analysis.toon; then\n    echo \"❌ God modules detected\"\n    exit 1\nfi\n```\n\n### Pre-commit Hook\n```bash\n#!/bin/sh\n# .git/hooks/pre-commit\ncode2llm ./ -f toon -o ./temp_analysis\nif grep -q \"🔴\" ./temp_analysis/analysis.toon; then\n    echo \"⚠️  Critical issues found. Review before committing.\"\nfi\nrm -rf ./temp_analysis\n```\n\n### Documentation Generation\n```bash\n# Generate docs for README\ncode2llm ./ -f context -o ./docs/\necho \"## Architecture\" >> README.md\ncat docs/context.md >> README.md\n```\n\n## 📚 Next Steps\n\n1. **Review `analysis.toon`** - Identify critical issues\n2. **Check `evolution.toon.yaml`** - Plan refactoring priorities\n3. **Use `context.md`** - Get LLM assistance for complex changes\n4. **Reference visualizations** - Understand system architecture\n5. **Track progress** - Re-run analysis after changes\n\n## 🔧 Advanced Usage\n\n### Custom Analysis\n```bash\n# Deep analysis with all insights\ncode2llm ./ -m hybrid -f all --max-depth 15 -v\n\n# Performance-optimized\ncode2llm ./ -m static -f toon --strategy quick\n\n# Refactoring-focused\ncode2llm ./ -f toon,evolution --refactor\n```\n\n### Output Customization\n```bash\n# Separate output directories\ncode2llm ./ -f all -o ./analysis-$(date +%Y%m%d)\n\n# Split YAML into multiple files\ncode2llm ./ -f yaml --split-output\n\n# Separate orphaned functions\ncode2llm ./ -f yaml --separate-orphans\n```\n\n---\n\n**Generated by**: `code2llm ./ -f all --readme`  \n**Analysis Date**: 2026-04-23  \n**Total Functions**: 88  \n**Total Classes**: 22  \n**Modules**: 34  \n\nFor more information about code2llm, visit: https://github.com/tom-sapletta/code2llm\n", "is_subdir": false}, {"name": "context.md", "rel_path": "context.md", "path": "context.md", "size": "9.9KB", "icon": "📝", "type": "markdown", "type_name": "Markdown", "content": "# System Architecture Analysis\n\n## Overview\n\n- **Project**: /home/tom/github/semcod/codot/godot\n- **Primary Language**: shell\n- **Languages**: shell: 10, json: 6, go: 5, md: 3, yaml: 2\n- **Analysis Mode**: static\n- **Total Functions**: 88\n- **Total Classes**: 22\n- **Modules**: 34\n- **Entry Points**: 60\n\n## Architecture by Module\n\n### llm.app\n- **Functions**: 38\n- **Classes**: 6\n- **File**: `app.py`\n\n### README\n- **Functions**: 24\n- **Classes**: 10\n- **File**: `README.md`\n\n### src.deploy_workflow\n- **Functions**: 9\n- **Classes**: 3\n- **File**: `deploy_workflow.go`\n\n### scripts.validate-bundle\n- **Functions**: 8\n- **File**: `validate-bundle.sh`\n\n### scripts.test-llm\n- **Functions**: 6\n- **File**: `test-llm.sh`\n\n### src.bundle_test\n- **Functions**: 6\n- **File**: `bundle_test.go`\n\n### src.bundle\n- **Functions**: 6\n- **Classes**: 3\n- **File**: `bundle.go`\n\n### generated.dashboard\n- **Functions**: 2\n- **File**: `dashboard.php`\n\n### scripts.test-services\n- **Functions**: 2\n- **File**: `test-services.sh`\n\n### src.starter\n- **Functions**: 2\n- **Classes**: 1\n- **File**: `starter.go`\n\n### src.structs\n- **Functions**: 0\n- **Classes**: 4\n- **File**: `structs.go`\n\n## Key Entry Points\n\nMain execution flows into the system:\n\n### src.starter.main\n- **Calls**: src.starter.len, src.starter.Fprintln, src.starter.Exit, src.starter.ReadFile, src.starter.Fatalf, src.starter.byte, src.starter.Unmarshal, src.starter.Printf\n\n### llm.app.ACLPolicy.from_file\n- **Calls**: cls, path.exists, cls, yaml.safe_load, path.read_text, list, list, list\n\n### llm.app.ACLPolicy.allows\n- **Calls**: urlparse, parsed.scheme.lower, self._matches_any, self._matches_any, None.resolve, self._matches_any, llm.app.is_private_host, Path\n\n### src.bundle.Run\n- **Calls**: src.bundle.func, src.bundle.validate, src.bundle.Getenv, src.bundle.LoadSchema, src.bundle.Printf, src.bundle.failed, src.bundle.Errorf, src.bundle.runGoTemporal\n\n### src.deploy_workflow.main\n- **Calls**: src.deploy_workflow.Dial, src.deploy_workflow.Fatalln, src.deploy_workflow.Close, src.deploy_workflow.New, src.deploy_workflow.RegisterWorkflow, src.deploy_workflow.RegisterActivity, src.deploy_workflow.Run, src.deploy_workflow.InterruptCh\n\n### llm.app.list_bundles\n- **Calls**: main_app.get, sorted, target_dir.exists, len, str, path.relative_to, target_dir.rglob, path.is_file\n\n### generated.dashboard.updateData\n- **Calls**: generated.dashboard.fetch, generated.dashboard.then, generated.dashboard.json, generated.dashboard.getElementById, generated.dashboard.stringify, generated.dashboard.setTimeout\n\n### src.bundle_test.TestBundleSchemaValidation\n- **Calls**: src.bundle_test.collectBundleFiles, src.bundle_test.Fatalf, src.bundle_test.Run, src.bundle_test.Base, src.bundle_test.func, src.bundle_test.validateBundleData\n\n### llm.app.build_state\n- **Calls**: Settings, json.loads, Draft202012Validator, ACLPolicy.from_file, AppState, settings.schema_file.read_text\n\n### src.bundle_test.TestOutputValidation\n- **Calls**: src.bundle_test.Marshal, src.bundle_test.Fatalf, src.bundle_test.Unmarshal, src.bundle_test.Errorf, src.bundle_test.Error\n\n### src.bundle_test.TestBundleUnmarshal\n- **Calls**: src.bundle_test.Unmarshal, src.bundle_test.byte, src.bundle_test.Fatalf, src.bundle_test.Errorf, src.bundle_test.len\n\n### generated.dashboard.fetchData\n- **Calls**: generated.dashboard.curl_init, generated.dashboard.curl_setopt, generated.dashboard.json_decode, generated.dashboard.curl_exec\n\n### src.bundle_test.TestSourceValidation\n- **Calls**: src.bundle_test.Marshal, src.bundle_test.Fatalf, src.bundle_test.Unmarshal, src.bundle_test.Errorf\n\n### llm.app.generate_bundles\n- **Calls**: main_app.post, results.append, len, llm.app.generate_bundle\n\n### llm.app.env_bool\n- **Calls**: os.getenv, None.lower, value.strip\n\n### llm.app.env_int\n- **Calls**: os.getenv, int, value.strip\n\n### llm.app.env_float\n- **Calls**: os.getenv, float, value.strip\n\n### llm.app.fetch_context\n- **Calls**: main_app.post, len, llm.app.fetch_many\n\n### src.deploy_workflow.HealthcheckActivity\n- **Calls**: src.deploy_workflow.Get, src.deploy_workflow.Errorf\n\n### llm.app.health\n- **Calls**: main_app.get, str\n\n### llm.app.describe_acl\n- **Calls**: main_app.get, STATE.acl.describe\n\n### llm.app.fetch_single\n- **Calls**: main_app.post, llm.app.fetch_uri\n\n### src.deploy_workflow.DeployServiceBundle\n- **Calls**: src.deploy_workflow.DeployViewBundle\n\n### src.deploy_workflow.DeployWorkflowBundle\n- **Calls**: src.deploy_workflow.DeployViewBundle\n\n### src.deploy_workflow.DeployApplicationBundle\n- **Calls**: src.deploy_workflow.DeployViewBundle\n\n### src.deploy_workflow.DeployServiceActivity\n- **Calls**: src.deploy_workflow.Sprintf\n\n### llm.app.ACLPolicy._matches_any\n- **Calls**: fnmatch.fnmatch\n\n### llm.app.ACLPolicy.describe\n- **Calls**: str\n\n### llm.app.mock_health\n- **Calls**: mock_app.get\n\n### llm.app.mock_devices\n- **Calls**: mock_app.get\n\n## Process Flows\n\nKey execution flows identified:\n\n### Flow 1: main\n```\nmain [src.starter]\n```\n\n### Flow 2: from_file\n```\nfrom_file [llm.app.ACLPolicy]\n```\n\n### Flow 3: allows\n```\nallows [llm.app.ACLPolicy]\n```\n\n### Flow 4: Run\n```\nRun [src.bundle]\n```\n\n### Flow 5: list_bundles\n```\nlist_bundles [llm.app]\n```\n\n### Flow 6: updateData\n```\nupdateData [generated.dashboard]\n```\n\n### Flow 7: TestBundleSchemaValidation\n```\nTestBundleSchemaValidation [src.bundle_test]\n  └─> collectBundleFiles\n```\n\n### Flow 8: build_state\n```\nbuild_state [llm.app]\n```\n\n### Flow 9: TestOutputValidation\n```\nTestOutputValidation [src.bundle_test]\n```\n\n### Flow 10: TestBundleUnmarshal\n```\nTestBundleUnmarshal [src.bundle_test]\n```\n\n## Key Classes\n\n### llm.app.ACLPolicy\n- **Methods**: 4\n- **Key Methods**: llm.app.ACLPolicy.from_file, llm.app.ACLPolicy._matches_any, llm.app.ACLPolicy.allows, llm.app.ACLPolicy.describe\n\n### README.Bundle\n- **Methods**: 0\n\n### README.Source\n- **Methods**: 0\n\n### README.Output\n- **Methods**: 0\n\n### README.ViewBundle\n- **Methods**: 0\n\n### README.Template\n- **Methods**: 0\n\n### src.starter.bundleMetadata\n- **Methods**: 0\n\n### src.structs.ViewBundle\n- **Methods**: 0\n\n### src.structs.Source\n- **Methods**: 0\n\n### src.structs.Template\n- **Methods**: 0\n\n### src.structs.Output\n- **Methods**: 0\n\n### src.bundle.Bundle\n- **Methods**: 0\n\n### src.bundle.Source\n- **Methods**: 0\n\n### src.bundle.Output\n- **Methods**: 0\n\n### src.deploy_workflow.Bundle\n- **Methods**: 0\n\n### src.deploy_workflow.Source\n- **Methods**: 0\n\n### src.deploy_workflow.Output\n- **Methods**: 0\n\n### llm.app.Settings\n- **Methods**: 0\n\n### llm.app.FetchRequest\n- **Methods**: 0\n- **Inherits**: BaseModel\n\n### llm.app.FetchManyRequest\n- **Methods**: 0\n- **Inherits**: BaseModel\n\n## Data Transformation Functions\n\nKey functions that process and transform data:\n\n### README.validateBundleData\n\n### src.bundle_test.validateBundleData\n- **Output to**: src.bundle_test.Helper, src.bundle_test.ReadFile, src.bundle_test.Fatalf, src.bundle_test.Unmarshal, src.bundle_test.Error\n\n### llm.app.infer_output_format\n- **Output to**: prompt.lower, None.intersection, None.intersection\n\n### llm.app.validate_bundle\n- **Output to**: sorted, STATE.validator.iter_errors, HTTPException, None.join, details.append\n\n## Behavioral Patterns\n\n### recursion_compact\n- **Type**: recursion\n- **Confidence**: 0.90\n- **Functions**: llm.app.compact\n\n## Public API Surface\n\nFunctions exposed as public API (no underscore prefix):\n\n- `llm.app.fetch_uri` - 25 calls\n- `src.starter.main` - 18 calls\n- `llm.app.ACLPolicy.from_file` - 15 calls\n- `llm.app.ACLPolicy.allows` - 12 calls\n- `llm.app.build_bundle_from_prompt` - 12 calls\n- `src.bundle.LoadSchema` - 9 calls\n- `src.bundle.Run` - 9 calls\n- `src.bundle.runGoTemporal` - 9 calls\n- `src.bundle_test.validateBundleData` - 8 calls\n- `src.deploy_workflow.main` - 8 calls\n- `llm.app.list_bundles` - 8 calls\n- `llm.app.maybe_refine_bundle` - 7 calls\n- `llm.app.validate_bundle` - 7 calls\n- `generated.dashboard.updateData` - 6 calls\n- `src.bundle_test.collectBundleFiles` - 6 calls\n- `src.bundle_test.TestBundleSchemaValidation` - 6 calls\n- `src.bundle.fetchSchema` - 6 calls\n- `llm.app.build_state` - 6 calls\n- `llm.app.source_name_from_uri` - 6 calls\n- `src.bundle_test.TestOutputValidation` - 5 calls\n- `src.bundle_test.TestBundleUnmarshal` - 5 calls\n- `src.deploy_workflow.DeployViewBundle` - 5 calls\n- `llm.app.compact` - 5 calls\n- `llm.app.generate_bundle` - 5 calls\n- `generated.dashboard.fetchData` - 4 calls\n- `src.bundle_test.TestSourceValidation` - 4 calls\n- `llm.app.is_private_host` - 4 calls\n- `llm.app.infer_kind` - 4 calls\n- `llm.app.infer_targets` - 4 calls\n- `llm.app.fetch_many` - 4 calls\n- `llm.app.generate_bundles` - 4 calls\n- `src.bundle.runPythonFastAPI` - 3 calls\n- `llm.app.env_bool` - 3 calls\n- `llm.app.env_int` - 3 calls\n- `llm.app.env_float` - 3 calls\n- `llm.app.slugify` - 3 calls\n- `llm.app.dedupe` - 3 calls\n- `llm.app.infer_output_format` - 3 calls\n- `llm.app.build_sources` - 3 calls\n- `llm.app.normalize_bundle` - 3 calls\n\n## System Interactions\n\nHow components interact:\n\n```mermaid\ngraph TD\n    main --> len\n    main --> Fprintln\n    main --> Exit\n    main --> ReadFile\n    main --> Fatalf\n    from_file --> cls\n    from_file --> exists\n    from_file --> safe_load\n    from_file --> read_text\n    allows --> urlparse\n    allows --> lower\n    allows --> _matches_any\n    allows --> resolve\n    Run --> func\n    Run --> validate\n    Run --> Getenv\n    Run --> LoadSchema\n    Run --> Printf\n    main --> Dial\n    main --> Fatalln\n    main --> Close\n    main --> New\n    main --> RegisterWorkflow\n    list_bundles --> get\n    list_bundles --> sorted\n    list_bundles --> exists\n    list_bundles --> len\n    list_bundles --> str\n    updateData --> fetch\n    updateData --> then\n```\n\n## Reverse Engineering Guidelines\n\n1. **Entry Points**: Start analysis from the entry points listed above\n2. **Core Logic**: Focus on classes with many methods\n3. **Data Flow**: Follow data transformation functions\n4. **Process Flows**: Use the flow diagrams for execution paths\n5. **API Surface**: Public API functions reveal the interface\n\n## Context for LLM\n\nMaintain the identified architectural patterns and public API surface when suggesting changes.", "is_subdir": false}, {"name": "calls.mmd", "rel_path": "calls.mmd", "path": "calls.mmd", "size": "4.1KB", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart LR\n    subgraph llm__app\n        llm__app__normalize_bundle[&quot;normalize_bundle&quot;]\n        llm__app__maybe_refine_bundle[&quot;maybe_refine_bundle&quot;]\n        llm__app__ACLPolicy__allows[&quot;allows&quot;]\n        llm__app__fetch_single[&quot;fetch_single&quot;]\n        llm__app__fetch_many[&quot;fetch_many&quot;]\n        llm__app__is_private_host[&quot;is_private_host&quot;]\n        llm__app__infer_runner[&quot;infer_runner&quot;]\n        llm__app__validate_bundle[&quot;validate_bundle&quot;]\n        llm__app__build_bundle_from_prompt[&quot;build_bundle_from_prompt&quot;]\n        llm__app__write_bundle[&quot;write_bundle&quot;]\n        llm__app__infer_kind[&quot;infer_kind&quot;]\n        llm__app__slugify[&quot;slugify&quot;]\n        llm__app__compact[&quot;compact&quot;]\n        llm__app__dedupe[&quot;dedupe&quot;]\n        llm__app__source_name_from_uri[&quot;source_name_from_uri&quot;]\n        llm__app__infer_output_format[&quot;infer_output_format&quot;]\n        llm__app__infer_targets[&quot;infer_targets&quot;]\n        llm__app__generate_bundles[&quot;generate_bundles&quot;]\n        llm__app__generate_bundle[&quot;generate_bundle&quot;]\n        llm__app__fetch_uri[&quot;fetch_uri&quot;]\n        llm__app__fetch_context[&quot;fetch_context&quot;]\n        llm__app__build_sources[&quot;build_sources&quot;]\n    end\n    subgraph src__bundle\n        src__bundle__runGoTemporal[&quot;runGoTemporal&quot;]\n        src__bundle__Run[&quot;Run&quot;]\n        src__bundle__runPythonFastAPI[&quot;runPythonFastAPI&quot;]\n        src__bundle__fetchSchema[&quot;fetchSchema&quot;]\n        src__bundle__workflowNameForKind[&quot;workflowNameForKind&quot;]\n        src__bundle__LoadSchema[&quot;LoadSchema&quot;]\n    end\n    subgraph src__bundle_test\n        src__bundle_test__TestBundleSchemaValidation[&quot;TestBundleSchemaValidation&quot;]\n        src__bundle_test__collectBundleFiles[&quot;collectBundleFiles&quot;]\n        src__bundle_test__validateBundleData[&quot;validateBundleData&quot;]\n    end\n    subgraph src__deploy_workflow\n        src__deploy_workflow__DeployApplicationBundle[&quot;DeployApplicationBundle&quot;]\n        src__deploy_workflow__DeployServiceBundle[&quot;DeployServiceBundle&quot;]\n        src__deploy_workflow__DeployViewBundle[&quot;DeployViewBundle&quot;]\n        src__deploy_workflow__DeployWorkflowBundle[&quot;DeployWorkflowBundle&quot;]\n    end\n    subgraph src__starter\n        src__starter__main[&quot;main&quot;]\n        src__starter__workflowNameForKind[&quot;workflowNameForKind&quot;]\n    end\n    src__bundle_test__TestBundleSchemaValidation --&gt; src__bundle_test__collectBundleFiles\n    src__bundle_test__TestBundleSchemaValidation --&gt; src__bundle_test__validateBundleData\n    src__starter__main --&gt; src__starter__workflowNameForKind\n    src__bundle__LoadSchema --&gt; src__bundle__fetchSchema\n    src__bundle__Run --&gt; src__bundle__LoadSchema\n    src__bundle__Run --&gt; src__bundle__runGoTemporal\n    src__bundle__Run --&gt; src__bundle__runPythonFastAPI\n    src__bundle__runGoTemporal --&gt; src__bundle__workflowNameForKind\n    src__deploy_workflow__DeployServiceBundle --&gt; src__deploy_workflow__DeployViewBundle\n    src__deploy_workflow__DeployWorkflowBundle --&gt; src__deploy_workflow__DeployViewBundle\n    src__deploy_workflow__DeployApplicationBundle --&gt; src__deploy_workflow__DeployViewBundle\n    llm__app__ACLPolicy__allows --&gt; llm__app__is_private_host\n    llm__app__infer_targets --&gt; llm__app__dedupe\n    llm__app__build_sources --&gt; llm__app__source_name_from_uri\n    llm__app__normalize_bundle --&gt; llm__app__compact\n    llm__app__maybe_refine_bundle --&gt; llm__app__normalize_bundle\n    llm__app__fetch_many --&gt; llm__app__fetch_uri\n    llm__app__build_bundle_from_prompt --&gt; llm__app__infer_kind\n    llm__app__build_bundle_from_prompt --&gt; llm__app__infer_targets\n    llm__app__build_bundle_from_prompt --&gt; llm__app__infer_runner\n    llm__app__build_bundle_from_prompt --&gt; llm__app__build_sources\n    llm__app__build_bundle_from_prompt --&gt; llm__app__normalize_bundle\n    llm__app__build_bundle_from_prompt --&gt; llm__app__validate_bundle\n    llm__app__build_bundle_from_prompt --&gt; llm__app__slugify\n    llm__app__build_bundle_from_prompt --&gt; llm__app__infer_output_format\n    llm__app__build_bundle_from_prompt --&gt; llm__app__maybe_refine_bundle\n    llm__app__fetch_single --&gt; llm__app__fetch_uri\n    llm__app__fetch_context --&gt; llm__app__fetch_many\n    llm__app__generate_bundle --&gt; llm__app__build_bundle_from_prompt\n    llm__app__generate_bundle --&gt; llm__app__write_bundle\n    llm__app__generate_bundles --&gt; llm__app__generate_bundle\n", "is_subdir": false}, {"name": "compact_flow.mmd", "rel_path": "compact_flow.mmd", "path": "compact_flow.mmd", "size": "528B", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart TD\n    README[&quot;README&lt;br/&gt;19 funcs&quot;]\n    generated__dashboard[&quot;generated.dashboard&lt;br/&gt;2 funcs&quot;]\n    llm__app[&quot;llm.app&lt;br/&gt;38 funcs&quot;]\n    scripts__test_llm[&quot;scripts.test-llm&lt;br/&gt;3 funcs&quot;]\n    scripts__test_services[&quot;scripts.test-services&lt;br/&gt;2 funcs&quot;]\n    scripts__validate_bundle[&quot;scripts.validate-bundle&lt;br/&gt;1 funcs&quot;]\n    src__bundle[&quot;src.bundle&lt;br/&gt;6 funcs&quot;]\n    src__bundle_test[&quot;src.bundle_test&lt;br/&gt;6 funcs&quot;]\n    src__deploy_workflow[&quot;src.deploy_workflow&lt;br/&gt;9 funcs&quot;]\n    src__starter[&quot;src.starter&lt;br/&gt;2 funcs&quot;]\n", "is_subdir": false}, {"name": "flow.mmd", "rel_path": "flow.mmd", "path": "flow.mmd", "size": "1.2KB", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart TD\n\n    %% Entry points (blue)\n    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff\n\n    subgraph Core\n        generated__dashboard__fetchData[&quot;fetchData&quot;]\n        generated__dashboard__updateData[&quot;updateData&quot;]\n        README__fetchData[&quot;fetchData&quot;]\n        README__updateData[&quot;updateData&quot;]\n        README__wait_for_http[&quot;wait_for_http&quot;]\n        README__wait_for_port[&quot;wait_for_port&quot;]\n        README__print[&quot;print&quot;]\n        README__workflowNameForKind[&quot;workflowNameForKind&quot;]\n        README__fetchSchema[&quot;fetchSchema&quot;]\n        README__collectBundleFiles[&quot;collectBundleFiles&quot;]\n        README__validateBundleData[&quot;validateBundleData&quot;]\n        README__TestBundleSchemaValidation[&quot;TestBundleSchemaValidation&quot;]\n        README__TestSourceValidation[&quot;TestSourceValidation&quot;]\n        README__TestOutputValidation[&quot;TestOutputValidation&quot;]\n        README__TestBundleUnmarshal[&quot;TestBundleUnmarshal&quot;]\n        ...[&quot;+45 more&quot;]\n    end\n\n    class generated__dashboard__fetchData,generated__dashboard__updateData,README__fetchData,README__updateData,README__wait_for_http,README__wait_for_port,README__print,README__workflowNameForKind,README__fetchSchema,README__collectBundleFiles entry\n", "is_subdir": false}, {"name": "prompt.txt", "rel_path": "prompt.txt", "path": "prompt.txt", "size": "2.9KB", "icon": "📄", "type": "text", "type_name": "Text", "content": "You are an AI assistant helping me understand and improve a codebase.\nUse the attached/generated files as the authoritative context.\nYour goal is to refactor the project based on these files, not just summarize it.\n\nwe are in project path: godot\n\nFiles for analysis:\n\nNote: project/validation.toon.yaml and project/duplication.toon.yaml are generated by external tools (vallm and redup)\n- analysis.toon.yaml  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities) [3KB]\n- map.toon.yaml  (Structural map - files, sizes, imports, exports, signatures, project header) [6KB]\n- evolution.toon.yaml  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history) [1KB]\n- project.toon.yaml  (Compact project overview - generated from project.yaml data) [1KB]\n- context.md  (LLM narrative - architecture summary and project context) [9KB]\n\nMissing files (not generated in this run):\n- README.md\n\nTask:\n- Treat this prompt as a refactoring brief: identify the highest-priority changes and prepare concrete edits.\n- Use the file set to decide whether the first pass should focus on correctness, duplication, complexity reduction, or architecture cleanup.\n- If you can safely implement the refactor, do it; otherwise give an exact file-by-file change plan and test plan.\n- Use analysis.toon.yaml to locate high-CC functions and god modules that should be split first.\n- Keep module boundaries intact and update imports/exports according to map.toon.yaml.\n- Use evolution.toon.yaml as the execution backlog and work from the top-ranked items.\n- Keep project.toon.yaml aligned with the refactored architecture.\n\nPriority Order:\nP1 — Split or simplify the highest-CC / god modules identified in analysis.toon.yaml.\nP1 — Preserve module boundaries and update imports/exports according to map.toon.yaml.\nP2 — Keep the compact project overview in project.toon.yaml aligned with the refactor.\nP2 — Execute the highest-impact items from evolution.toon.yaml in order of benefit/risk.\n\nFocus Areas for Analysis:\n1. **Code Health Analysis** - Review complexity metrics, god modules, coupling issues from analysis.toon.yaml\n2. **Structural Map** - Use map.toon.yaml to inspect imports, exports, signatures, and the project header\n3. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon.yaml\n4. **Project Overview** - Review the compact project overview from project.toon.yaml\n\nAnalysis Strategy:\n- Start with analysis.toon.yaml for health metrics, then map.toon.yaml for structure and signatures\n- Review evolution.toon.yaml for action priorities and next steps\n- Compare the compact project overview in project.toon.yaml with the main analysis files\n\nConstraints:\n- Prefer minimal, incremental changes.\n- Maintain full backward compatibility.\n- Base recommendations on concrete metrics from the provided files.\n- If uncertain, ask clarifying questions.\n", "is_subdir": false}, {"name": "mermaid.export", "rel_path": "mermaid.export", "path": "mermaid.export", "size": "7.5KB", "icon": "📄", "type": "unknown", "type_name": "EXPORT", "content": "[Binary file]", "is_subdir": false}, {"name": "analysis.toon.yaml", "rel_path": "analysis.toon.yaml", "path": "analysis.toon.yaml", "size": "3.9KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm | 34f 4656L | shell:10,json:6,go:5,md:3,yaml:2,conf:1,yml:1,php:1,txt:1,python:1 | 2026-04-23\n# CC̄=3.1 | critical:2/88 | dups:0 | cycles:1\n\nHEALTH[4]:\n  🔴 GOD   README.md = 2073L, 5 classes, 19m, max CC=0.0\n  🔴 GOD   llm/app.py = 595L, 6 classes, 38m, max CC=13\n  🟡 CC    validateBundleData CC=18 (limit:15)\n  🟡 CC    main CC=16 (limit:15)\n\nREFACTOR[4]:\n  1. split README.md  (god module)\n  2. split llm/app.py  (god module)\n  3. split 2 high-CC methods  (CC&gt;15)\n  4. break 1 circular dependencies\n\nPIPELINES[33]:\n  [1] Src [fetchData]: fetchData\n      PURITY: 100% pure\n  [2] Src [updateData]: updateData\n      PURITY: 100% pure\n  [3] Src [TestBundleSchemaValidation]: TestBundleSchemaValidation → collectBundleFiles\n      PURITY: 100% pure\n  [4] Src [TestSourceValidation]: TestSourceValidation\n      PURITY: 100% pure\n  [5] Src [TestOutputValidation]: TestOutputValidation\n      PURITY: 100% pure\n\nLAYERS:\n  src/                            CC̄=5.3    ←in:0  →out:0\n  │ !! bundle_test.go             230L  0C    6m  CC=18     ←0\n  │ bundle.go                  179L  3C    6m  CC=11     ←0\n  │ deploy_workflow.go         117L  3C    9m  CC=7      ←0\n  │ !! starter.go                  84L  1C    2m  CC=16     ←0\n  │ structs.go                  32L  4C    0m  CC=0.0    ←0\n  │\n  llm/                            CC̄=3.9    ←in:0  →out:0\n  │ !! app                        595L  6C   38m  CC=13     ←0\n  │ acl.yaml                    31L  0C    0m  CC=0.0    ←0\n  │ requirements.txt             7L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0\n  │\n  generated/                      CC̄=1.0    ←in:0  →out:0\n  │ dashboard.php               34L  0C    2m  CC=1      ←0\n  │\n  scripts/                        CC̄=0.0    ←in:0  →out:0\n  │ test-llm.sh                195L  0C    3m  CC=0.0    ←0\n  │ test-services.sh           137L  0C    2m  CC=0.0    ←0\n  │ install.sh                 100L  0C    0m  CC=0.0    ←0\n  │ validate-bundle.sh          65L  0C    1m  CC=0.0    ←0\n  │ run-bundle.sh               34L  0C    0m  CC=0.0    ←0\n  │ validate-all.sh             31L  0C    0m  CC=0.0    ←0\n  │ quickstart.sh               21L  0C    0m  CC=0.0    ←0\n  │ starter.sh                  16L  0C    0m  CC=0.0    ←0\n  │ run.sh                       6L  0C    0m  CC=0.0    ←0\n  │\n  ./                              CC̄=0.0    ←in:0  →out:0\n  │ !! README.md                 2073L  5C   19m  CC=0.0    ←0\n  │ SUMD.md                    203L  0C    0m  CC=0.0    ←0\n  │ docker-compose.yml         122L  0C    0m  CC=0.0    ←0\n  │ bundle.schema.json          91L  0C    0m  CC=0.0    ←0\n  │ project.sh                  40L  0C    0m  CC=0.0    ←0\n  │ TODO.md                     21L  0C    0m  CC=0.0    ←0\n  │ caddy.conf                  16L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   0L  0C    0m  CC=0.0    ←0\n  │ Makefile                     0L  0C    0m  CC=0.0    ←0\n  │\n  bundles/                        CC̄=0.0    ←in:0  →out:0\n  │ service_bundle.json         33L  0C    0m  CC=0.0    ←0\n  │ workflow_bundle.json        33L  0C    0m  CC=0.0    ←0\n  │ protocol-dashboard.json     33L  0C    0m  CC=0.0    ←0\n  │ view_bundle_sse.json        29L  0C    0m  CC=0.0    ←0\n  │ static_bundle.json          25L  0C    0m  CC=0.0    ←0\n  │\n  project/                        CC̄=0.0    ←in:0  →out:0\n  │ map.toon.yaml               23L  0C    0m  CC=0.0    ←0\n  │\n  ── zero ──\n     Dockerfile                                0L\n     Makefile                                  0L\n     llm/Dockerfile                            0L\n\nCOUPLING: no cross-package imports detected\n\nEXTERNAL:\n  validation: run `vallm batch .` → validation.toon\n  duplication: run `redup scan .` → duplication.toon\n", "is_subdir": false}, {"name": "calls.toon.yaml", "rel_path": "calls.toon.yaml", "path": "calls.toon.yaml", "size": "4.0KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm call graph | /home/tom/github/semcod/codot/godot\n# nodes: 37 | edges: 31 | modules: 5\n# CC̄=3.1\n\nHUBS[20]:\n  llm.app.fetch_uri\n    CC=10  in:2  out:25  total:27\n  src.starter.main\n    CC=16  in:0  out:18  total:18\n  llm.app.build_bundle_from_prompt\n    CC=5  in:1  out:12  total:13\n  llm.app.ACLPolicy.allows\n    CC=13  in:0  out:12  total:12\n  src.bundle.runGoTemporal\n    CC=5  in:1  out:9  total:10\n  src.bundle.LoadSchema\n    CC=4  in:1  out:9  total:10\n  src.bundle.Run\n    CC=11  in:0  out:9  total:9\n  src.bundle_test.validateBundleData\n    CC=18  in:1  out:8  total:9\n  llm.app.maybe_refine_bundle\n    CC=8  in:1  out:7  total:8\n  llm.app.validate_bundle\n    CC=4  in:1  out:7  total:8\n  llm.app.compact\n    CC=7  in:3  out:5  total:8\n  src.deploy_workflow.DeployViewBundle\n    CC=7  in:3  out:5  total:8\n  src.bundle_test.collectBundleFiles\n    CC=5  in:1  out:6  total:7\n  llm.app.source_name_from_uri\n    CC=4  in:1  out:6  total:7\n  src.bundle.fetchSchema\n    CC=6  in:1  out:6  total:7\n  src.bundle_test.TestBundleSchemaValidation\n    CC=3  in:0  out:6  total:6\n  llm.app.fetch_many\n    CC=3  in:2  out:4  total:6\n  llm.app.generate_bundle\n    CC=2  in:1  out:5  total:6\n  llm.app.normalize_bundle\n    CC=2  in:2  out:3  total:5\n  llm.app.is_private_host\n    CC=5  in:1  out:4  total:5\n\nMODULES:\n  llm.app  [22 funcs]\n    allows  CC=13  out:12\n    build_bundle_from_prompt  CC=5  out:12\n    build_sources  CC=4  out:3\n    compact  CC=7  out:5\n    dedupe  CC=3  out:3\n    fetch_context  CC=1  out:3\n    fetch_many  CC=3  out:4\n    fetch_single  CC=1  out:2\n    fetch_uri  CC=10  out:25\n    generate_bundle  CC=2  out:5\n  src.bundle  [6 funcs]\n    LoadSchema  CC=4  out:9\n    Run  CC=11  out:9\n    fetchSchema  CC=6  out:6\n    runGoTemporal  CC=5  out:9\n    runPythonFastAPI  CC=2  out:3\n    workflowNameForKind  CC=5  out:0\n  src.bundle_test  [3 funcs]\n    TestBundleSchemaValidation  CC=3  out:6\n    collectBundleFiles  CC=5  out:6\n    validateBundleData  CC=18  out:8\n  src.deploy_workflow  [4 funcs]\n    DeployApplicationBundle  CC=1  out:1\n    DeployServiceBundle  CC=1  out:1\n    DeployViewBundle  CC=7  out:5\n    DeployWorkflowBundle  CC=1  out:1\n  src.starter  [2 funcs]\n    main  CC=16  out:18\n    workflowNameForKind  CC=5  out:0\n\nEDGES:\n  src.bundle_test.TestBundleSchemaValidation → src.bundle_test.collectBundleFiles\n  src.bundle_test.TestBundleSchemaValidation → src.bundle_test.validateBundleData\n  src.starter.main → src.starter.workflowNameForKind\n  src.bundle.LoadSchema → src.bundle.fetchSchema\n  src.bundle.Run → src.bundle.LoadSchema\n  src.bundle.Run → src.bundle.runGoTemporal\n  src.bundle.Run → src.bundle.runPythonFastAPI\n  src.bundle.runGoTemporal → src.bundle.workflowNameForKind\n  src.deploy_workflow.DeployServiceBundle → src.deploy_workflow.DeployViewBundle\n  src.deploy_workflow.DeployWorkflowBundle → src.deploy_workflow.DeployViewBundle\n  src.deploy_workflow.DeployApplicationBundle → src.deploy_workflow.DeployViewBundle\n  llm.app.ACLPolicy.allows → llm.app.is_private_host\n  llm.app.infer_targets → llm.app.dedupe\n  llm.app.build_sources → llm.app.source_name_from_uri\n  llm.app.normalize_bundle → llm.app.compact\n  llm.app.maybe_refine_bundle → llm.app.normalize_bundle\n  llm.app.fetch_many → llm.app.fetch_uri\n  llm.app.build_bundle_from_prompt → llm.app.infer_kind\n  llm.app.build_bundle_from_prompt → llm.app.infer_targets\n  llm.app.build_bundle_from_prompt → llm.app.infer_runner\n  llm.app.build_bundle_from_prompt → llm.app.build_sources\n  llm.app.build_bundle_from_prompt → llm.app.normalize_bundle\n  llm.app.build_bundle_from_prompt → llm.app.validate_bundle\n  llm.app.build_bundle_from_prompt → llm.app.slugify\n  llm.app.build_bundle_from_prompt → llm.app.infer_output_format\n  llm.app.build_bundle_from_prompt → llm.app.maybe_refine_bundle\n  llm.app.fetch_single → llm.app.fetch_uri\n  llm.app.fetch_context → llm.app.fetch_many\n  llm.app.generate_bundle → llm.app.build_bundle_from_prompt\n  llm.app.generate_bundle → llm.app.write_bundle\n  llm.app.generate_bundles → llm.app.generate_bundle\n", "is_subdir": false}, {"name": "calls.yaml", "rel_path": "calls.yaml", "path": "calls.yaml", "size": "11.5KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "project: /home/tom/github/semcod/codot/godot\ngenerated_from: code2llm call graph analysis\nstats:\n  total_nodes: 37\n  total_edges: 31\n  modules_count: 5\nnodes:\n  src.bundle.runGoTemporal:\n    name: runGoTemporal\n    module: src.bundle\n    line: 115\n    cyclomatic_complexity: 5\n    calls_out: 9\n    calls_in: 1\n  src.bundle_test.TestBundleSchemaValidation:\n    name: TestBundleSchemaValidation\n    module: src.bundle_test\n    line: 111\n    cyclomatic_complexity: 3\n    calls_out: 6\n    calls_in: 0\n  src.bundle.Run:\n    name: Run\n    module: src.bundle\n    line: 75\n    cyclomatic_complexity: 11\n    calls_out: 9\n    calls_in: 0\n  llm.app.normalize_bundle:\n    name: normalize_bundle\n    module: llm.app\n    line: 332\n    cyclomatic_complexity: 2\n    calls_out: 3\n    calls_in: 2\n  llm.app.maybe_refine_bundle:\n    name: maybe_refine_bundle\n    module: llm.app\n    line: 339\n    cyclomatic_complexity: 8\n    calls_out: 7\n    calls_in: 1\n  src.bundle.runPythonFastAPI:\n    name: runPythonFastAPI\n    module: src.bundle\n    line: 146\n    cyclomatic_complexity: 2\n    calls_out: 3\n    calls_in: 1\n  src.bundle_test.collectBundleFiles:\n    name: collectBundleFiles\n    module: src.bundle_test\n    line: 27\n    cyclomatic_complexity: 5\n    calls_out: 6\n    calls_in: 1\n  llm.app.ACLPolicy.allows:\n    name: allows\n    module: llm.app\n    line: 158\n    cyclomatic_complexity: 13\n    calls_out: 12\n    calls_in: 0\n  src.starter.main:\n    name: main\n    module: src.starter\n    line: 32\n    cyclomatic_complexity: 16\n    calls_out: 18\n    calls_in: 0\n  llm.app.fetch_single:\n    name: fetch_single\n    module: llm.app\n    line: 515\n    cyclomatic_complexity: 1\n    calls_out: 2\n    calls_in: 0\n  llm.app.fetch_many:\n    name: fetch_many\n    module: llm.app\n    line: 431\n    cyclomatic_complexity: 3\n    calls_out: 4\n    calls_in: 2\n  llm.app.is_private_host:\n    name: is_private_host\n    module: llm.app\n    line: 91\n    cyclomatic_complexity: 5\n    calls_out: 4\n    calls_in: 1\n  llm.app.infer_runner:\n    name: infer_runner\n    module: llm.app\n    line: 268\n    cyclomatic_complexity: 6\n    calls_out: 1\n    calls_in: 1\n  llm.app.validate_bundle:\n    name: validate_bundle\n    module: llm.app\n    line: 373\n    cyclomatic_complexity: 4\n    calls_out: 7\n    calls_in: 1\n  src.deploy_workflow.DeployApplicationBundle:\n    name: DeployApplicationBundle\n    module: src.deploy_workflow\n    line: 75\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 0\n  llm.app.build_bundle_from_prompt:\n    name: build_bundle_from_prompt\n    module: llm.app\n    line: 441\n    cyclomatic_complexity: 5\n    calls_out: 12\n    calls_in: 1\n  llm.app.write_bundle:\n    name: write_bundle\n    module: llm.app\n    line: 475\n    cyclomatic_complexity: 2\n    calls_out: 3\n    calls_in: 1\n  llm.app.infer_kind:\n    name: infer_kind\n    module: llm.app\n    line: 242\n    cyclomatic_complexity: 8\n    calls_out: 4\n    calls_in: 1\n  llm.app.slugify:\n    name: slugify\n    module: llm.app\n    line: 68\n    cyclomatic_complexity: 2\n    calls_out: 3\n    calls_in: 1\n  llm.app.compact:\n    name: compact\n    module: llm.app\n    line: 83\n    cyclomatic_complexity: 7\n    calls_out: 5\n    calls_in: 3\n  src.starter.workflowNameForKind:\n    name: workflowNameForKind\n    module: src.starter\n    line: 19\n    cyclomatic_complexity: 5\n    calls_out: 0\n    calls_in: 1\n  src.deploy_workflow.DeployServiceBundle:\n    name: DeployServiceBundle\n    module: src.deploy_workflow\n    line: 67\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 0\n  llm.app.dedupe:\n    name: dedupe\n    module: llm.app\n    line: 73\n    cyclomatic_complexity: 3\n    calls_out: 3\n    calls_in: 2\n  llm.app.source_name_from_uri:\n    name: source_name_from_uri\n    module: llm.app\n    line: 307\n    cyclomatic_complexity: 4\n    calls_out: 6\n    calls_in: 1\n  src.bundle.fetchSchema:\n    name: fetchSchema\n    module: src.bundle\n    line: 156\n    cyclomatic_complexity: 6\n    calls_out: 6\n    calls_in: 1\n  src.bundle.workflowNameForKind:\n    name: workflowNameForKind\n    module: src.bundle\n    line: 101\n    cyclomatic_complexity: 5\n    calls_out: 0\n    calls_in: 1\n  llm.app.infer_output_format:\n    name: infer_output_format\n    module: llm.app\n    line: 278\n    cyclomatic_complexity: 9\n    calls_out: 3\n    calls_in: 1\n  src.deploy_workflow.DeployViewBundle:\n    name: DeployViewBundle\n    module: src.deploy_workflow\n    line: 38\n    cyclomatic_complexity: 7\n    calls_out: 5\n    calls_in: 3\n  llm.app.infer_targets:\n    name: infer_targets\n    module: llm.app\n    line: 255\n    cyclomatic_complexity: 6\n    calls_out: 4\n    calls_in: 1\n  llm.app.generate_bundles:\n    name: generate_bundles\n    module: llm.app\n    line: 542\n    cyclomatic_complexity: 2\n    calls_out: 4\n    calls_in: 0\n  src.bundle_test.validateBundleData:\n    name: validateBundleData\n    module: src.bundle_test\n    line: 47\n    cyclomatic_complexity: 18\n    calls_out: 8\n    calls_in: 1\n  llm.app.generate_bundle:\n    name: generate_bundle\n    module: llm.app\n    line: 525\n    cyclomatic_complexity: 2\n    calls_out: 5\n    calls_in: 1\n  src.deploy_workflow.DeployWorkflowBundle:\n    name: DeployWorkflowBundle\n    module: src.deploy_workflow\n    line: 71\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 0\n  src.bundle.LoadSchema:\n    name: LoadSchema\n    module: src.bundle\n    line: 47\n    cyclomatic_complexity: 4\n    calls_out: 9\n    calls_in: 1\n  llm.app.fetch_uri:\n    name: fetch_uri\n    module: llm.app\n    line: 383\n    cyclomatic_complexity: 10\n    calls_out: 25\n    calls_in: 2\n  llm.app.fetch_context:\n    name: fetch_context\n    module: llm.app\n    line: 520\n    cyclomatic_complexity: 1\n    calls_out: 3\n    calls_in: 0\n  llm.app.build_sources:\n    name: build_sources\n    module: llm.app\n    line: 315\n    cyclomatic_complexity: 4\n    calls_out: 3\n    calls_in: 1\nedges:\n- caller: src.bundle_test.TestBundleSchemaValidation\n  callee: src.bundle_test.collectBundleFiles\n  call_type: resolved\n- caller: src.bundle_test.TestBundleSchemaValidation\n  callee: src.bundle_test.validateBundleData\n  call_type: resolved\n- caller: src.starter.main\n  callee: src.starter.workflowNameForKind\n  call_type: resolved\n- caller: src.bundle.LoadSchema\n  callee: src.bundle.fetchSchema\n  call_type: resolved\n- caller: src.bundle.Run\n  callee: src.bundle.LoadSchema\n  call_type: resolved\n- caller: src.bundle.Run\n  callee: src.bundle.runGoTemporal\n  call_type: resolved\n- caller: src.bundle.Run\n  callee: src.bundle.runPythonFastAPI\n  call_type: resolved\n- caller: src.bundle.runGoTemporal\n  callee: src.bundle.workflowNameForKind\n  call_type: resolved\n- caller: src.deploy_workflow.DeployServiceBundle\n  callee: src.deploy_workflow.DeployViewBundle\n  call_type: resolved\n- caller: src.deploy_workflow.DeployWorkflowBundle\n  callee: src.deploy_workflow.DeployViewBundle\n  call_type: resolved\n- caller: src.deploy_workflow.DeployApplicationBundle\n  callee: src.deploy_workflow.DeployViewBundle\n  call_type: resolved\n- caller: llm.app.ACLPolicy.allows\n  callee: llm.app.is_private_host\n  call_type: resolved\n- caller: llm.app.infer_targets\n  callee: llm.app.dedupe\n  call_type: resolved\n- caller: llm.app.build_sources\n  callee: llm.app.source_name_from_uri\n  call_type: resolved\n- caller: llm.app.normalize_bundle\n  callee: llm.app.compact\n  call_type: resolved\n- caller: llm.app.maybe_refine_bundle\n  callee: llm.app.normalize_bundle\n  call_type: resolved\n- caller: llm.app.fetch_many\n  callee: llm.app.fetch_uri\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.infer_kind\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.infer_targets\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.infer_runner\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.build_sources\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.normalize_bundle\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.validate_bundle\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.slugify\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.infer_output_format\n  call_type: resolved\n- caller: llm.app.build_bundle_from_prompt\n  callee: llm.app.maybe_refine_bundle\n  call_type: resolved\n- caller: llm.app.fetch_single\n  callee: llm.app.fetch_uri\n  call_type: resolved\n- caller: llm.app.fetch_context\n  callee: llm.app.fetch_many\n  call_type: resolved\n- caller: llm.app.generate_bundle\n  callee: llm.app.build_bundle_from_prompt\n  call_type: resolved\n- caller: llm.app.generate_bundle\n  callee: llm.app.write_bundle\n  call_type: resolved\n- caller: llm.app.generate_bundles\n  callee: llm.app.generate_bundle\n  call_type: resolved\nmodules:\n  llm.app:\n  - llm.app.ACLPolicy.allows\n  - llm.app.build_bundle_from_prompt\n  - llm.app.build_sources\n  - llm.app.compact\n  - llm.app.dedupe\n  - llm.app.fetch_context\n  - llm.app.fetch_many\n  - llm.app.fetch_single\n  - llm.app.fetch_uri\n  - llm.app.generate_bundle\n  - llm.app.generate_bundles\n  - llm.app.infer_kind\n  - llm.app.infer_output_format\n  - llm.app.infer_runner\n  - llm.app.infer_targets\n  - llm.app.is_private_host\n  - llm.app.maybe_refine_bundle\n  - llm.app.normalize_bundle\n  - llm.app.slugify\n  - llm.app.source_name_from_uri\n  - llm.app.validate_bundle\n  - llm.app.write_bundle\n  src.bundle:\n  - src.bundle.LoadSchema\n  - src.bundle.Run\n  - src.bundle.fetchSchema\n  - src.bundle.runGoTemporal\n  - src.bundle.runPythonFastAPI\n  - src.bundle.workflowNameForKind\n  src.bundle_test:\n  - src.bundle_test.TestBundleSchemaValidation\n  - src.bundle_test.collectBundleFiles\n  - src.bundle_test.validateBundleData\n  src.deploy_workflow:\n  - src.deploy_workflow.DeployApplicationBundle\n  - src.deploy_workflow.DeployServiceBundle\n  - src.deploy_workflow.DeployViewBundle\n  - src.deploy_workflow.DeployWorkflowBundle\n  src.starter:\n  - src.starter.main\n  - src.starter.workflowNameForKind\nentry_points:\n- README.CleanupActivity\n- README.DeployServiceActivity\n- README.DeployViewBundle\n- README.GenerateCodeActivity\n- README.HealthcheckActivity\n- README.TestBundleSchemaValidation\n- README.TestBundleUnmarshal\n- README.TestOutputValidation\n- README.TestSourceValidation\n- README.collectBundleFiles\n- README.fetchData\n- README.fetchSchema\n- README.main\n- README.print\n- README.updateData\n- README.validateBundleData\n- README.wait_for_http\n- README.wait_for_port\n- README.workflowNameForKind\n- generated.dashboard.fetchData\n- generated.dashboard.updateData\n- llm.app.ACLPolicy._matches_any\n- llm.app.ACLPolicy.allows\n- llm.app.ACLPolicy.describe\n- llm.app.ACLPolicy.from_file\n- llm.app.build_state\n- llm.app.describe_acl\n- llm.app.env_bool\n- llm.app.env_float\n- llm.app.env_int\n- llm.app.fetch_context\n- llm.app.fetch_single\n- llm.app.generate_bundles\n- llm.app.health\n- llm.app.list_bundles\n- llm.app.mock_catalog\n- llm.app.mock_devices\n- llm.app.mock_health\n- llm.app.mock_posts\n- llm.app.mock_protocol\n- scripts.test-llm.assert_json_field\n- scripts.test-llm.print\n- scripts.test-llm.wait_for_http\n- scripts.test-services.wait_for_http\n- scripts.test-services.wait_for_port\n- scripts.validate-bundle.print\n- src.bundle.Run\n- src.bundle_test.TestBundleSchemaValidation\n- src.bundle_test.TestBundleUnmarshal\n- src.bundle_test.TestOutputValidation\n- src.bundle_test.TestSourceValidation\n- src.deploy_workflow.CleanupActivity\n- src.deploy_workflow.DeployApplicationBundle\n- src.deploy_workflow.DeployServiceActivity\n- src.deploy_workflow.DeployServiceBundle\n- src.deploy_workflow.DeployWorkflowBundle\n- src.deploy_workflow.GenerateCodeActivity\n- src.deploy_workflow.HealthcheckActivity\n- src.deploy_workflow.main\n- src.starter.main\n", "is_subdir": false}, {"name": "evolution.toon.yaml", "rel_path": "evolution.toon.yaml", "path": "evolution.toon.yaml", "size": "1.7KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm/evolution | 82 func | 7f | 2026-04-23\n\nNEXT[3] (ranked by impact):\n  [1] !! SPLIT           llm/app.py\n      WHY: 595L, 6 classes, max CC=13\n      EFFORT: ~4h  IMPACT: 7735\n\n  [2] !  SPLIT-FUNC      main  CC=16  fan=18\n      WHY: CC=16 exceeds 15\n      EFFORT: ~1h  IMPACT: 288\n\n  [3] !  SPLIT-FUNC      validateBundleData  CC=18  fan=8\n      WHY: CC=18 exceeds 15\n      EFFORT: ~1h  IMPACT: 144\n\n\nRISKS[1]:\n  ⚠ Splitting llm/app.py may break 38 import paths\n\nMETRICS-TARGET:\n  CC̄:          3.3 → ≤2.3\n  max-CC:      18 → ≤9\n  god-modules: 1 → 0\n  high-CC(≥15): 2 → ≤1\n  hub-types:   0 → ≤0\n\nPATTERNS (language parser shared logic):\n  _extract_declarations() in base.py — unified extraction for:\n    - TypeScript: interfaces, types, classes, functions, arrow funcs\n    - PHP: namespaces, traits, classes, functions, includes\n    - Ruby: modules, classes, methods, requires\n    - C++: classes, structs, functions, #includes\n    - C#: classes, interfaces, methods, usings\n    - Java: classes, interfaces, methods, imports\n    - Go: packages, functions, structs\n    - Rust: modules, functions, traits, use statements\n\n  Shared regex patterns per language:\n    - import: language-specific import/require/using patterns\n    - class: class/struct/trait declarations with inheritance\n    - function: function/method signatures with visibility\n    - brace_tracking: for C-family languages ({ })\n    - end_keyword_tracking: for Ruby (module/class/def...end)\n\n  Benefits:\n    - Consistent extraction logic across all languages\n    - Reduced code duplication (~70% reduction in parser LOC)\n    - Easier maintenance: fix once, apply everywhere\n    - Standardized FunctionInfo/ClassInfo models\n\nHISTORY:\n  (first run — no previous data)\n", "is_subdir": false}, {"name": "map.toon.yaml", "rel_path": "map.toon.yaml", "path": "map.toon.yaml", "size": "6.3KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# godot | 34f 4846L | conf:1,yml:1,json:6,md:3,shell:10,php:1,yaml:2,txt:1,go:5,python:1 | 2026-04-23\n# stats: 88 func | 0 cls | 34 mod | CC̄=3.1 | critical:2 | cycles:0\n# alerts[5]: fan-out fetch_uri=21; CC validateBundleData=18; fan-out main=18; CC main=16; fan-out build_bundle_from_prompt=12\n# hotspots[5]: fetch_uri fan=21; main fan=18; build_bundle_from_prompt fan=12; ACLPolicy.allows fan=10; LoadSchema fan=9\n# evolution: baseline\n# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods\nM[34]:\n  Dockerfile,35\n  Makefile,138\n  README.md,2073\n  SUMD.md,203\n  TODO.md,21\n  bundle.schema.json,91\n  bundles/protocol-dashboard.json,33\n  bundles/service_bundle.json,33\n  bundles/static_bundle.json,25\n  bundles/view_bundle_sse.json,29\n  bundles/workflow_bundle.json,33\n  caddy.conf,16\n  docker-compose.yml,122\n  generated/dashboard.php,34\n  llm/Dockerfile,17\n  llm/acl.yaml,31\n  llm/app.py,595\n  llm/requirements.txt,7\n  project.sh,40\n  project/map.toon.yaml,23\n  scripts/install.sh,100\n  scripts/quickstart.sh,21\n  scripts/run.sh,6\n  scripts/run-bundle.sh,34\n  scripts/starter.sh,16\n  scripts/test-llm.sh,195\n  scripts/test-services.sh,137\n  scripts/validate-all.sh,31\n  scripts/validate-bundle.sh,65\n  src/bundle.go,179\n  src/bundle_test.go,230\n  src/deploy_workflow.go,117\n  src/starter.go,84\n  src/structs.go,32\nD:\n  src/bundle_test.go:\n    e: collectBundleFiles,validateBundleData,TestBundleSchemaValidation,TestSourceValidation,TestOutputValidation,TestBundleUnmarshal\n    collectBundleFiles()\n    validateBundleData()\n    TestBundleSchemaValidation()\n    TestSourceValidation()\n    TestOutputValidation()\n    TestBundleUnmarshal()\n  src/starter.go:\n    e: bundleMetadata,workflowNameForKind,main\n    bundleMetadata:\n    workflowNameForKind()\n    main()\n  llm/app.py:\n    e: Settings,ACLPolicy,FetchRequest,FetchManyRequest,GenerateBundleRequest,AppState,env_bool,env_int,env_float,slugify,dedupe,compact,is_private_host,build_state,infer_kind,infer_targets,infer_runner,infer_output_format,infer_runtime,source_name_from_uri,build_sources,normalize_bundle,maybe_refine_bundle,validate_bundle,fetch_uri,fetch_many,build_bundle_from_prompt,write_bundle,health,list_bundles,describe_acl,fetch_single,fetch_context,generate_bundle,generate_bundles,mock_health,mock_devices,mock_protocol,mock_posts,mock_catalog\n    Settings:\n    ACLPolicy: from_file(1),_matches_any(2),allows(1),describe(0)\n    FetchRequest(BaseModel):\n    FetchManyRequest(BaseModel):\n    GenerateBundleRequest(BaseModel):\n    AppState:\n    env_bool(name;default)\n    env_int(name;default)\n    env_float(name;default)\n    slugify(value)\n    dedupe(values)\n    compact(value)\n    is_private_host(hostname)\n    build_state()\n    infer_kind(prompt;explicit)\n    infer_targets(prompt;explicit;kind)\n    infer_runner(kind;targets;explicit)\n    infer_output_format(kind;targets;prompt;runner)\n    infer_runtime(kind;targets;runner)\n    source_name_from_uri(uri;index)\n    build_sources(uris)\n    normalize_bundle(bundle)\n    maybe_refine_bundle(prompt;base_bundle)\n    validate_bundle(bundle)\n    fetch_uri(request)\n    fetch_many(uris)\n    build_bundle_from_prompt(request)\n    write_bundle(bundle;output_dir)\n    health()\n    list_bundles()\n    describe_acl()\n    fetch_single(request)\n    fetch_context(request)\n    generate_bundle(request)\n    generate_bundles(requests)\n    mock_health()\n    mock_devices()\n    mock_protocol(protocol_id)\n    mock_posts()\n    mock_catalog()\n  src/bundle.go:\n    e: Bundle,Source,Output,LoadSchema,Run,workflowNameForKind,runGoTemporal,runPythonFastAPI,fetchSchema\n    Bundle:\n    Source:\n    Output:\n    LoadSchema()\n    Run()\n    workflowNameForKind()\n    runGoTemporal()\n    runPythonFastAPI()\n    fetchSchema()\n  src/deploy_workflow.go:\n    e: Bundle,Source,Output,DeployViewBundle,DeployServiceBundle,DeployWorkflowBundle,DeployApplicationBundle,GenerateCodeActivity,DeployServiceActivity,HealthcheckActivity,CleanupActivity,main\n    Bundle:\n    Source:\n    Output:\n    DeployViewBundle()\n    DeployServiceBundle()\n    DeployWorkflowBundle()\n    DeployApplicationBundle()\n    GenerateCodeActivity()\n    DeployServiceActivity()\n    HealthcheckActivity()\n    CleanupActivity()\n    main()\n  generated/dashboard.php:\n    e: fetchData,updateData\n    fetchData()\n    updateData()\n  caddy.conf:\n  docker-compose.yml:\n  bundle.schema.json:\n  Dockerfile:\n  TODO.md:\n  SUMD.md:\n  project.sh:\n  Makefile:\n  bundles/service_bundle.json:\n  bundles/workflow_bundle.json:\n  scripts/test-services.sh:\n    e: wait_for_http,wait_for_port\n    wait_for_http()\n    wait_for_port()\n  bundles/protocol-dashboard.json:\n  scripts/install.sh:\n  scripts/validate-bundle.sh:\n    e: print,print,print,print,print,print,print,print\n    print()\n    print()\n    print()\n    print()\n    print()\n    print()\n    print()\n    print()\n  scripts/validate-all.sh:\n  scripts/run-bundle.sh:\n  scripts/starter.sh:\n  project/map.toon.yaml:\n  bundles/view_bundle_sse.json:\n  README.md:\n    e: Bundle,Source,Output,Bundle,Source,Output,ViewBundle,Source,Template,Output,fetchData,updateData,wait_for_http,wait_for_port,print,print,print,print,workflowNameForKind,fetchSchema,collectBundleFiles,validateBundleData,TestBundleSchemaValidation,validateBundleData,TestSourceValidation,TestOutputValidation,TestBundleUnmarshal,DeployViewBundle,GenerateCodeActivity,DeployServiceActivity,HealthcheckActivity,CleanupActivity,main,main\n    Bundle:\n    Source:\n    Output:\n    Bundle:\n    Source:\n    Output:\n    ViewBundle:\n    Source:\n    Template:\n    Output:\n    fetchData()\n    updateData()\n    wait_for_http()\n    wait_for_port()\n    print()\n    print()\n    print()\n    print()\n    workflowNameForKind()\n    fetchSchema()\n    collectBundleFiles()\n    validateBundleData()\n    TestBundleSchemaValidation()\n    validateBundleData()\n    TestSourceValidation()\n    TestOutputValidation()\n    TestBundleUnmarshal()\n    DeployViewBundle()\n    GenerateCodeActivity()\n    DeployServiceActivity()\n    HealthcheckActivity()\n    CleanupActivity()\n    main()\n    main()\n  scripts/test-llm.sh:\n    e: wait_for_http,assert_json_field,print,print,print,print\n    wait_for_http()\n    assert_json_field()\n    print()\n    print()\n    print()\n    print()\n  scripts/run.sh:\n  bundles/static_bundle.json:\n  llm/Dockerfile:\n  llm/requirements.txt:\n  scripts/quickstart.sh:\n  llm/acl.yaml:\n  src/structs.go:\n    e: ViewBundle,Source,Template,Output\n    ViewBundle:\n    Source:\n    Template:\n    Output:\n", "is_subdir": false}, {"name": "project.toon.yaml", "rel_path": "project.toon.yaml", "path": "project.toon.yaml", "size": "1.9KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# godot | 88 func | 10f | 4672L | shell | 2026-04-23\n\nHEALTH:\n  CC̄=3.1  critical=5 (limit:10)  dup=5  cycles=1\n\nALERTS[6]:\n  !!! high_fan_out     fetch_uri = 21 (limit:10)\n  !!  high_fan_out     main = 18 (limit:10)\n  !   cc_exceeded      validateBundleData = 18 (limit:15)\n  !   cc_exceeded      main = 16 (limit:15)\n  !   high_fan_out     build_bundle_from_prompt = 12 (limit:10)\n  !   high_fan_out     ACLPolicy.allows = 10 (limit:10)\n\nMODULES[34] (top by size):\n  M[README.md] 2073L C:5 F:19 CC↑0 D:0 (md)\n  M[llm/app.py] 595L C:6 F:38 CC↑13 D:0 (python)\n  M[src/bundle_test.go] 230L C:0 F:6 CC↑18 D:0 (go)\n  M[SUMD.md] 203L C:0 F:0 CC↑0 D:0 (md)\n  M[scripts/test-llm.sh] 195L C:0 F:3 CC↑0 D:0 (shell)\n  M[src/bundle.go] 179L C:3 F:6 CC↑11 D:0 (go)\n  M[scripts/test-services.sh] 137L C:0 F:2 CC↑0 D:0 (shell)\n  M[docker-compose.yml] 122L C:0 F:0 CC↑0 D:0 (yml)\n  M[src/deploy_workflow.go] 117L C:3 F:9 CC↑7 D:0 (go)\n  M[scripts/install.sh] 100L C:0 F:0 CC↑0 D:0 (shell)\n  M[bundle.schema.json] 91L C:0 F:0 CC↑0 D:0 (json)\n  M[src/starter.go] 84L C:1 F:2 CC↑16 D:0 (go)\n  M[scripts/validate-bundle.sh] 65L C:0 F:1 CC↑0 D:0 (shell)\n  M[project.sh] 40L C:0 F:0 CC↑0 D:0 (shell)\n  M[generated/dashboard.php] 34L C:0 F:2 CC↑1 D:0 (php)\n  LANGS: shell:10/json:6/go:5/other:3/md:3/yaml:2/python:1/php:1/conf:1/yml:1/txt:1\n\nHOTSPOTS[4]:\n  ★ fetch_uri fan=21  // Orchestrates 21 calls\n  ★ main fan=18  // Orchestrates 18 calls\n  ★ build_bundle_from_prompt fan=12  // Orchestrates 12 calls\n  ★ ACLPolicy.allows fan=10  // Orchestrates 10 calls\n\nREFACTOR[7]:\n  [1] H/H Split god module llm/app.py (595L, 6 classes)\n  [2] H/H Split god module README.md (2073L, 5 classes)\n  [3] M/L Split validateBundleData (CC=18)\n  [4] M/L Split main (CC=16)\n  [5] M/L Break circular dependency: llm.app.compact\n\nEVOLUTION:\n  2026-04-23 CC̄=3.1 crit=5 4672L // Automated analysis\n", "is_subdir": false}];
+        let currentFile = null;
+
+        function renderFileList(filter = '') {
+            const list = document.getElementById('fileList');
+            const filtered = files.filter(f =>
+                f.name.toLowerCase().includes(filter.toLowerCase()) ||
+                f.path.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state">No files found</div>';
+                return;
+            }
+
+            // Group by type
+            const groups = {};
+            for (const file of filtered) {
+                const type = file.type_name;
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(file);
+            }
+
+            let html = '';
+            for (const [typeName, groupFiles] of Object.entries(groups)) {
+                html += `
+                    <div class="file-group">
+                        <div class="file-group-title">${typeName} Files (${groupFiles.length})</div>
+                        ${groupFiles.map(f => `
+                            <div class="file-item ${currentFile?.name === f.name ? 'active' : ''}"
+                                 onclick="selectFile('${f.name}')">
+                                <span class="file-icon">${f.icon}</span>
+                                <div class="file-info">
+                                    <div class="file-name">${f.name}</div>
+                                    <div class="file-meta">${f.path}</div>
+                                </div>
+                                <span class="file-size">${f.size}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            list.innerHTML = html;
+        }
+
+        function selectFile(name) {
+            const file = files.find(f => f.name === name);
+            if (!file) return;
+
+            currentFile = file;
+
+            document.getElementById('contentIcon').textContent = file.icon;
+            document.getElementById('contentTitle').textContent = file.name;
+
+            // Actions
+            const actions = document.getElementById('contentActions');
+            actions.innerHTML = `
+                <a href="${file.rel_path}" download class="btn">⬇ Download</a>
+                <a href="${file.rel_path}" target="_blank" class="btn btn-primary">↗ Open Raw</a>
+            `;
+
+            // Content
+            const body = document.getElementById('contentBody');
+            if (file.type === 'markdown') {
+                // Render markdown as HTML using marked.js
+                body.innerHTML = `<div class="markdown-content">${marked.parse(file.content)}</div>`;
+            } else if (file.type === 'html') {
+                // For HTML files, show in iframe for safety
+                body.innerHTML = `<iframe src="${file.rel_path}" style="width:100%;height:100%;border:none;border-radius:0.5rem;"></iframe>`;
+            } else if (file.type === 'image') {
+                // For images, display the actual image
+                body.innerHTML = `<div class="image-preview"><img src="${file.rel_path}" alt="${file.name}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:0.5rem;"></div>`;
+            } else if (file.type === 'mermaid') {
+                // Render mermaid diagram
+                const diagramId = 'mermaid-diagram-' + Date.now();
+                body.innerHTML = `<div class="mermaid-content"><pre class="mermaid" id="${diagramId}">${file.content}</pre></div>`;
+                // Initialize mermaid on the new element
+                setTimeout(() => {
+                    mermaid.init(undefined, document.getElementById(diagramId));
+                }, 0);
+            } else if (file.type === 'json') {
+                try {
+                    const json = JSON.parse(file.content.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
+                    const formatted = JSON.stringify(json, null, 2);
+                    body.innerHTML = `<pre><code class="language-json">${formatted.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                    hljs.highlightElement(body.querySelector('code'));
+                } catch {
+                    body.innerHTML = `<pre>${file.content}</pre>`;
+                }
+            } else if (file.type === 'yaml') {
+                // YAML with syntax highlighting
+                body.innerHTML = `<pre><code class="language-yaml">${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else if (file.type === 'toon') {
+                // TOON with simple highlighting (use ini as closest match for key: value format)
+                body.innerHTML = `<pre><code class="language-ini">${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else if (file.type === 'code') {
+                // Code files with auto-highlighting
+                body.innerHTML = `<pre><code>${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else {
+                body.innerHTML = `<pre>${file.content}</pre>`;
+            }
+
+            renderFileList(document.getElementById('search').value);
+        }
+
+        function filterFiles(query) {
+            renderFileList(query);
+        }
+
+        function renderStats() {
+            const stats = {};
+            for (const f of files) {
+                stats[f.type_name] = (stats[f.type_name] || 0) + 1;
+            }
+
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => `
+                    <div class="stat-card">
+                        <div class="stat-value">${count}</div>
+                        <div class="stat-label">${type}</div>
+                    </div>
+                `).join('');
+        }
+
+        // Initialize
+        renderStats();
+        renderFileList();
+
+        // Select first file if available
+        if (files.length > 0) {
+            selectFile(files[0].name);
+        }
+    </script>
+</body>
+</html>

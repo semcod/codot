@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"context"
 	"fmt"
 	"log"
@@ -9,6 +10,24 @@ import (
 
 	"go.temporal.io/sdk/client"
 )
+
+type bundleMetadata struct {
+	Bundle string `json:"bundle"`
+	Kind   string `json:"kind"`
+}
+
+func workflowNameForKind(kind string) string {
+	switch kind {
+	case "SERVICE_BUNDLE":
+		return "DeployServiceBundle"
+	case "WORKFLOW_BUNDLE":
+		return "DeployWorkflowBundle"
+	case "APPLICATION_BUNDLE":
+		return "DeployApplicationBundle"
+	default:
+		return "DeployViewBundle"
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -29,6 +48,16 @@ func main() {
 		bundleJSON = []byte(arg)
 	}
 
+	var metadata bundleMetadata
+	if err := json.Unmarshal(bundleJSON, &metadata); err != nil {
+		log.Printf("warning: could not parse bundle metadata, defaulting to view workflow: %v", err)
+	}
+	workflowName := workflowNameForKind(metadata.Kind)
+	workflowID := "deploy-protocol-dashboard"
+	if metadata.Bundle != "" {
+		workflowID = fmt.Sprintf("deploy-%s", metadata.Bundle)
+	}
+
 	c, err := client.Dial(client.Options{})
 	if err != nil {
 		log.Fatalf("dial temporal: %v", err)
@@ -39,9 +68,9 @@ func main() {
 	defer cancel()
 
 	w, err := c.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
-		ID:        "deploy-protocol-dashboard",
+		ID:        workflowID,
 		TaskQueue: "view-bundle-queue",
-	}, "DeployViewBundle", bundleJSON)
+	}, workflowName, bundleJSON)
 	if err != nil {
 		log.Fatalf("start workflow: %v", err)
 	}

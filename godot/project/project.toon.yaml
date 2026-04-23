@@ -1,0 +1,46 @@
+# godot | 88 func | 10f | 4672L | shell | 2026-04-23
+
+HEALTH:
+  CC̄=3.1  critical=5 (limit:10)  dup=5  cycles=1
+
+ALERTS[6]:
+  !!! high_fan_out     fetch_uri = 21 (limit:10)
+  !!  high_fan_out     main = 18 (limit:10)
+  !   cc_exceeded      validateBundleData = 18 (limit:15)
+  !   cc_exceeded      main = 16 (limit:15)
+  !   high_fan_out     build_bundle_from_prompt = 12 (limit:10)
+  !   high_fan_out     ACLPolicy.allows = 10 (limit:10)
+
+MODULES[34] (top by size):
+  M[README.md] 2073L C:5 F:19 CC↑0 D:0 (md)
+  M[llm/app.py] 595L C:6 F:38 CC↑13 D:0 (python)
+  M[src/bundle_test.go] 230L C:0 F:6 CC↑18 D:0 (go)
+  M[SUMD.md] 203L C:0 F:0 CC↑0 D:0 (md)
+  M[scripts/test-llm.sh] 195L C:0 F:3 CC↑0 D:0 (shell)
+  M[src/bundle.go] 179L C:3 F:6 CC↑11 D:0 (go)
+  M[scripts/test-services.sh] 137L C:0 F:2 CC↑0 D:0 (shell)
+  M[docker-compose.yml] 122L C:0 F:0 CC↑0 D:0 (yml)
+  M[src/deploy_workflow.go] 117L C:3 F:9 CC↑7 D:0 (go)
+  M[scripts/install.sh] 100L C:0 F:0 CC↑0 D:0 (shell)
+  M[bundle.schema.json] 91L C:0 F:0 CC↑0 D:0 (json)
+  M[src/starter.go] 84L C:1 F:2 CC↑16 D:0 (go)
+  M[scripts/validate-bundle.sh] 65L C:0 F:1 CC↑0 D:0 (shell)
+  M[project.sh] 40L C:0 F:0 CC↑0 D:0 (shell)
+  M[generated/dashboard.php] 34L C:0 F:2 CC↑1 D:0 (php)
+  LANGS: shell:10/json:6/go:5/other:3/md:3/yaml:2/python:1/php:1/conf:1/yml:1/txt:1
+
+HOTSPOTS[4]:
+  ★ fetch_uri fan=21  // Orchestrates 21 calls
+  ★ main fan=18  // Orchestrates 18 calls
+  ★ build_bundle_from_prompt fan=12  // Orchestrates 12 calls
+  ★ ACLPolicy.allows fan=10  // Orchestrates 10 calls
+
+REFACTOR[7]:
+  [1] H/H Split god module llm/app.py (595L, 6 classes)
+  [2] H/H Split god module README.md (2073L, 5 classes)
+  [3] M/L Split validateBundleData (CC=18)
+  [4] M/L Split main (CC=16)
+  [5] M/L Break circular dependency: llm.app.compact
+
+EVOLUTION:
+  2026-04-23 CC̄=3.1 crit=5 4672L // Automated analysis

@@ -195,19 +195,18 @@ service-factory/
 
 This module is self-contained and has no runtime dependency on the main
 CQRS-URL API. It's a pure build tool — one side reads contracts, the other
-writes artifacts. The obvious integration point with the rest of the platform
-is exposing it as a CQRS command:
+writes artifacts. The integration point with the rest of the platform is the
+`compile_service` command in the main API:
 
 ```
-PUT /commands/compile-service
-  body: { bundle_uri: "file:///bundles/connect-test-service.bundle.json",
-          targets: ["python-fastapi", "docker"] }
-  → returns artifacts bundle URI (data:application/gzip;base64,…)
+PUT /commands/compile_service
+  body: { input_uri: "file:///bundles/connect-test-service.bundle.json",
+          meta: { targets: "python-fastapi,docker" } }
+  → returns artifacts as base64-encoded tar.gz (mime: application/gzip)
 ```
 
-That's a 20-line wrapper around this CLI. Deliberately not written yet — it
-belongs in the next module, the **Service Runtime** that actually deploys the
-compiled artifacts.
+This command is a thin wrapper around the `BundleLoader` + `GeneratorRegistry`
+from this module, and is now live in the CQRS-URL platform.
 
 ## License
 

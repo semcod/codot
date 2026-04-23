@@ -4,68 +4,121 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sort"
 	"testing"
 )
 
+var validBundleKinds = map[string]struct{}{
+	"SERVICE_BUNDLE":      {},
+	"VIEW_BUNDLE":         {},
+	"WORKFLOW_BUNDLE":     {},
+	"APPLICATION_BUNDLE":  {},
+}
+
+var validTargets = map[string]struct{}{
+	"desktop": {},
+	"mobile":  {},
+	"web":     {},
+	"pwa":     {},
+	"service": {},
+	"cli":     {},
+}
+
+func collectBundleFiles(root string) ([]string, error) {
+	var files []string
+	if err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		if filepath.Ext(path) == ".json" {
+			files = append(files, path)
+		}
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+	sort.Strings(files)
+	return files, nil
+}
+
+func validateBundleData(t *testing.T, bundlePath string) {
+	t.Helper()
+	data, err := os.ReadFile(bundlePath)
+	if err != nil {
+		t.Fatalf("Failed to read bundle: %v", err)
+	}
+
+	var bundle Bundle
+	if err := json.Unmarshal(data, &bundle); err != nil {
+		t.Fatalf("Failed to unmarshal bundle: %v", err)
+	}
+
+	// Validate required fields
+	if bundle.Bundle == "" {
+		t.Error("bundle field is required")
+	}
+	if bundle.Kind == "" {
+		t.Error("kind field is required")
+	}
+	if bundle.SchemaURI == "" {
+		t.Error("schema_uri field is required")
+	}
+	if bundle.Runner == "" {
+		t.Error("runner field is required")
+	}
+
+	if _, ok := validBundleKinds[bundle.Kind]; !ok {
+		t.Errorf("invalid kind: %s", bundle.Kind)
+	}
+
+	validRunners := map[string]struct{}{
+		"go_temporal":    {},
+		"python_fastapi": {},
+	}
+	if _, ok := validRunners[bundle.Runner]; !ok {
+		t.Errorf("invalid runner: %s", bundle.Runner)
+	}
+
+	if bundle.Kind == "APPLICATION_BUNDLE" && len(bundle.Targets) == 0 {
+		t.Error("application bundles must declare at least one target")
+	}
+	for _, target := range bundle.Targets {
+		if _, ok := validTargets[target]; !ok {
+			t.Errorf("invalid target: %s", target)
+		}
+	}
+
+	if len(bundle.Sources) > 0 {
+		for i, source := range bundle.Sources {
+			if source.Name == "" {
+				t.Errorf("source[%d].name is required", i)
+			}
+			if source.URI == "" {
+				t.Errorf("source[%d].uri is required", i)
+			}
+			if source.RefreshSec <= 0 {
+				t.Errorf("source[%d].refresh_sec must be > 0", i)
+			}
+		}
+	}
+
+	t.Logf("✓ Bundle %s validated successfully", bundle.Bundle)
+}
+
 func TestBundleSchemaValidation(t *testing.T) {
-	// Test that all bundle JSONs can be unmarshaled into Bundle struct
 	bundlesDir := "../bundles"
-	entries, err := os.ReadDir(bundlesDir)
+	entries, err := collectBundleFiles(bundlesDir)
 	if err != nil {
 		t.Fatalf("Failed to read bundles directory: %v", err)
 	}
 
-	for _, entry := range entries {
-		if entry.IsDir() || filepath.Ext(entry.Name()) != ".json" {
-			continue
-		}
-
-		t.Run(entry.Name(), func(t *testing.T) {
-			bundlePath := filepath.Join(bundlesDir, entry.Name())
-			data, err := os.ReadFile(bundlePath)
-			if err != nil {
-				t.Fatalf("Failed to read bundle: %v", err)
-			}
-
-			var bundle Bundle
-			if err := json.Unmarshal(data, &bundle); err != nil {
-				t.Fatalf("Failed to unmarshal bundle: %v", err)
-			}
-
-			// Validate required fields
-			if bundle.Bundle == "" {
-				t.Error("bundle field is required")
-			}
-			if bundle.Kind == "" {
-				t.Error("kind field is required")
-			}
-			if bundle.SchemaURI == "" {
-				t.Error("schema_uri field is required")
-			}
-			if bundle.Runner == "" {
-				t.Error("runner field is required")
-			}
-
-			// Validate kind enum
-			validKinds := map[string]bool{
-				"SERVICE_BUNDLE":  true,
-				"VIEW_BUNDLE":     true,
-				"WORKFLOW_BUNDLE": true,
-			}
-			if !validKinds[bundle.Kind] {
-				t.Errorf("invalid kind: %s", bundle.Kind)
-			}
-
-			// Validate runner
-			validRunners := map[string]bool{
-				"go_temporal":      true,
-				"python_fastapi":   true,
-			}
-			if !validRunners[bundle.Runner] {
-				t.Errorf("invalid runner: %s", bundle.Runner)
-			}
-
-			t.Logf("✓ Bundle %s validated successfully", bundle.Bundle)
+	for _, bundlePath := range entries {
+		bundlePath := bundlePath
+		t.Run(filepath.Base(bundlePath), func(t *testing.T) {
+			validateBundleData(t, bundlePath)
 		})
 	}
 }
@@ -141,6 +194,7 @@ func TestBundleUnmarshal(t *testing.T) {
 		"description": "Test bundle",
 		"schema_uri": "https://example.com/bundle.schema.json",
 		"runner": "go_temporal",
+		"targets": ["web"],
 		"sources": [
 			{
 				"name": "test",
@@ -169,5 +223,8 @@ func TestBundleUnmarshal(t *testing.T) {
 	}
 	if len(bundle.Sources) != 1 {
 		t.Errorf("Sources count mismatch: got %d, want 1", len(bundle.Sources))
+	}
+	if len(bundle.Targets) != 1 || bundle.Targets[0] != "web" {
+		t.Errorf("Targets mismatch: got %#v, want [web]", bundle.Targets)
 	}
 }

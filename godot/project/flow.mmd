@@ -1,0 +1,25 @@
+flowchart TD
+
+    %% Entry points (blue)
+    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
+
+    subgraph Core
+        generated__dashboard__fetchData["fetchData"]
+        generated__dashboard__updateData["updateData"]
+        README__fetchData["fetchData"]
+        README__updateData["updateData"]
+        README__wait_for_http["wait_for_http"]
+        README__wait_for_port["wait_for_port"]
+        README__print["print"]
+        README__workflowNameForKind["workflowNameForKind"]
+        README__fetchSchema["fetchSchema"]
+        README__collectBundleFiles["collectBundleFiles"]
+        README__validateBundleData["validateBundleData"]
+        README__TestBundleSchemaValidation["TestBundleSchemaValidation"]
+        README__TestSourceValidation["TestSourceValidation"]
+        README__TestOutputValidation["TestOutputValidation"]
+        README__TestBundleUnmarshal["TestBundleUnmarshal"]
+        ...["+45 more"]
+    end
+
+    class generated__dashboard__fetchData,generated__dashboard__updateData,README__fetchData,README__updateData,README__wait_for_http,README__wait_for_port,README__print,README__workflowNameForKind,README__fetchSchema,README__collectBundleFiles entry

@@ -1,0 +1,79 @@
+flowchart LR
+    subgraph llm__app
+        llm__app__normalize_bundle["normalize_bundle"]
+        llm__app__maybe_refine_bundle["maybe_refine_bundle"]
+        llm__app__ACLPolicy__allows["allows"]
+        llm__app__fetch_single["fetch_single"]
+        llm__app__fetch_many["fetch_many"]
+        llm__app__is_private_host["is_private_host"]
+        llm__app__infer_runner["infer_runner"]
+        llm__app__validate_bundle["validate_bundle"]
+        llm__app__build_bundle_from_prompt["build_bundle_from_prompt"]
+        llm__app__write_bundle["write_bundle"]
+        llm__app__infer_kind["infer_kind"]
+        llm__app__slugify["slugify"]
+        llm__app__compact["compact"]
+        llm__app__dedupe["dedupe"]
+        llm__app__source_name_from_uri["source_name_from_uri"]
+        llm__app__infer_output_format["infer_output_format"]
+        llm__app__infer_targets["infer_targets"]
+        llm__app__generate_bundles["generate_bundles"]
+        llm__app__generate_bundle["generate_bundle"]
+        llm__app__fetch_uri["fetch_uri"]
+        llm__app__fetch_context["fetch_context"]
+        llm__app__build_sources["build_sources"]
+    end
+    subgraph src__bundle
+        src__bundle__runGoTemporal["runGoTemporal"]
+        src__bundle__Run["Run"]
+        src__bundle__runPythonFastAPI["runPythonFastAPI"]
+        src__bundle__fetchSchema["fetchSchema"]
+        src__bundle__workflowNameForKind["workflowNameForKind"]
+        src__bundle__LoadSchema["LoadSchema"]
+    end
+    subgraph src__bundle_test
+        src__bundle_test__TestBundleSchemaValidation["TestBundleSchemaValidation"]
+        src__bundle_test__collectBundleFiles["collectBundleFiles"]
+        src__bundle_test__validateBundleData["validateBundleData"]
+    end
+    subgraph src__deploy_workflow
+        src__deploy_workflow__DeployApplicationBundle["DeployApplicationBundle"]
+        src__deploy_workflow__DeployServiceBundle["DeployServiceBundle"]
+        src__deploy_workflow__DeployViewBundle["DeployViewBundle"]
+        src__deploy_workflow__DeployWorkflowBundle["DeployWorkflowBundle"]
+    end
+    subgraph src__starter
+        src__starter__main["main"]
+        src__starter__workflowNameForKind["workflowNameForKind"]
+    end
+    src__bundle_test__TestBundleSchemaValidation --> src__bundle_test__collectBundleFiles
+    src__bundle_test__TestBundleSchemaValidation --> src__bundle_test__validateBundleData
+    src__starter__main --> src__starter__workflowNameForKind
+    src__bundle__LoadSchema --> src__bundle__fetchSchema
+    src__bundle__Run --> src__bundle__LoadSchema
+    src__bundle__Run --> src__bundle__runGoTemporal
+    src__bundle__Run --> src__bundle__runPythonFastAPI
+    src__bundle__runGoTemporal --> src__bundle__workflowNameForKind
+    src__deploy_workflow__DeployServiceBundle --> src__deploy_workflow__DeployViewBundle
+    src__deploy_workflow__DeployWorkflowBundle --> src__deploy_workflow__DeployViewBundle
+    src__deploy_workflow__DeployApplicationBundle --> src__deploy_workflow__DeployViewBundle
+    llm__app__ACLPolicy__allows --> llm__app__is_private_host
+    llm__app__infer_targets --> llm__app__dedupe
+    llm__app__build_sources --> llm__app__source_name_from_uri
+    llm__app__normalize_bundle --> llm__app__compact
+    llm__app__maybe_refine_bundle --> llm__app__normalize_bundle
+    llm__app__fetch_many --> llm__app__fetch_uri
+    llm__app__build_bundle_from_prompt --> llm__app__infer_kind
+    llm__app__build_bundle_from_prompt --> llm__app__infer_targets
+    llm__app__build_bundle_from_prompt --> llm__app__infer_runner
+    llm__app__build_bundle_from_prompt --> llm__app__build_sources
+    llm__app__build_bundle_from_prompt --> llm__app__normalize_bundle
+    llm__app__build_bundle_from_prompt --> llm__app__validate_bundle
+    llm__app__build_bundle_from_prompt --> llm__app__slugify
+    llm__app__build_bundle_from_prompt --> llm__app__infer_output_format
+    llm__app__build_bundle_from_prompt --> llm__app__maybe_refine_bundle
+    llm__app__fetch_single --> llm__app__fetch_uri
+    llm__app__fetch_context --> llm__app__fetch_many
+    llm__app__generate_bundle --> llm__app__build_bundle_from_prompt
+    llm__app__generate_bundle --> llm__app__write_bundle
+    llm__app__generate_bundles --> llm__app__generate_bundle

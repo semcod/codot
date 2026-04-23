@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.com/bundle.schema.json",
   "title": "Bundle Schema",
-  "description": "Schema for service, view, and workflow bundles",
+  "description": "Schema for service, view, workflow, and application bundles",
   "type": "object",
   "required": ["bundle", "kind", "schema_uri", "runner"],
   "properties": {
@@ -12,7 +12,7 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["SERVICE_BUNDLE", "VIEW_BUNDLE", "WORKFLOW_BUNDLE"],
+      "enum": ["SERVICE_BUNDLE", "VIEW_BUNDLE", "WORKFLOW_BUNDLE", "APPLICATION_BUNDLE"],
       "description": "Type of bundle"
     },
     "version": {
@@ -31,6 +31,14 @@
     "runner": {
       "type": "string",
       "description": "Runner to execute the bundle (e.g., go_temporal, python_fastapi)"
+    },
+    "targets": {
+      "type": "array",
+      "description": "Optional target platforms for application bundles",
+      "items": {
+        "type": "string",
+        "enum": ["desktop", "mobile", "web", "pwa", "service", "cli"]
+      }
     },
     "sources": {
       "type": "array",

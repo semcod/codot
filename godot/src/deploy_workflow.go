@@ -14,17 +14,25 @@ import (
 )
 
 type Bundle struct {
-	Bundle  string   `json:"bundle"`
-	Sources []Source `json:"sources"`
-	Output  Output   `json:"output"`
+	Bundle      string   `json:"bundle"`
+	Kind        string   `json:"kind"`
+	SchemaURI   string   `json:"schema_uri"`
+	Runner      string   `json:"runner"`
+	Targets     []string `json:"targets,omitempty"`
+	Sources     []Source `json:"sources"`
+	Output      Output   `json:"output"`
 }
 type Source struct {
 	URI       string   `json:"uri"`
+	RefreshSec int      `json:"refresh_sec,omitempty"`
 	DependsOn []string `json:"depends_on,omitempty"`
 }
 type Output struct {
-	Format string `json:"format"`
-	Port   int    `json:"port"`
+	Format  string `json:"format"`
+	Runtime *struct {
+		Port int    `json:"port,omitempty"`
+		Lang string `json:"lang,omitempty"`
+	} `json:"runtime,omitempty"`
 }
 
 func DeployViewBundle(ctx workflow.Context, bundleJSON []byte) (string, error) {
@@ -40,8 +48,12 @@ func DeployViewBundle(ctx workflow.Context, bundleJSON []byte) (string, error) {
 		_ = workflow.ExecuteActivity(ctx, CleanupActivity, []string{codePath}).Get(ctx, nil)
 		return "", fmt.Errorf("generate: %w", err)
 	}
+	port := 8082
+	if b.Output.Runtime != nil && b.Output.Runtime.Port > 0 {
+		port = b.Output.Runtime.Port
+	}
 	var svcURL string
-	if err := workflow.ExecuteActivity(ctx, DeployServiceActivity, codePath, b.Output.Port).Get(ctx, &svcURL); err != nil {
+	if err := workflow.ExecuteActivity(ctx, DeployServiceActivity, codePath, port).Get(ctx, &svcURL); err != nil {
 		_ = workflow.ExecuteActivity(ctx, CleanupActivity, []string{codePath, svcURL}).Get(ctx, nil)
 		return "", fmt.Errorf("deploy: %w", err)
 	}
@@ -52,8 +64,38 @@ func DeployViewBundle(ctx workflow.Context, bundleJSON []byte) (string, error) {
 	return svcURL, nil
 }
 
+func DeployServiceBundle(ctx workflow.Context, bundleJSON []byte) (string, error) {
+	return DeployViewBundle(ctx, bundleJSON)
+}
+
+func DeployWorkflowBundle(ctx workflow.Context, bundleJSON []byte) (string, error) {
+	return DeployViewBundle(ctx, bundleJSON)
+}
+
+func DeployApplicationBundle(ctx workflow.Context, bundleJSON []byte) (string, error) {
+	return DeployViewBundle(ctx, bundleJSON)
+}
+
 func GenerateCodeActivity(ctx context.Context, bundleJSON []byte) (string, error) {
-	return "/output/dashboard.php", nil
+	var b Bundle
+	if err := json.Unmarshal(bundleJSON, &b); err != nil {
+		return "", err
+	}
+	switch b.Kind {
+	case "SERVICE_BUNDLE":
+		return "/output/service.py", nil
+	case "WORKFLOW_BUNDLE":
+		return "/output/workflow.go", nil
+	case "APPLICATION_BUNDLE":
+		for _, target := range b.Targets {
+			if target == "desktop" || target == "mobile" {
+				return "/output/app-native/", nil
+			}
+		}
+		return "/output/app-web/", nil
+	default:
+		return "/output/dashboard.php", nil
+	}
 }
 func DeployServiceActivity(ctx context.Context, codePath string, port int) (string, error) {
 	return fmt.Sprintf("http://localhost:%d", port), nil
@@ -80,6 +122,9 @@ func main() {
 	defer c.Close()
 	w := worker.New(c, "view-bundle-queue", worker.Options{})
 	w.RegisterWorkflow(DeployViewBundle)
+	w.RegisterWorkflow(DeployServiceBundle)
+	w.RegisterWorkflow(DeployWorkflowBundle)
+	w.RegisterWorkflow(DeployApplicationBundle)
 	w.RegisterActivity(GenerateCodeActivity)
 	w.RegisterActivity(DeployServiceActivity)
 	w.RegisterActivity(HealthcheckActivity)

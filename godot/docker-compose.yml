@@ -71,6 +71,50 @@ services:
     networks:
       - bundle-network
 
+  # LiteLLM bundle generation + ACL service
+  llm:
+    build:
+      context: .
+      dockerfile: llm/Dockerfile
+    container_name: godot-llm
+    env_file:
+      - ./llm/.env
+    environment:
+      - LLM_ACL_FILE=/app/acl.yaml
+      - LLM_OFFLINE=true
+      - BUNDLE_OUTPUT_DIR=/app/bundles/generated
+      - BUNDLE_SCHEMA_FILE=/app/bundle.schema.json
+    volumes:
+      - ./llm:/app
+      - ./bundles:/app/bundles
+      - ./sample-data:/app/sample-data:ro
+      - ./schemas:/app/schemas:ro
+      - ./bundle.schema.json:/app/bundle.schema.json:ro
+    ports:
+      - "${LLM_PORT:-18094}:8000"
+    networks:
+      - bundle-network
+    depends_on:
+      - schema-server
+      - mock-api
+
+  # Mock API used for service and NLP tests
+  mock-api:
+    build:
+      context: .
+      dockerfile: llm/Dockerfile
+    container_name: godot-mock-api
+    env_file:
+      - ./llm/.env
+    volumes:
+      - ./llm:/app
+      - ./bundle.schema.json:/app/bundle.schema.json:ro
+    command: uvicorn app:mock_app --host 0.0.0.0 --port 8001
+    ports:
+      - "${MOCK_API_PORT:-18095}:8001"
+    networks:
+      - bundle-network
+
 networks:
   bundle-network:
     driver: bridge

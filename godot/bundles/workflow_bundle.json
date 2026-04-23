@@ -25,6 +25,9 @@
   ],
   "output": {
     "format": "temporal_workflow",
-    "language": "go"
+    "language": "go",
+    "runtime": {
+      "lang": "go"
+    }
   }
 }

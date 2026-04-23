@@ -1,0 +1,110 @@
+# code2llm call graph | /home/tom/github/semcod/codot/godot
+# nodes: 37 | edges: 31 | modules: 5
+# CC̄=3.1
+
+HUBS[20]:
+  llm.app.fetch_uri
+    CC=10  in:2  out:25  total:27
+  src.starter.main
+    CC=16  in:0  out:18  total:18
+  llm.app.build_bundle_from_prompt
+    CC=5  in:1  out:12  total:13
+  llm.app.ACLPolicy.allows
+    CC=13  in:0  out:12  total:12
+  src.bundle.runGoTemporal
+    CC=5  in:1  out:9  total:10
+  src.bundle.LoadSchema
+    CC=4  in:1  out:9  total:10
+  src.bundle.Run
+    CC=11  in:0  out:9  total:9
+  src.bundle_test.validateBundleData
+    CC=18  in:1  out:8  total:9
+  llm.app.maybe_refine_bundle
+    CC=8  in:1  out:7  total:8
+  llm.app.validate_bundle
+    CC=4  in:1  out:7  total:8
+  llm.app.compact
+    CC=7  in:3  out:5  total:8
+  src.deploy_workflow.DeployViewBundle
+    CC=7  in:3  out:5  total:8
+  src.bundle_test.collectBundleFiles
+    CC=5  in:1  out:6  total:7
+  llm.app.source_name_from_uri
+    CC=4  in:1  out:6  total:7
+  src.bundle.fetchSchema
+    CC=6  in:1  out:6  total:7
+  src.bundle_test.TestBundleSchemaValidation
+    CC=3  in:0  out:6  total:6
+  llm.app.fetch_many
+    CC=3  in:2  out:4  total:6
+  llm.app.generate_bundle
+    CC=2  in:1  out:5  total:6
+  llm.app.normalize_bundle
+    CC=2  in:2  out:3  total:5
+  llm.app.is_private_host
+    CC=5  in:1  out:4  total:5
+
+MODULES:
+  llm.app  [22 funcs]
+    allows  CC=13  out:12
+    build_bundle_from_prompt  CC=5  out:12
+    build_sources  CC=4  out:3
+    compact  CC=7  out:5
+    dedupe  CC=3  out:3
+    fetch_context  CC=1  out:3
+    fetch_many  CC=3  out:4
+    fetch_single  CC=1  out:2
+    fetch_uri  CC=10  out:25
+    generate_bundle  CC=2  out:5
+  src.bundle  [6 funcs]
+    LoadSchema  CC=4  out:9
+    Run  CC=11  out:9
+    fetchSchema  CC=6  out:6
+    runGoTemporal  CC=5  out:9
+    runPythonFastAPI  CC=2  out:3
+    workflowNameForKind  CC=5  out:0
+  src.bundle_test  [3 funcs]
+    TestBundleSchemaValidation  CC=3  out:6
+    collectBundleFiles  CC=5  out:6
+    validateBundleData  CC=18  out:8
+  src.deploy_workflow  [4 funcs]
+    DeployApplicationBundle  CC=1  out:1
+    DeployServiceBundle  CC=1  out:1
+    DeployViewBundle  CC=7  out:5
+    DeployWorkflowBundle  CC=1  out:1
+  src.starter  [2 funcs]
+    main  CC=16  out:18
+    workflowNameForKind  CC=5  out:0
+
+EDGES:
+  src.bundle_test.TestBundleSchemaValidation → src.bundle_test.collectBundleFiles
+  src.bundle_test.TestBundleSchemaValidation → src.bundle_test.validateBundleData
+  src.starter.main → src.starter.workflowNameForKind
+  src.bundle.LoadSchema → src.bundle.fetchSchema
+  src.bundle.Run → src.bundle.LoadSchema
+  src.bundle.Run → src.bundle.runGoTemporal
+  src.bundle.Run → src.bundle.runPythonFastAPI
+  src.bundle.runGoTemporal → src.bundle.workflowNameForKind
+  src.deploy_workflow.DeployServiceBundle → src.deploy_workflow.DeployViewBundle
+  src.deploy_workflow.DeployWorkflowBundle → src.deploy_workflow.DeployViewBundle
+  src.deploy_workflow.DeployApplicationBundle → src.deploy_workflow.DeployViewBundle
+  llm.app.ACLPolicy.allows → llm.app.is_private_host
+  llm.app.infer_targets → llm.app.dedupe
+  llm.app.build_sources → llm.app.source_name_from_uri
+  llm.app.normalize_bundle → llm.app.compact
+  llm.app.maybe_refine_bundle → llm.app.normalize_bundle
+  llm.app.fetch_many → llm.app.fetch_uri
+  llm.app.build_bundle_from_prompt → llm.app.infer_kind
+  llm.app.build_bundle_from_prompt → llm.app.infer_targets
+  llm.app.build_bundle_from_prompt → llm.app.infer_runner
+  llm.app.build_bundle_from_prompt → llm.app.build_sources
+  llm.app.build_bundle_from_prompt → llm.app.normalize_bundle
+  llm.app.build_bundle_from_prompt → llm.app.validate_bundle
+  llm.app.build_bundle_from_prompt → llm.app.slugify
+  llm.app.build_bundle_from_prompt → llm.app.infer_output_format
+  llm.app.build_bundle_from_prompt → llm.app.maybe_refine_bundle
+  llm.app.fetch_single → llm.app.fetch_uri
+  llm.app.fetch_context → llm.app.fetch_many
+  llm.app.generate_bundle → llm.app.build_bundle_from_prompt
+  llm.app.generate_bundle → llm.app.write_bundle
+  llm.app.generate_bundles → llm.app.generate_bundle

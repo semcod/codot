@@ -1,0 +1,147 @@
+flowchart TD
+    subgraph README
+        README__fetchData["fetchData"]
+        README__updateData["updateData"]
+        README__wait_for_http["wait_for_http"]
+        README__wait_for_port["wait_for_port"]
+        README__print["print"]
+        README__workflowNameForKind["workflowNameForKind"]
+        README__fetchSchema["fetchSchema"]
+        README__collectBundleFiles["collectBundleFiles"]
+        README__validateBundleData["validateBundleData"]
+        README__TestBundleSchemaValidation["TestBundleSchemaValidation"]
+        README__TestSourceValidation["TestSourceValidation"]
+        README__TestOutputValidation["TestOutputValidation"]
+        README__TestBundleUnmarshal["TestBundleUnmarshal"]
+        README__DeployViewBundle["DeployViewBundle"]
+        README__GenerateCodeActivity["GenerateCodeActivity"]
+        README__DeployServiceActivity["DeployServiceActivity"]
+        README__HealthcheckActivity["HealthcheckActivity"]
+        README__CleanupActivity["CleanupActivity"]
+        README__main["main"]
+    end
+    subgraph generated__dashboard
+        generated__dashboard__fetchData["fetchData"]
+        generated__dashboard__updateData["updateData"]
+    end
+    subgraph llm__app
+        llm__app__env_bool["env_bool"]
+        llm__app__env_int["env_int"]
+        llm__app__env_float["env_float"]
+        llm__app__slugify["slugify"]
+        llm__app__dedupe["dedupe"]
+        llm__app__compact["compact"]
+        llm__app__is_private_host["is_private_host"]
+        llm__app__ACLPolicy__from_file("from_file CC=8")
+        llm__app__ACLPolicy___matches_any["_matches_any"]
+        llm__app__ACLPolicy__allows("allows CC=13")
+        llm__app__ACLPolicy__describe["describe"]
+        llm__app__build_state["build_state"]
+        llm__app__infer_kind("infer_kind CC=8")
+        llm__app__infer_targets["infer_targets"]
+        llm__app__infer_runner["infer_runner"]
+        llm__app__infer_output_format("infer_output_format CC=9")
+        llm__app__infer_runtime["infer_runtime"]
+        llm__app__source_name_from_uri["source_name_from_uri"]
+        llm__app__build_sources["build_sources"]
+        llm__app__normalize_bundle["normalize_bundle"]
+        llm__app__maybe_refine_bundle("maybe_refine_bundle CC=8")
+        llm__app__validate_bundle["validate_bundle"]
+        llm__app__fetch_uri("fetch_uri CC=10")
+        llm__app__fetch_many["fetch_many"]
+        llm__app__build_bundle_from_prompt["build_bundle_from_prompt"]
+        llm__app__write_bundle["write_bundle"]
+        llm__app__health["health"]
+        llm__app__list_bundles["list_bundles"]
+        llm__app__describe_acl["describe_acl"]
+        llm__app__fetch_single["fetch_single"]
+        llm__app__fetch_context["fetch_context"]
+        llm__app__generate_bundle["generate_bundle"]
+        llm__app__generate_bundles["generate_bundles"]
+        llm__app__mock_health["mock_health"]
+        llm__app__mock_devices["mock_devices"]
+        llm__app__mock_protocol["mock_protocol"]
+        llm__app__mock_posts["mock_posts"]
+        llm__app__mock_catalog["mock_catalog"]
+    end
+    subgraph scripts__test_llm
+        scripts__test_llm__wait_for_http["wait_for_http"]
+        scripts__test_llm__assert_json_field["assert_json_field"]
+        scripts__test_llm__print["print"]
+    end
+    subgraph scripts__test_services
+        scripts__test_services__wait_for_http["wait_for_http"]
+        scripts__test_services__wait_for_port["wait_for_port"]
+    end
+    subgraph scripts__validate_bundle
+        scripts__validate_bundle__print["print"]
+    end
+    subgraph src__bundle
+        src__bundle__LoadSchema["LoadSchema"]
+        src__bundle__Run("Run CC=11")
+        src__bundle__workflowNameForKind["workflowNameForKind"]
+        src__bundle__runGoTemporal["runGoTemporal"]
+        src__bundle__runPythonFastAPI["runPythonFastAPI"]
+        src__bundle__fetchSchema["fetchSchema"]
+    end
+    subgraph src__bundle_test
+        src__bundle_test__collectBundleFiles["collectBundleFiles"]
+        src__bundle_test__validateBundleData{{validateBundleData CC=18}}
+        src__bundle_test__TestBundleSchemaValidation["TestBundleSchemaValidation"]
+        src__bundle_test__TestSourceValidation["TestSourceValidation"]
+        src__bundle_test__TestOutputValidation["TestOutputValidation"]
+        src__bundle_test__TestBundleUnmarshal["TestBundleUnmarshal"]
+    end
+    subgraph src__deploy_workflow
+        src__deploy_workflow__DeployViewBundle["DeployViewBundle"]
+        src__deploy_workflow__DeployServiceBundle["DeployServiceBundle"]
+        src__deploy_workflow__DeployWorkflowBundle["DeployWorkflowBundle"]
+        src__deploy_workflow__DeployApplicationBundle["DeployApplicationBundle"]
+        src__deploy_workflow__GenerateCodeActivity["GenerateCodeActivity"]
+        src__deploy_workflow__DeployServiceActivity["DeployServiceActivity"]
+        src__deploy_workflow__HealthcheckActivity["HealthcheckActivity"]
+        src__deploy_workflow__CleanupActivity["CleanupActivity"]
+        src__deploy_workflow__main["main"]
+    end
+    subgraph src__starter
+        src__starter__workflowNameForKind["workflowNameForKind"]
+        src__starter__main{{main CC=16}}
+    end
+    src__bundle_test__TestBundleSchemaValidation --> src__bundle_test__collectBundleFiles
+    src__bundle_test__TestBundleSchemaValidation --> src__bundle_test__validateBundleData
+    src__starter__main --> src__starter__workflowNameForKind
+    src__bundle__LoadSchema --> src__bundle__fetchSchema
+    src__bundle__Run --> src__bundle__LoadSchema
+    src__bundle__Run --> src__bundle__runGoTemporal
+    src__bundle__Run --> src__bundle__runPythonFastAPI
+    src__bundle__runGoTemporal --> src__bundle__workflowNameForKind
+    src__deploy_workflow__DeployServiceBundle --> src__deploy_workflow__DeployViewBundle
+    src__deploy_workflow__DeployWorkflowBundle --> src__deploy_workflow__DeployViewBundle
+    src__deploy_workflow__DeployApplicationBundle --> src__deploy_workflow__DeployViewBundle
+    llm__app__ACLPolicy__allows --> llm__app__is_private_host
+    llm__app__infer_targets --> llm__app__dedupe
+    llm__app__build_sources --> llm__app__source_name_from_uri
+    llm__app__normalize_bundle --> llm__app__compact
+    llm__app__maybe_refine_bundle --> llm__app__normalize_bundle
+    llm__app__fetch_many --> llm__app__fetch_uri
+    llm__app__build_bundle_from_prompt --> llm__app__infer_kind
+    llm__app__build_bundle_from_prompt --> llm__app__infer_targets
+    llm__app__build_bundle_from_prompt --> llm__app__infer_runner
+    llm__app__build_bundle_from_prompt --> llm__app__build_sources
+    llm__app__build_bundle_from_prompt --> llm__app__normalize_bundle
+    llm__app__build_bundle_from_prompt --> llm__app__validate_bundle
+    llm__app__build_bundle_from_prompt --> llm__app__slugify
+    llm__app__build_bundle_from_prompt --> llm__app__infer_output_format
+    llm__app__build_bundle_from_prompt --> llm__app__maybe_refine_bundle
+    llm__app__build_bundle_from_prompt --> llm__app__infer_runtime
+    llm__app__build_bundle_from_prompt --> llm__app__fetch_many
+    llm__app__fetch_single --> llm__app__fetch_uri
+    llm__app__fetch_context --> llm__app__fetch_many
+    llm__app__generate_bundle --> llm__app__build_bundle_from_prompt
+    llm__app__generate_bundle --> llm__app__write_bundle
+    llm__app__generate_bundles --> llm__app__generate_bundle
+
+    classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
+    class src__bundle_test__validateBundleData,src__starter__main highCC
+    class src__bundle__Run,llm__app__ACLPolicy__from_file,llm__app__ACLPolicy__allows,llm__app__infer_kind,llm__app__infer_output_format,llm__app__maybe_refine_bundle,llm__app__fetch_uri medCC

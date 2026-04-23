@@ -40,7 +40,7 @@ make token
 #    Sign in with admin/admin, alice/alice (analyst), or bob/bob (user).
 #    Hit one of the preset buttons: CSV → JSON, render posts, pipeline.
 
-# 4. Smoke-test the API (14 tests: commands, queries, policy, agents)
+# 4. Smoke-test the API (15 tests: commands, queries, policy, agents, compile_service)
 make test
 ```
 
@@ -78,6 +78,7 @@ make test-agent
 | POST   | `/queries/{name}`             | run a query                               |
 | POST   | `/agents/{agent_id}/run`      | execute an agent (MCP, LiteLLM, Bash, etc.) |
 | GET    | `/agents/backends`            | list registered agent backends            |
+| PUT    | `/commands/compile_service`   | compile a bundle into deployable artifacts |
 | GET    | `/docs`                       | OpenAPI / Swagger UI                      |
 
 ## Bundled commands
@@ -91,6 +92,7 @@ make test-agent
 | `converttobase64` | base64-encode any resource (useful for PDFs, images)                  |
 | `render`        | Jinja2 template → HTML page (data from URI or inline)                   |
 | `pipeline`      | chain other commands; use `"$previous.output"` as a URI reference       |
+| `compile_service`| compile a SERVICE_BUNDLE or VIEW_BUNDLE into deployable artifacts (Python/Docker/PHP/k8s) |
 
 Adding your own command is three steps: subclass `Command`, register it, optionally add a policy rule.
 

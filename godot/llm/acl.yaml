@@ -1,0 +1,31 @@
+allowed_schemes:
+  - http
+  - https
+  - file
+  - data
+
+allow_patterns:
+  - "http://mock-api:8001/*"
+  - "http://schema-server:80/*"
+  - "file:///app/bundles/*"
+  - "file:///app/sample-data/*"
+  - "file:///app/schemas/*"
+  - "data:*"
+
+deny_patterns:
+  - "http://localhost/*"
+  - "http://127.0.0.1/*"
+  - "http://[::1]/*"
+  - "http://169.254.*/*"
+  - "https://localhost/*"
+  - "https://127.0.0.1/*"
+  - "file:///etc/*"
+  - "file:///proc/*"
+  - "file:///sys/*"
+
+allow_file_roots:
+  - /app/bundles
+  - /app/sample-data
+  - /app/schemas
+
+deny_private_networks: true
