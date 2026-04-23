@@ -1,54 +1,54 @@
-# codot | 402 func | 33f | 14520L | python | 2026-04-22
+# codot | 436 func | 34f | 15622L | python | 2026-04-23
 
 HEALTH:
-  CC̄=1.1  critical=3 (limit:10)  dup=2  cycles=1
+  CC̄=1.2  critical=4 (limit:10)  dup=2  cycles=1
 
-ALERTS[17]:
+ALERTS[20]:
   !!! high_fan_out     ConvertToCsvCommand.execute = 21 (limit:10)
   !!! high_fan_out     ConvertToXmlCommand.execute = 20 (limit:10)
-  !!  high_fan_out     _mcp_execute = 18 (limit:10)
   !!  high_fan_out     ConvertToJsonCommand.execute = 17 (limit:10)
   !!  high_fan_out     RenderCommand.execute = 16 (limit:10)
   !!  high_fan_out     _bash_cli_execute = 15 (limit:10)
   !   high_fan_out     API = 14 (limit:10)
-  !   high_fan_out     _litellm_execute = 14 (limit:10)
   !   high_fan_out     fetchPreview = 14 (limit:10)
+  !   high_fan_out     _litellm_execute = 14 (limit:10)
   !   high_fan_out     FileProtocol._resolve = 13 (limit:10)
+  !   high_fan_out     _mcp_execute = 13 (limit:10)
 
-MODULES[96] (top by size):
-  M[project/calls.yaml] 954L C:0 F:0 CC↑0 D:0 (yaml)
-  M[cqrs-workflow-editor/src/App.tsx] 637L C:0 F:35 CC↑13 D:0 (typescript)
-  M[SUMD.md] 601L C:0 F:64 CC↑0 D:0 (md)
-  M[project/context.md] 522L C:0 F:0 CC↑0 D:0 (md)
+MODULES[101] (top by size):
+  M[project/calls.yaml] 1110L C:0 F:0 CC↑0 D:0 (yaml)
+  M[cqrs-workflow-editor/src/App.tsx] 825L C:0 F:44 CC↑13 D:0 (typescript)
+  M[SUMD.md] 650L C:0 F:66 CC↑0 D:0 (md)
+  M[project/context.md] 526L C:0 F:0 CC↑0 D:0 (md)
   M[goal.yaml] 512L C:0 F:0 CC↑0 D:0 (yaml)
   M[docs/04-workflow-editor-spec.md] 497L C:3 F:1 CC↑0 D:0 (md)
-  M[cqrs-backend-workflows/server.py] 376L C:5 F:16 CC↑8 D:0 (python)
-  M[api/agent.py] 373L C:0 F:7 CC↑7 D:1 (python)
+  M[cqrs-backend-workflows/server.py] 400L C:5 F:18 CC↑8 D:0 (python)
+  M[api/agent.py] 362L C:0 F:7 CC↑10 D:0 (python)
   M[project/README.md] 339L C:0 F:0 CC↑0 D:0 (md)
-  M[api/SUMD.md] 315L C:0 F:37 CC↑0 D:0 (md)
+  M[api/SUMD.md] 315L C:0 F:37 CC↑0 D:10 (md)
   M[docs/03-multi-agent-architecture.md] 295L C:0 F:0 CC↑0 D:0 (md)
   M[docs/02-market-comparison.md] 276L C:0 F:0 CC↑0 D:0 (md)
   M[api/main.py] 234L C:0 F:15 CC↑3 D:0 (python)
   M[ansible/test-services.yml] 229L C:0 F:0 CC↑0 D:0 (yml)
-  M[project/map.toon.yaml] 220L C:0 F:64 CC↑0 D:8 (yaml)
-  LANGS: python:23/md:20/yaml:13/json:12/shell:7/other:6/txt:4/typescript:3/javascript:2/yml:2/conf:2/cfg:1/toml:1
+  M[project/map.toon.yaml] 218L C:0 F:66 CC↑0 D:0 (yaml)
+  LANGS: python:24/md:20/json:16/yaml:13/shell:7/other:6/txt:4/typescript:3/javascript:2/yml:2/conf:2/cfg:1/toml:1
 
 HOTSPOTS[10]:
   ★ ConvertToCsvCommand.execute fan=21  // Orchestrates 21 calls
   ★ ConvertToXmlCommand.execute fan=20  // Orchestrates 20 calls
-  ★ _mcp_execute fan=18  // Execute agent via MCP server.
-
-backend_config keys:
-    - server_url: SSE endpoi
   ★ ConvertToJsonCommand.execute fan=17  // Orchestrates 17 calls
   ★ RenderCommand.execute fan=16  // Orchestrates 16 calls
+  ★ _bash_cli_execute fan=15  // Execute agent via shell / CLI.
+
+backend_config keys:
+    - shell: shell path (de
 
 REFACTOR[9]:
-  [1] H/H Split god module cqrs-workflow-editor/src/App.tsx (637L, 0 classes)
-  [2] H/H Split god module SUMD.md (601L, 0 classes)
+  [1] H/H Split god module cqrs-workflow-editor/src/App.tsx (825L, 0 classes)
+  [2] H/H Split god module SUMD.md (650L, 0 classes)
   [3] H/H Split god module goal.yaml (512L, 0 classes)
-  [4] H/H Split god module project/calls.yaml (954L, 0 classes)
-  [5] H/H Split god module project/context.md (522L, 0 classes)
+  [4] H/H Split god module project/calls.yaml (1110L, 0 classes)
+  [5] H/H Split god module project/context.md (526L, 0 classes)
 
 EVOLUTION:
-  2026-04-22 CC̄=1.1 crit=3 14520L // Automated analysis
+  2026-04-23 CC̄=1.2 crit=4 15622L // Automated analysis

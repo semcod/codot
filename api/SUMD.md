@@ -153,14 +153,14 @@ pip install -e .[dev]
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# api | 24f 1981L | python:23,less:1 | 2026-04-22
-# stats: 39 func | 38 cls | 24 mod | CC̄=2.3 | critical:0 | cycles:0
-# alerts[5]: CC _substitute=8; CC _mcp_execute=7; CC validate_against_schema_uri=7; CC _websocket_execute=6; CC _bash_cli_execute=5
-# hotspots[5]: _mcp_execute fan=16; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _litellm_execute fan=10
+# api | 25f 2136L | python:24,less:1 | 2026-04-23
+# stats: 39 func | 42 cls | 25 mod | CC̄=2.4 | critical:1 | cycles:0
+# alerts[5]: CC _mcp_execute=10; CC _substitute=8; CC validate_against_schema_uri=7; CC _websocket_execute=6; CC _bash_cli_execute=5
+# hotspots[5]: _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _mcp_execute fan=10; _litellm_execute fan=10
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[24]:
-  agent.py,374
+M[25]:
+  agent.py,363
   app.doql.less,60
   auth/__init__.py,103
   commands/__init__.py,81
@@ -173,7 +173,8 @@ M[24]:
   commands/render.py,98
   config.py,35
   main.py,235
-  models.py,125
+  mcp_client.py,165
+  models.py,126
   policy/__init__.py,150
   protocols/__init__.py,70
   protocols/data_protocol.py,41
@@ -250,6 +251,12 @@ D:
     catalog()
     run_agent(agent_id;body;user)
     list_agent_backends()
+  mcp_client.py:
+    e: MCPError,MCPClient,MCPStdioClient,MCPSseClient
+    MCPError:
+    MCPClient: __init__(0),_next_id(0),_send(1),initialize(2),list_tools(0),call_tool(2),close(0)  # Base MCP client (transport-agnostic).
+    MCPStdioClient: __init__(2),_read_message(0),_send(1),close(0)  # Spawn an MCP server as a subprocess and speak JSON-RPC over 
+    MCPSseClient: __init__(2),_send(1),initialize(2),close(0)  # Connect to an MCP server via HTTP SSE transport.
   models.py:
     e: CommandRequest,CommandResponse,QueryRequest,QueryResponse,TokenRequest,TokenResponse,PipelineStep,PipelineRequest,ErrorResponse,AgentCommunicationBackend,AgentNode,AgentRequest,AgentResponse
     CommandRequest:  # Envelope for every command invocation.

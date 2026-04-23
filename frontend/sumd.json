@@ -71,7 +71,7 @@
     {
       "name": "# `project/map.toon.yaml`",
       "type": "unknown",
-      "content": "```toon markpact:analysis path=project/map.toon.yaml\n# frontend | 5f 353L | javascript:3,less:1,css:1 | 2026-04-22\n# stats: 0 func | 0 cls | 5 mod | CC̄=1.0 | critical:0 | cycles:0\n# alerts[5]: none\n# hotspots[5]: none\n# evolution: baseline\n# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods\nM[5]:\n  app.doql.less,60\n  html/css/style.css,35\n  html/js/api.js,62\n  html/js/app.js,188\n  test/codot.test.js,8\nD:\n```",
+      "content": "```toon markpact:analysis path=project/map.toon.yaml\n# frontend | 5f 353L | javascript:3,less:1,css:1 | 2026-04-23\n# stats: 0 func | 0 cls | 5 mod | CC̄=1.0 | critical:0 | cycles:0\n# alerts[5]: none\n# hotspots[5]: none\n# evolution: baseline\n# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods\nM[5]:\n  app.doql.less,60\n  html/css/style.css,35\n  html/js/api.js,62\n  html/js/app.js,188\n  test/codot.test.js,8\nD:\n```",
       "level": 2
     },
     {

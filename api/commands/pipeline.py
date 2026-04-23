@@ -11,7 +11,7 @@ import base64
 import json
 from typing import Any
 
-from models import CommandRequest, CommandResponse
+from models import AgentRequest, CommandRequest, CommandResponse
 from . import Command, get_registry as get_command_registry
 
 
@@ -60,8 +60,27 @@ class PipelineCommand(Command):
             substituted = _substitute(raw_req, previous)
             req = CommandRequest(**substituted)
 
-            command = reg.get(cmd_name)
-            resp = await command.execute(req)
+            agent_node_raw = step.get("agent_node")
+            if agent_node_raw is not None:
+                from models import AgentNode
+                from agent import execute_agent
+                agent_node = AgentNode(**agent_node_raw)
+                agent_req = AgentRequest(agent_node=agent_node, context=req.meta)
+                agent_resp = await execute_agent(agent_req)
+                payload_b64 = base64.b64encode(json.dumps(agent_resp.output).encode()).decode()
+                resp = CommandResponse(
+                    payload_b64=payload_b64,
+                    mime="application/json",
+                    meta={
+                        "agent_trace": agent_resp.reasoning_trace,
+                        "agent_meta": agent_resp.meta,
+                        "agent_ok": agent_resp.ok,
+                    },
+                )
+            else:
+                command = reg.get(cmd_name)
+                resp = await command.execute(req)
+
             previous = resp
             trace.append({
                 "step": idx,

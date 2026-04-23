@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-04-23
+
+### Docs
+- Update README.md
+- Update SUMD.md
+- Update api/SUMD.md
+- Update cqrs-backend-workflows/SUMD.md
+- Update cqrs-workflow-editor/SUMD.md
+- Update frontend/SUMD.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update .gitignore
+- Update api/project/map.toon.yaml
+- Update api/sumd.json
+- Update app.doql.less
+- Update cqrs-backend-workflows/Dockerfile
+- Update cqrs-backend-workflows/examples/01-products-csv-to-html.json
+- Update cqrs-backend-workflows/examples/02-posts-json-feed.json
+- Update cqrs-backend-workflows/examples/03-api-health-monitor.json
+- Update cqrs-backend-workflows/examples/04-agent-research-pipeline.json
+- Update cqrs-backend-workflows/project/map.toon.yaml
+- ... and 31 more files
+
 ## [0.1.3] - 2026-04-22
 
 ### Docs

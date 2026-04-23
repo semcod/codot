@@ -1,12 +1,12 @@
-# code2llm | 96f 11380L | python:23,md:20,yaml:13,json:12,shell:7,txt:4,typescript:3,yml:2,conf:2,javascript:2,toml:1,cfg:1 | 2026-04-22
-# CC̄=1.1 | critical:0/402 | dups:0 | cycles:1
+# code2llm | 101f 12160L | python:24,md:20,json:16,yaml:13,shell:7,txt:4,typescript:3,yml:2,conf:2,javascript:2,toml:1,cfg:1 | 2026-04-23
+# CC̄=1.2 | critical:0/436 | dups:0 | cycles:1
 
 HEALTH[0]: ok
 
 REFACTOR[1]:
   1. break 1 circular dependencies
 
-PIPELINES[111]:
+PIPELINES[139]:
   [1] Src [API]: API → getToken
       PURITY: 100% pure
   [2] Src [clearToken]: clearToken
@@ -29,38 +29,39 @@ LAYERS:
   │ map.toon.yaml               13L  0C    0m  CC=0.0    ←0
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
-  cqrs-workflow-editor/           CC̄=2.2    ←in:0  →out:0
-  │ !! App.tsx                    637L  0C   35m  CC=13     ←0
-  │ SUMD.md                    177L  0C    0m  CC=0.0    ←0
+  cqrs-workflow-editor/           CC̄=2.3    ←in:0  →out:0
+  │ !! App.tsx                    825L  0C   44m  CC=13     ←0
+  │ SUMD.md                    179L  0C    0m  CC=0.0    ←0
   │ README.md                   92L  0C    0m  CC=0.0    ←0
   │ vite.config.ts              36L  0C    0m  CC=0.0    ←0
   │ tsconfig.json               26L  0C    0m  CC=0.0    ←0
-  │ package.json                23L  0C    0m  CC=0.0    ←0
+  │ package.json                25L  0C    0m  CC=0.0    ←0
+  │ nginx.conf                  21L  0C    0m  CC=0.0    ←0
   │ main.tsx                    11L  0C    1m  CC=1      ←0
   │ map.toon.yaml               11L  0C    0m  CC=0.0    ←0
-  │ nginx.conf                  10L  0C    0m  CC=0.0    ←0
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
-  api/                            CC̄=1.6    ←in:5  →out:1
-  │ agent                      373L  0C    7m  CC=7      ←1
-  │ SUMD.md                    315L  0C   37m  CC=0.0    ←0
+  api/                            CC̄=1.6    ←in:14  →out:0
+  │ agent                      362L  0C    7m  CC=10     ←0
+  │ SUMD.md                    315L  0C   37m  CC=0.0    ←10
   │ main                       234L  0C   15m  CC=3      ←0
+  │ mcp_client                 164L  4C   15m  CC=6      ←0
   │ map.toon.yaml              155L  0C   37m  CC=0.0    ←0
-  │ __init__                   149L  3C   11m  CC=8      ←1
-  │ models                     124L  13C    0m  CC=0.0    ←0
-  │ __init__                   102L  1C    6m  CC=3      ←1
+  │ __init__                   149L  3C   11m  CC=8      ←0
+  │ models                     125L  13C    0m  CC=0.0    ←0
+  │ __init__                   102L  1C    6m  CC=3      ←0
   │ render                      97L  1C    1m  CC=6      ←0
   │ sumd.json                   90L  0C    0m  CC=0.0    ←0
+  │ __init__                    80L  2C    7m  CC=2      ←5
   │ converttojson               80L  1C    3m  CC=8      ←0
-  │ __init__                    80L  2C    7m  CC=2      ←0
   │ pipeline                    78L  1C    3m  CC=8      ←0
   │ __init__                    69L  3C    7m  CC=3      ←0
   │ rules.yaml                  66L  0C    0m  CC=0.0    ←0
   │ converttocsv                60L  1C    1m  CC=13     ←0
-  │ __init__                    56L  2C    7m  CC=2      ←5
+  │ __init__                    56L  2C    7m  CC=2      ←0
   │ converttoxml                51L  1C    1m  CC=9      ←0
   │ file_protocol               51L  1C    2m  CC=10     ←0
-  │ __init__                    48L  1C    2m  CC=7      ←1
+  │ __init__                    48L  1C    2m  CC=7      ←0
   │ from_url                    45L  1C    1m  CC=9      ←0
   │ data_protocol               40L  1C    1m  CC=9      ←0
   │ config                      34L  1C    1m  CC=3      ←0
@@ -72,13 +73,17 @@ LAYERS:
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
   cqrs-backend-workflows/         CC̄=0.8    ←in:0  →out:1
-  │ server                     376L  5C   16m  CC=8      ←0
-  │ SUMD.md                    203L  0C   18m  CC=0.0    ←0
+  │ server                     400L  5C   18m  CC=8      ←0
+  │ SUMD.md                    205L  0C   20m  CC=0.0    ←0
   │ README.md                  135L  0C    0m  CC=0.0    ←0
   │ sumd.json                   96L  0C    0m  CC=0.0    ←0
   │ workflow.schema.json        69L  0C    0m  CC=0.0    ←0
-  │ map.toon.yaml               38L  0C   18m  CC=0.0    ←0
+  │ 04-agent-research-pipeline.json    46L  0C    0m  CC=0.0    ←0
+  │ map.toon.yaml               40L  0C   20m  CC=0.0    ←0
+  │ 01-products-csv-to-html.json    36L  0C    0m  CC=0.0    ←0
+  │ 02-posts-json-feed.json     36L  0C    0m  CC=0.0    ←0
   │ example-workflow.json       35L  0C    0m  CC=0.0    ←0
+  │ 03-api-health-monitor.json    35L  0C    0m  CC=0.0    ←0
   │ requirements.txt             5L  0C    0m  CC=0.0    ←0
   │ Makefile                     0L  0C    0m  CC=0.0    ←0
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
@@ -93,28 +98,28 @@ LAYERS:
   │ 02-protocol-registry-status.md    55L  1C    0m  CC=0.0    ←0
   │ 04-frontend-playground-status.md    45L  0C    0m  CC=0.0    ←0
   │
-  project/                        CC̄=0.0    ←in:0  →out:0
-  │ !! calls.yaml                 954L  0C    0m  CC=0.0    ←0
-  │ !! context.md                 522L  0C    0m  CC=0.0    ←0
-  │ README.md                  339L  0C    0m  CC=0.0    ←0
-  │ map.toon.yaml              220L  0C   64m  CC=0.0    ←8
-  │ analysis.toon.yaml         163L  0C    0m  CC=0.0    ←0
-  │ calls.toon.yaml            161L  0C    0m  CC=0.0    ←0
-  │ project.toon.yaml           54L  0C    0m  CC=0.0    ←0
-  │ prompt.txt                  47L  0C    0m  CC=0.0    ←0
-  │ evolution.toon.yaml         43L  0C    0m  CC=0.0    ←0
-  │ duplication.toon.yaml        9L  0C    0m  CC=0.0    ←0
-  │
   ./                              CC̄=0.0    ←in:0  →out:0
-  │ !! SUMD.md                    601L  0C   64m  CC=0.0    ←0
+  │ !! SUMD.md                    650L  0C   66m  CC=0.0    ←0
   │ !! goal.yaml                  512L  0C    0m  CC=0.0    ←0
   │ README.md                  161L  1C    0m  CC=0.0    ←0
   │ sumd.json                  120L  0C    0m  CC=0.0    ←0
   │ pyproject.toml              94L  0C    0m  CC=0.0    ←0
+  │ CHANGELOG.md                92L  0C    0m  CC=0.0    ←0
   │ docker-compose.yml          89L  0C    0m  CC=0.0    ←0
-  │ CHANGELOG.md                67L  0C    0m  CC=0.0    ←0
-  │ project.sh                  36L  0C    0m  CC=0.0    ←0
+  │ project.sh                  40L  0C    0m  CC=0.0    ←0
   │ Makefile                     0L  0C    0m  CC=0.0    ←0
+  │
+  project/                        CC̄=0.0    ←in:0  →out:0
+  │ !! calls.yaml                1110L  0C    0m  CC=0.0    ←0
+  │ !! context.md                 526L  0C    0m  CC=0.0    ←0
+  │ README.md                  339L  0C    0m  CC=0.0    ←0
+  │ map.toon.yaml              218L  0C   66m  CC=0.0    ←0
+  │ calls.toon.yaml            169L  0C    0m  CC=0.0    ←0
+  │ analysis.toon.yaml         165L  0C    0m  CC=0.0    ←0
+  │ project.toon.yaml           54L  0C    0m  CC=0.0    ←0
+  │ prompt.txt                  47L  0C    0m  CC=0.0    ←0
+  │ evolution.toon.yaml         39L  0C    0m  CC=0.0    ←0
+  │ duplication.toon.yaml        9L  0C    0m  CC=0.0    ←0
   │
   schemas/                        CC̄=0.0    ←in:0  →out:0
   │ public-products.json        23L  0C    0m  CC=0.0    ←0
@@ -146,16 +151,14 @@ LAYERS:
      frontend/Dockerfile                       0L
 
 COUPLING:
-                                    api.commands             project.map                     api             api.queries  cqrs-backend-workflows
-            api.commands                      ──                       7                       4                                                  !! fan-out
-             project.map                      ←7                      ──                      ←1                      ←1                          hub
-                     api                      ←4                       1                      ──                                              ←1  hub
-             api.queries                                               1                                              ──                        
-  cqrs-backend-workflows                                                                       1                                              ──
+                                             api            api.commands             api.queries  cqrs-backend-workflows
+                     api                      ──                     ←12                      ←1                      ←1  hub
+            api.commands                      12                      ──                                                  !! fan-out
+             api.queries                       1                                              ──                        
+  cqrs-backend-workflows                       1                                                                      ──
   CYCLES: 1
-  HUB: project.map/ (fan-in=9)
-  HUB: api/ (fan-in=5)
-  SMELL: api.commands/ fan-out=11 → split needed
+  HUB: api/ (fan-in=14)
+  SMELL: api.commands/ fan-out=12 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

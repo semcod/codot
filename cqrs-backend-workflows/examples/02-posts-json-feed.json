@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "description": "Fetch JSON posts, validate schema, render blog feed HTML",
+  "nodes": [
+    {
+      "id": "fetch_posts",
+      "label": "Fetch Posts JSON",
+      "type": "fetch",
+      "uri": "http://localhost:18091/posts.json",
+      "mime_type": "application/json",
+      "description": "Load blog posts from local data volume"
+    },
+    {
+      "id": "validate_posts",
+      "label": "Validate Posts Schema",
+      "type": "command",
+      "command_type": "converttojson",
+      "input": "fetch_posts",
+      "schema_uri": "http://localhost:18090/public-posts.json",
+      "description": "Validate post structure against public-posts schema"
+    },
+    {
+      "id": "render_feed",
+      "label": "Render Blog Feed",
+      "type": "command",
+      "command_type": "render",
+      "input": "validate_posts",
+      "mime_type": "text/html",
+      "description": "Generate HTML blog feed with tags and authors",
+      "meta": { "title": "Latest Posts" }
+    }
+  ],
+  "outputs": [
+    { "id": "feed_view", "label": "Blog Feed", "source": "render_feed", "description": "Rendered blog posts feed" }
+  ]
+}

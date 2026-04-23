@@ -3,6 +3,21 @@ flowchart TD
     %% Entry points (blue)
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
+    subgraph CLI
+        api__mcp_client__MCPClient___next_id["_next_id"]
+        api__mcp_client__MCPClient___send["_send"]
+        api__mcp_client__MCPClient__initialize["initialize"]
+        api__mcp_client__MCPClient__list_tools["list_tools"]
+        api__mcp_client__MCPClient__call_tool["call_tool"]
+        api__mcp_client__MCPClient__close["close"]
+        api__mcp_client__MCPStdioClient___read_message["_read_message"]
+        api__mcp_client__MCPStdioClient___send["_send"]
+        api__mcp_client__MCPStdioClient__close["close"]
+        api__mcp_client__MCPSseClient___send["_send"]
+        api__mcp_client__MCPSseClient__initialize["initialize"]
+        api__mcp_client__MCPSseClient__close["close"]
+    end
+
     subgraph Core
         frontend__html__js__api__API["API"]
         frontend__html__js__api__getToken["getToken"]
@@ -19,7 +34,7 @@ flowchart TD
         frontend__html__js__api__runQuery["runQuery"]
         frontend__html__js__app__showAuthed["showAuthed"]
         frontend__html__js__app__showAnonymous["showAnonymous"]
-        ...["+354 more"]
+        ...["+372 more"]
     end
 
     subgraph Exporters

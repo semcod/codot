@@ -6,6 +6,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY server.py workflow.schema.json example-workflow.json .
+COPY examples/ ./examples/
 
 EXPOSE 8000
 

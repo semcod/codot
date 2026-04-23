@@ -1,31 +1,10 @@
 project: /home/tom/github/semcod/codot
 generated_from: code2llm call graph analysis
 stats:
-  total_nodes: 60
-  total_edges: 46
-  modules_count: 18
+  total_nodes: 66
+  total_edges: 55
+  modules_count: 15
 nodes:
-  cqrs-workflow-editor.src.App.fetchPreview:
-    name: fetchPreview
-    module: cqrs-workflow-editor.src.App
-    line: 186
-    cyclomatic_complexity: 13
-    calls_out: 14
-    calls_in: 1
-  cqrs-workflow-editor.src.App.workflow:
-    name: workflow
-    module: cqrs-workflow-editor.src.App
-    line: 378
-    cyclomatic_complexity: 5
-    calls_out: 7
-    calls_in: 0
-  frontend.html.js.api.setToken:
-    name: setToken
-    module: frontend.html.js.api
-    line: 7
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
   frontend.html.js.api.runQuery:
     name: runQuery
     module: frontend.html.js.api
@@ -33,20 +12,13 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 0
-  api.commands.pipeline.PipelineCommand.execute:
-    name: execute
-    module: api.commands.pipeline
-    line: 46
-    cyclomatic_complexity: 8
-    calls_out: 13
+  cqrs-workflow-editor.src.App.fetchExampleFiles:
+    name: fetchExampleFiles
+    module: cqrs-workflow-editor.src.App
+    line: 207
+    cyclomatic_complexity: 4
+    calls_out: 5
     calls_in: 0
-  api.auth.get_jwt_manager:
-    name: get_jwt_manager
-    module: api.auth
-    line: 73
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
   api.queries.register_default_queries:
     name: register_default_queries
     module: api.queries
@@ -54,118 +26,41 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 5
     calls_in: 0
-  api.commands.converttojson.ConvertToJsonCommand._convert:
-    name: _convert
-    module: api.commands.converttojson
-    line: 40
-    cyclomatic_complexity: 8
-    calls_out: 8
-    calls_in: 0
-  cqrs-workflow-editor.src.App.loadPredefinedWorkflow:
-    name: loadPredefinedWorkflow
-    module: cqrs-workflow-editor.src.App
-    line: 128
-    cyclomatic_complexity: 2
-    calls_out: 5
-    calls_in: 0
-  cqrs-backend-workflows.server.list_workflows:
-    name: list_workflows
-    module: cqrs-backend-workflows.server
-    line: 266
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  project.map.toon.get_registry:
-    name: get_registry
-    module: project.map.toon
-    line: 162
-    cyclomatic_complexity: 0
-    calls_out: 0
-    calls_in: 9
-  cqrs-workflow-editor.src.App.reader:
-    name: reader
-    module: cqrs-workflow-editor.src.App
-    line: 290
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 0
-  api.auth.authenticate:
-    name: authenticate
-    module: api.auth
-    line: 77
-    cyclomatic_complexity: 3
-    calls_out: 1
-    calls_in: 1
-  api.protocols.register_default_protocols:
-    name: register_default_protocols
-    module: api.protocols
-    line: 57
-    cyclomatic_complexity: 1
-    calls_out: 9
-    calls_in: 0
-  frontend.html.js.api.setRole:
-    name: setRole
-    module: frontend.html.js.api
-    line: 13
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
   cqrs-workflow-editor.src.App.blob:
     name: blob
     module: cqrs-workflow-editor.src.App
-    line: 276
+    line: 390
     cyclomatic_complexity: 1
     calls_out: 2
     calls_in: 1
-  frontend.html.js.api.API:
-    name: API
-    module: frontend.html.js.api
-    line: 2
-    cyclomatic_complexity: 9
-    calls_out: 14
-    calls_in: 0
-  cqrs-workflow-editor.src.App.mapToNodes:
-    name: mapToNodes
-    module: cqrs-workflow-editor.src.App
-    line: 81
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 4
-  cqrs-workflow-editor.src.App.mapToEdges:
-    name: mapToEdges
-    module: cqrs-workflow-editor.src.App
-    line: 90
-    cyclomatic_complexity: 4
-    calls_out: 2
-    calls_in: 4
-  cqrs-workflow-editor.src.App.exportWorkflow:
-    name: exportWorkflow
-    module: cqrs-workflow-editor.src.App
-    line: 241
-    cyclomatic_complexity: 1
-    calls_out: 4
-    calls_in: 1
-  frontend.html.js.api.runCommand:
-    name: runCommand
-    module: frontend.html.js.api
-    line: 52
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
   cqrs-workflow-editor.src.App.timer:
     name: timer
     module: cqrs-workflow-editor.src.App
-    line: 233
+    line: 347
     cyclomatic_complexity: 1
     calls_out: 2
     calls_in: 0
-  cqrs-backend-workflows.server._result_to_data_uri:
-    name: _result_to_data_uri
-    module: cqrs-backend-workflows.server
-    line: 130
+  api.commands.fetch.FetchCommand.execute:
+    name: execute
+    module: api.commands.fetch
+    line: 15
     cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 2
+    calls_out: 7
+    calls_in: 0
+  cqrs-workflow-editor.src.App.loadExampleFile:
+    name: loadExampleFile
+    module: cqrs-workflow-editor.src.App
+    line: 223
+    cyclomatic_complexity: 3
+    calls_out: 11
+    calls_in: 0
+  cqrs-workflow-editor.src.App.fetchPreview:
+    name: fetchPreview
+    module: cqrs-workflow-editor.src.App
+    line: 300
+    cyclomatic_complexity: 13
+    calls_out: 14
+    calls_in: 1
   cqrs-backend-workflows.server.validate_workflow:
     name: validate_workflow
     module: cqrs-backend-workflows.server
@@ -173,11 +68,11 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 2
     calls_in: 2
-  api.commands.fetch.FetchCommand.execute:
-    name: execute
-    module: api.commands.fetch
-    line: 15
-    cyclomatic_complexity: 2
+  cqrs-workflow-editor.src.App.workflow:
+    name: workflow
+    module: cqrs-workflow-editor.src.App
+    line: 552
+    cyclomatic_complexity: 5
     calls_out: 7
     calls_in: 0
   api.commands.converttobase64.ConvertToBase64Command.execute:
@@ -187,81 +82,18 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 10
     calls_in: 0
-  api.agent.execute_agent:
-    name: execute_agent
-    module: api.agent
-    line: 359
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 1
-  frontend.html.js.api.login:
-    name: login
-    module: frontend.html.js.api
-    line: 39
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  cqrs-workflow-editor.src.App.text:
-    name: text
-    module: cqrs-workflow-editor.src.App
-    line: 209
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 3
-  api.commands.pipeline._substitute:
-    name: _substitute
-    module: api.commands.pipeline
-    line: 23
-    cyclomatic_complexity: 8
-    calls_out: 7
-    calls_in: 3
   api.validators.validate_against_schema_uri:
     name: validate_against_schema_uri
     module: api.validators
     line: 21
     cyclomatic_complexity: 7
     calls_out: 13
-    calls_in: 1
-  cqrs-workflow-editor.src.App.onUploadWorkflow:
-    name: onUploadWorkflow
-    module: cqrs-workflow-editor.src.App
-    line: 286
-    cyclomatic_complexity: 4
-    calls_out: 8
     calls_in: 0
-  api.main.execute_query:
-    name: execute_query
-    module: api.main
-    line: 150
-    cyclomatic_complexity: 3
-    calls_out: 9
-    calls_in: 1
-  cqrs-backend-workflows.server.update_workflow:
-    name: update_workflow
+  cqrs-backend-workflows.server._handle_command:
+    name: _handle_command
     module: cqrs-backend-workflows.server
-    line: 292
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 0
-  api.commands.register_default_commands:
-    name: register_default_commands
-    module: api.commands
-    line: 61
-    cyclomatic_complexity: 1
-    calls_out: 15
-    calls_in: 0
-  api.main.execute_command:
-    name: execute_command
-    module: api.main
-    line: 116
-    cyclomatic_complexity: 3
-    calls_out: 11
-    calls_in: 0
-  cqrs-backend-workflows.server._handle_render:
-    name: _handle_render
-    module: cqrs-backend-workflows.server
-    line: 187
-    cyclomatic_complexity: 3
+    line: 166
+    cyclomatic_complexity: 5
     calls_out: 3
     calls_in: 0
   cqrs-backend-workflows.server.create_workflow:
@@ -271,48 +103,83 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 5
     calls_in: 0
-  cqrs-backend-workflows.server._handle_command:
-    name: _handle_command
-    module: cqrs-backend-workflows.server
-    line: 166
-    cyclomatic_complexity: 5
+  frontend.html.js.api.setRole:
+    name: setRole
+    module: frontend.html.js.api
+    line: 13
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  frontend.html.js.api.login:
+    name: login
+    module: frontend.html.js.api
+    line: 39
+    cyclomatic_complexity: 1
     calls_out: 3
     calls_in: 0
-  cqrs-workflow-editor.src.App.onDownloadWorkflow:
-    name: onDownloadWorkflow
+  cqrs-workflow-editor.src.App.file:
+    name: file
     module: cqrs-workflow-editor.src.App
-    line: 274
-    cyclomatic_complexity: 1
+    line: 401
+    cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 0
+  cqrs-workflow-editor.src.App.reader:
+    name: reader
+    module: cqrs-workflow-editor.src.App
+    line: 404
+    cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 0
+  cqrs-workflow-editor.src.App.runBackendWorkflow:
+    name: runBackendWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 168
+    cyclomatic_complexity: 3
     calls_out: 6
     calls_in: 0
-  frontend.html.js.api.data:
-    name: data
-    module: frontend.html.js.api
-    line: 40
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  cqrs-workflow-editor.src.App.json:
-    name: json
-    module: cqrs-workflow-editor.src.App
-    line: 293
-    cyclomatic_complexity: 2
+  api.commands.pipeline._substitute:
+    name: _substitute
+    module: api.commands.pipeline
+    line: 23
+    cyclomatic_complexity: 8
+    calls_out: 7
+    calls_in: 2
+  api.SUMD.get_jwt_manager:
+    name: get_jwt_manager
+    module: api.SUMD
+    line: 200
+    cyclomatic_complexity: 0
     calls_out: 0
     calls_in: 1
-  cqrs-workflow-editor.src.App.sizeKB:
-    name: sizeKB
-    module: cqrs-workflow-editor.src.App
-    line: 204
-    cyclomatic_complexity: 3
-    calls_out: 2
+  api.commands.register_default_commands:
+    name: register_default_commands
+    module: api.commands
+    line: 61
+    cyclomatic_complexity: 1
+    calls_out: 15
     calls_in: 0
-  api.queries.QueryRegistry.list:
-    name: list
-    module: api.queries
-    line: 33
-    cyclomatic_complexity: 2
+  api.SUMD.get_engine:
+    name: get_engine
+    module: api.SUMD
+    line: 273
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 3
+  api.commands.converttojson.ConvertToJsonCommand._convert:
+    name: _convert
+    module: api.commands.converttojson
+    line: 40
+    cyclomatic_complexity: 8
+    calls_out: 8
+    calls_in: 0
+  frontend.html.js.api.getToken:
+    name: getToken
+    module: frontend.html.js.api
+    line: 6
+    cyclomatic_complexity: 1
     calls_out: 1
-    calls_in: 5
+    calls_in: 2
   api.protocols.get_registry:
     name: get_registry
     module: api.protocols
@@ -320,13 +187,20 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 0
     calls_in: 1
-  cqrs-workflow-editor.src.App.mime:
-    name: mime
+  cqrs-workflow-editor.src.App.onUploadWorkflow:
+    name: onUploadWorkflow
     module: cqrs-workflow-editor.src.App
-    line: 205
-    cyclomatic_complexity: 3
-    calls_out: 2
+    line: 400
+    cyclomatic_complexity: 4
+    calls_out: 10
     calls_in: 0
+  api.SUMD._substitute:
+    name: _substitute
+    module: api.SUMD
+    line: 228
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 1
   api.queries.from_url.FromUrlQuery.execute:
     name: execute
     module: api.queries.from_url
@@ -334,26 +208,40 @@ nodes:
     cyclomatic_complexity: 9
     calls_out: 13
     calls_in: 0
-  api.main.issue_token:
-    name: issue_token
-    module: api.main
-    line: 93
-    cyclomatic_complexity: 2
+  cqrs-workflow-editor.src.App.onDownloadWorkflow:
+    name: onDownloadWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 388
+    cyclomatic_complexity: 1
     calls_out: 6
     calls_in: 0
-  api.policy.get_engine:
-    name: get_engine
-    module: api.policy
-    line: 139
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 3
-  api.main.execute_query_get:
-    name: execute_query_get
-    module: api.main
-    line: 171
+  api.protocols.register_default_protocols:
+    name: register_default_protocols
+    module: api.protocols
+    line: 57
     cyclomatic_complexity: 1
-    calls_out: 5
+    calls_out: 9
+    calls_in: 0
+  cqrs-backend-workflows.server.list_workflows:
+    name: list_workflows
+    module: cqrs-backend-workflows.server
+    line: 266
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  api.commands.pipeline._to_data_uri:
+    name: _to_data_uri
+    module: api.commands.pipeline
+    line: 18
+    cyclomatic_complexity: 3
+    calls_out: 0
+    calls_in: 1
+  frontend.html.js.api.data:
+    name: data
+    module: frontend.html.js.api
+    line: 40
+    cyclomatic_complexity: 1
+    calls_out: 1
     calls_in: 0
   api.main.run_agent:
     name: run_agent
@@ -362,6 +250,104 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 7
     calls_in: 0
+  cqrs-backend-workflows.server.update_workflow:
+    name: update_workflow
+    module: cqrs-backend-workflows.server
+    line: 292
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 0
+  api.commands.get_registry:
+    name: get_registry
+    module: api.commands
+    line: 57
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  cqrs-workflow-editor.src.App.text:
+    name: text
+    module: cqrs-workflow-editor.src.App
+    line: 323
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 3
+  api.commands.pipeline.PipelineCommand.execute:
+    name: execute
+    module: api.commands.pipeline
+    line: 46
+    cyclomatic_complexity: 8
+    calls_out: 13
+    calls_in: 0
+  cqrs-backend-workflows.server._result_to_data_uri:
+    name: _result_to_data_uri
+    module: cqrs-backend-workflows.server
+    line: 130
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 2
+  cqrs-workflow-editor.src.App.mime:
+    name: mime
+    module: cqrs-workflow-editor.src.App
+    line: 319
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  cqrs-workflow-editor.src.App.exportWorkflow:
+    name: exportWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 355
+    cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 1
+  api.SUMD.execute_agent:
+    name: execute_agent
+    module: api.SUMD
+    line: 196
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 1
+  api.SUMD.authenticate:
+    name: authenticate
+    module: api.SUMD
+    line: 201
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 1
+  api.main.issue_token:
+    name: issue_token
+    module: api.main
+    line: 93
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 0
+  frontend.html.js.api.request:
+    name: request
+    module: frontend.html.js.api
+    line: 15
+    cyclomatic_complexity: 9
+    calls_out: 8
+    calls_in: 6
+  frontend.html.js.api.runCommand:
+    name: runCommand
+    module: frontend.html.js.api
+    line: 52
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  cqrs-workflow-editor.src.App.mapToEdges:
+    name: mapToEdges
+    module: cqrs-workflow-editor.src.App
+    line: 91
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 6
+  api.SUMD.get_registry:
+    name: get_registry
+    module: api.SUMD
+    line: 295
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 9
   frontend.html.js.api.catalog:
     name: catalog
     module: frontend.html.js.api
@@ -369,24 +355,31 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 0
-  api.queries.get_registry:
-    name: get_registry
-    module: api.queries
-    line: 43
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
-  cqrs-workflow-editor.src.App.file:
-    name: file
+  cqrs-workflow-editor.src.App.mapToNodes:
+    name: mapToNodes
     module: cqrs-workflow-editor.src.App
-    line: 287
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 0
-  frontend.html.js.api.getToken:
-    name: getToken
+    line: 82
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 6
+  api.main.execute_query:
+    name: execute_query
+    module: api.main
+    line: 150
+    cyclomatic_complexity: 3
+    calls_out: 9
+    calls_in: 1
+  cqrs-workflow-editor.src.App.json:
+    name: json
+    module: cqrs-workflow-editor.src.App
+    line: 407
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 6
+  frontend.html.js.api.setToken:
+    name: setToken
     module: frontend.html.js.api
-    line: 6
+    line: 7
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 2
@@ -397,6 +390,48 @@ nodes:
     cyclomatic_complexity: 9
     calls_out: 10
     calls_in: 0
+  frontend.html.js.api.API:
+    name: API
+    module: frontend.html.js.api
+    line: 2
+    cyclomatic_complexity: 9
+    calls_out: 14
+    calls_in: 0
+  cqrs-workflow-editor.src.App.loadPredefinedWorkflow:
+    name: loadPredefinedWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 240
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 0
+  api.main.execute_command:
+    name: execute_command
+    module: api.main
+    line: 116
+    cyclomatic_complexity: 3
+    calls_out: 11
+    calls_in: 0
+  api.commands.CommandRegistry.list:
+    name: list
+    module: api.commands
+    line: 43
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 5
+  api.queries.get_registry:
+    name: get_registry
+    module: api.queries
+    line: 43
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  api.main.execute_query_get:
+    name: execute_query_get
+    module: api.main
+    line: 171
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 0
   frontend.html.js.app.decodeB64:
     name: decodeB64
     module: frontend.html.js.app
@@ -404,27 +439,34 @@ nodes:
     cyclomatic_complexity: 3
     calls_out: 3
     calls_in: 1
-  api.commands.pipeline._to_data_uri:
-    name: _to_data_uri
-    module: api.commands.pipeline
-    line: 18
+  cqrs-workflow-editor.src.App.fetchBackendWorkflows:
+    name: fetchBackendWorkflows
+    module: cqrs-workflow-editor.src.App
+    line: 134
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  cqrs-workflow-editor.src.App.sizeKB:
+    name: sizeKB
+    module: cqrs-workflow-editor.src.App
+    line: 318
     cyclomatic_complexity: 3
-    calls_out: 0
-    calls_in: 1
-  api.commands.get_registry:
-    name: get_registry
-    module: api.commands
-    line: 57
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
-  frontend.html.js.api.request:
-    name: request
-    module: frontend.html.js.api
-    line: 15
-    cyclomatic_complexity: 9
-    calls_out: 8
-    calls_in: 6
+    calls_out: 2
+    calls_in: 0
+  cqrs-workflow-editor.src.App.loadBackendWorkflow:
+    name: loadBackendWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 150
+    cyclomatic_complexity: 3
+    calls_out: 11
+    calls_in: 0
+  cqrs-backend-workflows.server._handle_render:
+    name: _handle_render
+    module: cqrs-backend-workflows.server
+    line: 187
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
 edges:
 - caller: frontend.html.js.api.API
   callee: frontend.html.js.api.getToken
@@ -456,26 +498,92 @@ edges:
 - caller: frontend.html.js.app.renderDecoded
   callee: frontend.html.js.app.decodeB64
   call_type: resolved
+- caller: cqrs-backend-workflows.server._handle_command
+  callee: cqrs-backend-workflows.server._result_to_data_uri
+  call_type: resolved
+- caller: cqrs-backend-workflows.server._handle_render
+  callee: cqrs-backend-workflows.server._result_to_data_uri
+  call_type: resolved
+- caller: cqrs-backend-workflows.server.list_workflows
+  callee: api.commands.CommandRegistry.list
+  call_type: resolved
+- caller: cqrs-backend-workflows.server.create_workflow
+  callee: cqrs-backend-workflows.server.validate_workflow
+  call_type: resolved
+- caller: cqrs-backend-workflows.server.update_workflow
+  callee: cqrs-backend-workflows.server.validate_workflow
+  call_type: resolved
+- caller: api.main.issue_token
+  callee: api.SUMD.authenticate
+  call_type: resolved
+- caller: api.main.issue_token
+  callee: api.SUMD.get_jwt_manager
+  call_type: resolved
+- caller: api.main.execute_command
+  callee: api.SUMD.get_engine
+  call_type: resolved
+- caller: api.main.execute_query
+  callee: api.SUMD.get_engine
+  call_type: resolved
+- caller: api.main.execute_query_get
+  callee: api.main.execute_query
+  call_type: resolved
+- caller: api.main.run_agent
+  callee: api.SUMD.execute_agent
+  call_type: resolved
+- caller: api.main.run_agent
+  callee: api.SUMD.get_engine
+  call_type: resolved
 - caller: api.commands.fetch.FetchCommand.execute
-  callee: project.map.toon.get_registry
+  callee: api.SUMD.get_registry
+  call_type: resolved
+- caller: api.commands.register_default_commands
+  callee: api.commands.get_registry
   call_type: resolved
 - caller: api.commands.converttojson.ConvertToJsonCommand._convert
-  callee: api.queries.QueryRegistry.list
+  callee: api.commands.CommandRegistry.list
   call_type: resolved
 - caller: api.commands.converttobase64.ConvertToBase64Command.execute
-  callee: project.map.toon.get_registry
-  call_type: resolved
-- caller: api.commands.pipeline._substitute
-  callee: api.commands.pipeline._to_data_uri
-  call_type: resolved
-- caller: api.commands.pipeline.PipelineCommand.execute
-  callee: api.commands.pipeline._substitute
+  callee: api.SUMD.get_registry
   call_type: resolved
 - caller: api.validators.validate_against_schema_uri
-  callee: api.queries.QueryRegistry.list
+  callee: api.commands.CommandRegistry.list
+  call_type: resolved
+- caller: api.protocols.register_default_protocols
+  callee: api.protocols.get_registry
   call_type: resolved
 - caller: api.queries.from_url.FromUrlQuery.execute
-  callee: project.map.toon.get_registry
+  callee: api.SUMD.get_registry
+  call_type: resolved
+- caller: api.queries.register_default_queries
+  callee: api.queries.get_registry
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.fetchBackendWorkflows
+  callee: cqrs-workflow-editor.src.App.json
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.loadBackendWorkflow
+  callee: cqrs-workflow-editor.src.App.json
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.loadBackendWorkflow
+  callee: cqrs-workflow-editor.src.App.mapToNodes
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.loadBackendWorkflow
+  callee: cqrs-workflow-editor.src.App.mapToEdges
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.runBackendWorkflow
+  callee: cqrs-workflow-editor.src.App.json
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.fetchExampleFiles
+  callee: cqrs-workflow-editor.src.App.json
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.loadExampleFile
+  callee: cqrs-workflow-editor.src.App.json
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.loadExampleFile
+  callee: cqrs-workflow-editor.src.App.mapToNodes
+  call_type: resolved
+- caller: cqrs-workflow-editor.src.App.loadExampleFile
+  callee: cqrs-workflow-editor.src.App.mapToEdges
   call_type: resolved
 - caller: cqrs-workflow-editor.src.App.loadPredefinedWorkflow
   callee: cqrs-workflow-editor.src.App.mapToNodes
@@ -519,58 +627,22 @@ edges:
 - caller: cqrs-workflow-editor.src.App.reader
   callee: cqrs-workflow-editor.src.App.mapToEdges
   call_type: resolved
-- caller: api.main.issue_token
-  callee: api.auth.authenticate
+- caller: api.commands.pipeline._substitute
+  callee: api.commands.pipeline._to_data_uri
   call_type: resolved
-- caller: api.main.issue_token
-  callee: api.auth.get_jwt_manager
-  call_type: resolved
-- caller: api.main.execute_command
-  callee: api.policy.get_engine
-  call_type: resolved
-- caller: api.main.execute_query
-  callee: api.policy.get_engine
-  call_type: resolved
-- caller: api.main.execute_query_get
-  callee: api.main.execute_query
-  call_type: resolved
-- caller: api.main.run_agent
-  callee: api.agent.execute_agent
-  call_type: resolved
-- caller: api.main.run_agent
-  callee: api.policy.get_engine
-  call_type: resolved
-- caller: api.queries.register_default_queries
-  callee: api.queries.get_registry
-  call_type: resolved
-- caller: api.commands.register_default_commands
-  callee: api.commands.get_registry
-  call_type: resolved
-- caller: api.protocols.register_default_protocols
-  callee: api.protocols.get_registry
-  call_type: resolved
-- caller: cqrs-backend-workflows.server._handle_command
-  callee: cqrs-backend-workflows.server._result_to_data_uri
-  call_type: resolved
-- caller: cqrs-backend-workflows.server._handle_render
-  callee: cqrs-backend-workflows.server._result_to_data_uri
-  call_type: resolved
-- caller: cqrs-backend-workflows.server.list_workflows
-  callee: api.queries.QueryRegistry.list
-  call_type: resolved
-- caller: cqrs-backend-workflows.server.create_workflow
-  callee: cqrs-backend-workflows.server.validate_workflow
-  call_type: resolved
-- caller: cqrs-backend-workflows.server.update_workflow
-  callee: cqrs-backend-workflows.server.validate_workflow
+- caller: api.commands.pipeline.PipelineCommand.execute
+  callee: api.SUMD._substitute
   call_type: resolved
 modules:
-  api.agent:
-  - api.agent.execute_agent
-  api.auth:
-  - api.auth.authenticate
-  - api.auth.get_jwt_manager
+  api.SUMD:
+  - api.SUMD._substitute
+  - api.SUMD.authenticate
+  - api.SUMD.execute_agent
+  - api.SUMD.get_engine
+  - api.SUMD.get_jwt_manager
+  - api.SUMD.get_registry
   api.commands:
+  - api.commands.CommandRegistry.list
   - api.commands.get_registry
   - api.commands.register_default_commands
   api.commands.converttobase64:
@@ -589,13 +661,10 @@ modules:
   - api.main.execute_query_get
   - api.main.issue_token
   - api.main.run_agent
-  api.policy:
-  - api.policy.get_engine
   api.protocols:
   - api.protocols.get_registry
   - api.protocols.register_default_protocols
   api.queries:
-  - api.queries.QueryRegistry.list
   - api.queries.get_registry
   - api.queries.register_default_queries
   api.queries.from_url:
@@ -613,9 +682,13 @@ modules:
   cqrs-workflow-editor.src.App:
   - cqrs-workflow-editor.src.App.blob
   - cqrs-workflow-editor.src.App.exportWorkflow
+  - cqrs-workflow-editor.src.App.fetchBackendWorkflows
+  - cqrs-workflow-editor.src.App.fetchExampleFiles
   - cqrs-workflow-editor.src.App.fetchPreview
   - cqrs-workflow-editor.src.App.file
   - cqrs-workflow-editor.src.App.json
+  - cqrs-workflow-editor.src.App.loadBackendWorkflow
+  - cqrs-workflow-editor.src.App.loadExampleFile
   - cqrs-workflow-editor.src.App.loadPredefinedWorkflow
   - cqrs-workflow-editor.src.App.mapToEdges
   - cqrs-workflow-editor.src.App.mapToNodes
@@ -623,6 +696,7 @@ modules:
   - cqrs-workflow-editor.src.App.onDownloadWorkflow
   - cqrs-workflow-editor.src.App.onUploadWorkflow
   - cqrs-workflow-editor.src.App.reader
+  - cqrs-workflow-editor.src.App.runBackendWorkflow
   - cqrs-workflow-editor.src.App.sizeKB
   - cqrs-workflow-editor.src.App.text
   - cqrs-workflow-editor.src.App.timer
@@ -641,8 +715,6 @@ modules:
   frontend.html.js.app:
   - frontend.html.js.app.decodeB64
   - frontend.html.js.app.renderDecoded
-  project.map.toon:
-  - project.map.toon.get_registry
 entry_points:
 - SUMD._bash_cli_execute
 - SUMD._engine
@@ -674,6 +746,7 @@ entry_points:
 - SUMD.execute_query
 - SUMD.execute_query_get
 - SUMD.get_engine
+- SUMD.get_example
 - SUMD.get_jwt_manager
 - SUMD.get_registry
 - SUMD.get_workflow
@@ -681,6 +754,7 @@ entry_points:
 - SUMD.issue_token
 - SUMD.list_agent_backends
 - SUMD.list_commands
+- SUMD.list_examples
 - SUMD.list_queries
 - SUMD.list_workflows
 - SUMD.load_settings
@@ -715,20 +789,14 @@ entry_points:
 - api.SUMD._mcp_execute
 - api.SUMD._nf_error
 - api.SUMD._perm_error
-- api.SUMD._substitute
 - api.SUMD._to_data_uri
 - api.SUMD._value_error
 - api.SUMD._websocket_execute
-- api.SUMD.authenticate
 - api.SUMD.catalog
 - api.SUMD.current_user
-- api.SUMD.execute_agent
 - api.SUMD.execute_command
 - api.SUMD.execute_query
 - api.SUMD.execute_query_get
-- api.SUMD.get_engine
-- api.SUMD.get_jwt_manager
-- api.SUMD.get_registry
 - api.SUMD.health
 - api.SUMD.issue_token
 - api.SUMD.list_agent_backends
@@ -744,21 +812,22 @@ entry_points:
 - api.SUMD.run_agent
 - api.SUMD.test_import
 - api.SUMD.test_placeholder
-- api.SUMD.validate_against_schema_uri
 - api.agent._bash_cli_execute
 - api.agent._http_api_execute
 - api.agent._litellm_execute
 - api.agent._mcp_execute
 - api.agent._websocket_execute
+- api.agent.execute_agent
 - api.agent.register_backend
 - api.auth.JWTManager.__init__
 - api.auth.JWTManager.issue
 - api.auth.JWTManager.verify
+- api.auth.authenticate
 - api.auth.current_user
+- api.auth.get_jwt_manager
 - api.commands.Command.execute
 - api.commands.CommandRegistry.__init__
 - api.commands.CommandRegistry.get
-- api.commands.CommandRegistry.list
 - api.commands.CommandRegistry.register
 - api.commands.converttobase64.ConvertToBase64Command.execute
 - api.commands.converttocsv.ConvertToCsvCommand.execute
@@ -785,6 +854,21 @@ entry_points:
 - api.main.list_queries
 - api.main.me
 - api.main.run_agent
+- api.mcp_client.MCPClient.__init__
+- api.mcp_client.MCPClient._next_id
+- api.mcp_client.MCPClient._send
+- api.mcp_client.MCPClient.call_tool
+- api.mcp_client.MCPClient.close
+- api.mcp_client.MCPClient.initialize
+- api.mcp_client.MCPClient.list_tools
+- api.mcp_client.MCPSseClient.__init__
+- api.mcp_client.MCPSseClient._send
+- api.mcp_client.MCPSseClient.close
+- api.mcp_client.MCPSseClient.initialize
+- api.mcp_client.MCPStdioClient.__init__
+- api.mcp_client.MCPStdioClient._read_message
+- api.mcp_client.MCPStdioClient._send
+- api.mcp_client.MCPStdioClient.close
 - api.policy.PolicyDecision.allow
 - api.policy.PolicyDecision.deny
 - api.policy.PolicyEngine.__init__
@@ -794,6 +878,7 @@ entry_points:
 - api.policy.PolicyEngine.can_execute_query
 - api.policy.PolicyEngine.from_file
 - api.policy.User.has_role
+- api.policy.get_engine
 - api.policy.reload_engine
 - api.project.map.toon._bash_cli_execute
 - api.project.map.toon._http_api_execute
@@ -846,11 +931,13 @@ entry_points:
 - api.queries.Query.execute
 - api.queries.QueryRegistry.__init__
 - api.queries.QueryRegistry.get
+- api.queries.QueryRegistry.list
 - api.queries.QueryRegistry.register
 - api.queries.from_url.FromUrlQuery.execute
 - api.queries.introspect.IntrospectQuery.execute
 - api.queries.register_default_queries
 - api.validators.SchemaValidationError.__init__
+- api.validators.validate_against_schema_uri
 - cqrs-backend-workflows.SUMD._handle_agent
 - cqrs-backend-workflows.SUMD._handle_command
 - cqrs-backend-workflows.SUMD._handle_fetch
@@ -860,8 +947,10 @@ entry_points:
 - cqrs-backend-workflows.SUMD.create_workflow
 - cqrs-backend-workflows.SUMD.delete_workflow
 - cqrs-backend-workflows.SUMD.execute_node
+- cqrs-backend-workflows.SUMD.get_example
 - cqrs-backend-workflows.SUMD.get_workflow
 - cqrs-backend-workflows.SUMD.health
+- cqrs-backend-workflows.SUMD.list_examples
 - cqrs-backend-workflows.SUMD.list_workflows
 - cqrs-backend-workflows.SUMD.root
 - cqrs-backend-workflows.SUMD.run_workflow
@@ -878,8 +967,10 @@ entry_points:
 - cqrs-backend-workflows.project.map.toon.create_workflow
 - cqrs-backend-workflows.project.map.toon.delete_workflow
 - cqrs-backend-workflows.project.map.toon.execute_node
+- cqrs-backend-workflows.project.map.toon.get_example
 - cqrs-backend-workflows.project.map.toon.get_workflow
 - cqrs-backend-workflows.project.map.toon.health
+- cqrs-backend-workflows.project.map.toon.list_examples
 - cqrs-backend-workflows.project.map.toon.list_workflows
 - cqrs-backend-workflows.project.map.toon.root
 - cqrs-backend-workflows.project.map.toon.run_workflow
@@ -894,8 +985,10 @@ entry_points:
 - cqrs-backend-workflows.server._handle_render
 - cqrs-backend-workflows.server.create_workflow
 - cqrs-backend-workflows.server.delete_workflow
+- cqrs-backend-workflows.server.get_example
 - cqrs-backend-workflows.server.get_workflow
 - cqrs-backend-workflows.server.health
+- cqrs-backend-workflows.server.list_examples
 - cqrs-backend-workflows.server.list_workflows
 - cqrs-backend-workflows.server.root
 - cqrs-backend-workflows.server.run_workflow
@@ -903,8 +996,14 @@ entry_points:
 - cqrs-workflow-editor.src.App.a
 - cqrs-workflow-editor.src.App.center
 - cqrs-workflow-editor.src.App.createRes
+- cqrs-workflow-editor.src.App.data
+- cqrs-workflow-editor.src.App.fetchBackendWorkflows
+- cqrs-workflow-editor.src.App.fetchExampleFiles
 - cqrs-workflow-editor.src.App.file
+- cqrs-workflow-editor.src.App.handleKeyDown
 - cqrs-workflow-editor.src.App.initialNodes
+- cqrs-workflow-editor.src.App.loadBackendWorkflow
+- cqrs-workflow-editor.src.App.loadExampleFile
 - cqrs-workflow-editor.src.App.loadPredefinedWorkflow
 - cqrs-workflow-editor.src.App.mime
 - cqrs-workflow-editor.src.App.msg
@@ -914,12 +1013,15 @@ entry_points:
 - cqrs-workflow-editor.src.App.onConnect
 - cqrs-workflow-editor.src.App.onDownloadWorkflow
 - cqrs-workflow-editor.src.App.onEdgeClick
+- cqrs-workflow-editor.src.App.onNodeClick
 - cqrs-workflow-editor.src.App.onUploadWorkflow
 - cqrs-workflow-editor.src.App.outputs
 - cqrs-workflow-editor.src.App.previewUri
 - cqrs-workflow-editor.src.App.reader
+- cqrs-workflow-editor.src.App.res
 - cqrs-workflow-editor.src.App.response
 - cqrs-workflow-editor.src.App.result
+- cqrs-workflow-editor.src.App.runBackendWorkflow
 - cqrs-workflow-editor.src.App.runRes
 - cqrs-workflow-editor.src.App.saveRes
 - cqrs-workflow-editor.src.App.sizeKB
@@ -985,12 +1087,15 @@ entry_points:
 - project.map.toon.execute_query
 - project.map.toon.execute_query_get
 - project.map.toon.get_engine
+- project.map.toon.get_example
 - project.map.toon.get_jwt_manager
+- project.map.toon.get_registry
 - project.map.toon.get_workflow
 - project.map.toon.health
 - project.map.toon.issue_token
 - project.map.toon.list_agent_backends
 - project.map.toon.list_commands
+- project.map.toon.list_examples
 - project.map.toon.list_queries
 - project.map.toon.list_workflows
 - project.map.toon.load_settings

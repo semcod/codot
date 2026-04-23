@@ -1,11 +1,11 @@
-# codot | 46f 3577L | python:27,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-22
-# stats: 69 func | 43 cls | 46 mod | CC̄=2.3 | critical:0 | cycles:0
-# alerts[5]: CC _substitute=8; CC run_workflow=8; CC _mcp_execute=7; CC validate_against_schema_uri=7; CC _websocket_execute=6
-# hotspots[5]: _mcp_execute fan=16; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _litellm_execute fan=10
+# codot | 47f 3804L | python:28,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
+# stats: 71 func | 47 cls | 47 mod | CC̄=2.4 | critical:1 | cycles:0
+# alerts[5]: CC _mcp_execute=10; CC _substitute=8; CC run_workflow=8; CC validate_against_schema_uri=7; CC _websocket_execute=6
+# hotspots[5]: _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _mcp_execute fan=10; _litellm_execute fan=10
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[46]:
-  api/agent.py,374
+M[47]:
+  api/agent.py,363
   api/app.doql.less,60
   api/auth/__init__.py,103
   api/commands/__init__.py,81
@@ -18,7 +18,8 @@ M[46]:
   api/commands/render.py,98
   api/config.py,35
   api/main.py,235
-  api/models.py,125
+  api/mcp_client.py,165
+  api/models.py,126
   api/policy/__init__.py,150
   api/protocols/__init__.py,70
   api/protocols/data_protocol.py,41
@@ -29,9 +30,9 @@ M[46]:
   api/queries/introspect.py,23
   api/tests/test_api.py,12
   api/validators/__init__.py,49
-  app.doql.less,60
+  app.doql.less,104
   cqrs-backend-workflows/app.doql.less,60
-  cqrs-backend-workflows/server.py,376
+  cqrs-backend-workflows/server.py,400
   cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py,16
   cqrs-workflow-editor/app.doql.less,65
   cqrs-workflow-editor/test/cqrs-workflow-editor.test.js,8
@@ -47,7 +48,7 @@ M[46]:
   frontend/html/js/api.js,62
   frontend/html/js/app.js,188
   frontend/test/codot.test.js,8
-  project.sh,36
+  project.sh,40
   tests/smoke.sh,79
   tests/test_policy.py,63
   tests/test_protocols.py,61
@@ -117,6 +118,12 @@ D:
     catalog()
     run_agent(agent_id;body;user)
     list_agent_backends()
+  api/mcp_client.py:
+    e: MCPError,MCPClient,MCPStdioClient,MCPSseClient
+    MCPError:
+    MCPClient: __init__(0),_next_id(0),_send(1),initialize(2),list_tools(0),call_tool(2),close(0)  # Base MCP client (transport-agnostic).
+    MCPStdioClient: __init__(2),_read_message(0),_send(1),close(0)  # Spawn an MCP server as a subprocess and speak JSON-RPC over 
+    MCPSseClient: __init__(2),_send(1),initialize(2),close(0)  # Connect to an MCP server via HTTP SSE transport.
   api/models.py:
     e: CommandRequest,CommandResponse,QueryRequest,QueryResponse,TokenRequest,TokenResponse,PipelineStep,PipelineRequest,ErrorResponse,AgentCommunicationBackend,AgentNode,AgentRequest,AgentResponse
     CommandRequest:  # Envelope for every command invocation.
@@ -176,7 +183,7 @@ D:
     SchemaValidationError: __init__(2)
     validate_against_schema_uri(instance;schema_uri)
   cqrs-backend-workflows/server.py:
-    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,list_examples,get_example,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
     WorkflowNode:
     WorkflowOutput:
     Workflow:
@@ -197,6 +204,8 @@ D:
     create_workflow(workflow)
     update_workflow(workflow_id;workflow)
     delete_workflow(workflow_id)
+    list_examples()
+    get_example(filename)
     run_workflow(workflow_id;request)
   cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py:
     e: test_placeholder,test_import

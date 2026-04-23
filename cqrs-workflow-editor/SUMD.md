@@ -113,9 +113,11 @@ project:
 ### Runtime (Node.js)
 
 ```text markpact:deps node
+@types/react-syntax-highlighter
+@xyflow/react
 react
 react-dom
-@xyflow/react
+react-syntax-highlighter
 ```
 
 ## Deployment
@@ -152,14 +154,14 @@ npm install cqrs-workflow-editor
 - `npm run build` — `tsc && vite build`
 - `npm run preview` — `vite preview`
 
-**Runtime deps**: `react`, `react-dom`, `@xyflow/react`
+**Runtime deps**: `@types/react-syntax-highlighter`, `@xyflow/react`, `react`, `react-dom`, `react-syntax-highlighter`
 
 ## Code Analysis
 
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# cqrs-workflow-editor | 3f 109L | less:1,javascript:1,typescript:1 | 2026-04-22
+# cqrs-workflow-editor | 3f 109L | less:1,javascript:1,typescript:1 | 2026-04-23
 # stats: 0 func | 0 cls | 3 mod | CC̄=1.0 | critical:0 | cycles:0
 # alerts[5]: none
 # hotspots[5]: none

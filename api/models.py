@@ -61,6 +61,7 @@ class TokenResponse(BaseModel):
 class PipelineStep(BaseModel):
     command: str
     request: CommandRequest
+    agent_node: AgentNode | None = None
 
 
 class PipelineRequest(BaseModel):

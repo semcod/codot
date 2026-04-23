@@ -1,16 +1,16 @@
-# cqrs-backend-workflows | 3f 452L | python:2,less:1 | 2026-04-22
-# stats: 18 func | 5 cls | 3 mod | CC̄=2.4 | critical:0 | cycles:0
-# alerts[5]: CC run_workflow=8; CC _handle_command=5; CC _handle_http=3; CC _handle_render=3; CC execute_node=3
-# hotspots[5]: run_workflow fan=9; create_workflow fan=5; update_workflow fan=4; _handle_command fan=3; _handle_render fan=3
+# cqrs-backend-workflows | 3f 476L | python:2,less:1 | 2026-04-23
+# stats: 20 func | 5 cls | 3 mod | CC̄=2.5 | critical:0 | cycles:0
+# alerts[5]: CC run_workflow=8; CC _handle_command=5; CC list_examples=4; CC _handle_http=3; CC _handle_render=3
+# hotspots[5]: run_workflow fan=9; get_example fan=7; list_examples fan=6; create_workflow fan=5; update_workflow fan=4
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[3]:
   app.doql.less,60
-  server.py,376
+  server.py,400
   tests/test_cqrs_backend_workflows.py,16
 D:
   server.py:
-    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,list_examples,get_example,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
     WorkflowNode:
     WorkflowOutput:
     Workflow:
@@ -31,6 +31,8 @@ D:
     create_workflow(workflow)
     update_workflow(workflow_id;workflow)
     delete_workflow(workflow_id)
+    list_examples()
+    get_example(filename)
     run_workflow(workflow_id;request)
   tests/test_cqrs_backend_workflows.py:
     e: test_placeholder,test_import

@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "description": "Monitor codot API health, analyze response, render status dashboard",
+  "nodes": [
+    {
+      "id": "check_api",
+      "label": "Check API Health",
+      "type": "http",
+      "url": "http://localhost:18080/health",
+      "method": "GET",
+      "description": "HTTP GET on codot API health endpoint"
+    },
+    {
+      "id": "analyze_status",
+      "label": "Analyze Status",
+      "type": "command",
+      "command_type": "converttojson",
+      "input": "check_api",
+      "description": "Normalize health response to JSON for rendering"
+    },
+    {
+      "id": "render_dashboard",
+      "label": "Render Status Dashboard",
+      "type": "command",
+      "command_type": "render",
+      "input": "analyze_status",
+      "mime_type": "text/html",
+      "description": "Generate HTML status dashboard from health data",
+      "meta": { "title": "System Health Monitor" }
+    }
+  ],
+  "outputs": [
+    { "id": "status_view", "label": "Status Dashboard", "source": "render_dashboard", "description": "Real-time system health view" }
+  ]
+}

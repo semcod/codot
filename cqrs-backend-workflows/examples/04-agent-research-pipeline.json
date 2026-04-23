@@ -1,0 +1,46 @@
+{
+  "version": "1.0",
+  "description": "Multi-agent workflow: fetch data, agent transforms, render insight report",
+  "nodes": [
+    {
+      "id": "fetch_data",
+      "label": "Fetch Source Data",
+      "type": "fetch",
+      "uri": "http://localhost:18091/products.csv",
+      "mime_type": "text/csv",
+      "description": "Load raw data for agent analysis"
+    },
+    {
+      "id": "convert_for_agent",
+      "label": "Preprocess Data",
+      "type": "command",
+      "command_type": "converttojson",
+      "input": "fetch_data",
+      "description": "Convert CSV to structured JSON before agent processing"
+    },
+    {
+      "id": "agent_insight",
+      "label": "Data Analyst Agent",
+      "type": "agent",
+      "input": "convert_for_agent",
+      "role": "data-analyst",
+      "goal": "Analyze product catalog and suggest pricing optimizations",
+      "tools": ["fetch", "converttojson", "render"],
+      "memory_uri": "http://localhost:18091/products.csv",
+      "description": "AI agent analyzing product data for insights"
+    },
+    {
+      "id": "render_report",
+      "label": "Render Insight Report",
+      "type": "command",
+      "command_type": "render",
+      "input": "agent_insight",
+      "mime_type": "text/html",
+      "description": "Generate HTML report from agent analysis results",
+      "meta": { "title": "Pricing Insights Report" }
+    }
+  ],
+  "outputs": [
+    { "id": "insight_view", "label": "Insight Report", "source": "render_report", "description": "Agent-generated analysis report" }
+  ]
+}

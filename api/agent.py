@@ -38,79 +38,68 @@ def register_backend(
 
 
 # ---------------------------------------------------------------------------
-# MCP backend
+# MCP backend  (real MCP client via mcp_client module)
 # ---------------------------------------------------------------------------
 
 async def _mcp_execute(node: AgentNode, request: AgentRequest) -> AgentResponse:
-    """Execute agent via MCP server.
+    """Execute agent via a real MCP server.
 
     backend_config keys:
-        - server_url: SSE endpoint URL (or stdio command if absent)
+        - server_url: SSE endpoint URL
         - stdio_command: list[str] command to spawn MCP server
-        - tools: list of tool names to expose
+        - env: dict of extra env vars for stdio
+        - tool: name of the MCP tool to call
+        - tool_args: dict of arguments passed to the tool
     """
     cfg = node.backend_config
     server_url = cfg.get("server_url")
     stdio_cmd = cfg.get("stdio_command")
+    tool_name = cfg.get("tool", node.tools[0] if node.tools else "default")
+    tool_args = cfg.get("tool_args", request.context)
 
     trace: list[str] = [f"mcp backend for role={node.role!r}"]
     output: dict[str, Any] = {}
 
-    if server_url:
-        trace.append(f"connect SSE {server_url}")
-        try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                payload = {
-                    "role": node.role,
-                    "goal": node.goal,
-                    "tools": node.tools,
-                    "context": request.context,
-                }
-                resp = await client.post(
-                    f"{server_url.rstrip('/')}/invoke",
-                    json=payload,
-                )
-                resp.raise_for_status()
-                body = resp.json()
-                output = body.get("output", body)
-                trace.append("mcp_sse_ok")
-        except Exception as exc:
-            trace.append(f"mcp_sse_err: {exc}")
-            return AgentResponse(ok=False, output=output, reasoning_trace=trace, meta={"error": str(exc)})
-    elif stdio_cmd:
-        trace.append(f"spawn stdio: {stdio_cmd}")
-        try:
-            proc = await asyncio.create_subprocess_exec(
-                *stdio_cmd,
-                stdin=asyncio.subprocess.PIPE,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
+    from mcp_client import MCPStdioClient, MCPSseClient, MCPError
+
+    client = None
+    try:
+        if server_url:
+            trace.append(f"connect SSE {server_url}")
+            client = MCPSseClient(server_url)
+        elif stdio_cmd:
+            trace.append(f"spawn stdio: {stdio_cmd}")
+            client = MCPStdioClient(stdio_cmd, env=cfg.get("env"))
+        else:
+            return AgentResponse(
+                ok=False,
+                output={},
+                reasoning_trace=[*trace, "mcp missing server_url or stdio_command"],
             )
-            msg = json.dumps(
-                {
-                    "role": node.role,
-                    "goal": node.goal,
-                    "tools": node.tools,
-                    "context": request.context,
-                }
-            ).encode()
-            stdout, stderr = await asyncio.wait_for(proc.communicate(msg), timeout=60.0)
-            if stderr:
-                trace.append(f"stderr: {stderr.decode()[:500]}")
-            try:
-                output = json.loads(stdout.decode())
-            except json.JSONDecodeError:
-                output = {"raw_stdout": stdout.decode()}
-            trace.append("mcp_stdio_ok")
-        except Exception as exc:
-            trace.append(f"mcp_stdio_err: {exc}")
-            return AgentResponse(ok=False, output=output, reasoning_trace=trace, meta={"error": str(exc)})
-    else:
-        return AgentResponse(
-            ok=False,
-            output={},
-            reasoning_trace=["mcp missing server_url or stdio_command"],
-        )
+
+        init_result = await client.initialize(client_name="codot")
+        trace.append(f"mcp_init_ok: {init_result.get('serverInfo', {}).get('name', '?')}")
+
+        available = await client.list_tools()
+        tool_names = [t.get("name") for t in available]
+        trace.append(f"mcp_tools: {tool_names}")
+
+        if tool_name not in tool_names and tool_names:
+            tool_name = tool_names[0]
+            trace.append(f"mcp_fallback_tool: {tool_name}")
+
+        result = await client.call_tool(tool_name, tool_args)
+        output = {"tool_result": result}
+        trace.append("mcp_call_ok")
+    except MCPError as exc:
+        trace.append(f"mcp_error: {exc}")
+        return AgentResponse(ok=False, output=output, reasoning_trace=trace, meta={"error": str(exc)})
+    except Exception as exc:
+        trace.append(f"mcp_exc: {exc}")
+        return AgentResponse(ok=False, output=output, reasoning_trace=trace, meta={"error": str(exc)})
+    finally:
+        if client is not None:
+            await client.close()
 
     return AgentResponse(ok=True, output=output, reasoning_trace=trace)
 

@@ -1,56 +1,59 @@
 # code2llm call graph | /home/tom/github/semcod/codot
-# nodes: 60 | edges: 46 | modules: 18
-# CC̄=1.1
+# nodes: 66 | edges: 55 | modules: 15
+# CC̄=1.2
 
 HUBS[20]:
   cqrs-workflow-editor.src.App.fetchPreview
     CC=13  in:1  out:14  total:15
   api.commands.register_default_commands
     CC=1  in:0  out:15  total:15
+  frontend.html.js.api.request
+    CC=9  in:6  out:8  total:14
   frontend.html.js.api.API
     CC=9  in:0  out:14  total:14
   api.validators.validate_against_schema_uri
-    CC=7  in:1  out:13  total:14
-  frontend.html.js.api.request
-    CC=9  in:6  out:8  total:14
-  api.commands.pipeline.PipelineCommand.execute
-    CC=8  in:0  out:13  total:13
+    CC=7  in:0  out:13  total:13
   api.queries.from_url.FromUrlQuery.execute
     CC=9  in:0  out:13  total:13
+  api.commands.pipeline.PipelineCommand.execute
+    CC=8  in:0  out:13  total:13
+  cqrs-workflow-editor.src.App.loadExampleFile
+    CC=3  in:0  out:11  total:11
   api.main.execute_command
+    CC=3  in:0  out:11  total:11
+  cqrs-workflow-editor.src.App.loadBackendWorkflow
     CC=3  in:0  out:11  total:11
   api.commands.converttobase64.ConvertToBase64Command.execute
     CC=2  in:0  out:10  total:10
-  api.commands.pipeline._substitute
-    CC=8  in:3  out:7  total:10
+  cqrs-workflow-editor.src.App.onUploadWorkflow
+    CC=4  in:0  out:10  total:10
   api.main.execute_query
     CC=3  in:1  out:9  total:10
   frontend.html.js.app.renderDecoded
     CC=9  in:0  out:10  total:10
-  project.map.toon.get_registry
-    CC=0  in:9  out:0  total:9
+  api.commands.pipeline._substitute
+    CC=8  in:2  out:7  total:9
   api.protocols.register_default_protocols
     CC=1  in:0  out:9  total:9
+  api.SUMD.get_registry
+    CC=0  in:9  out:0  total:9
+  cqrs-workflow-editor.src.App.file
+    CC=2  in:0  out:8  total:8
+  cqrs-workflow-editor.src.App.reader
+    CC=2  in:0  out:8  total:8
   api.commands.converttojson.ConvertToJsonCommand._convert
     CC=8  in:0  out:8  total:8
-  cqrs-workflow-editor.src.App.onUploadWorkflow
-    CC=4  in:0  out:8  total:8
-  cqrs-workflow-editor.src.App.workflow
-    CC=5  in:0  out:7  total:7
-  api.commands.fetch.FetchCommand.execute
-    CC=2  in:0  out:7  total:7
-  api.main.run_agent
-    CC=2  in:0  out:7  total:7
-  cqrs-workflow-editor.src.App.reader
-    CC=2  in:0  out:6  total:6
 
 MODULES:
-  api.agent  [1 funcs]
-    execute_agent  CC=2  out:3
-  api.auth  [2 funcs]
-    authenticate  CC=3  out:1
-    get_jwt_manager  CC=1  out:0
-  api.commands  [2 funcs]
+  api.SUMD  [6 funcs]
+    _substitute  CC=0  out:0
+    authenticate  CC=0  out:0
+    execute_agent  CC=0  out:0
+    get_engine  CC=0  out:0
+    get_jwt_manager  CC=0  out:0
+    get_registry  CC=0  out:0
+  api.commands  [3 funcs]
+    list  CC=2  out:1
     get_registry  CC=1  out:0
     register_default_commands  CC=1  out:15
   api.commands.converttobase64  [1 funcs]
@@ -69,13 +72,10 @@ MODULES:
     execute_query_get  CC=1  out:5
     issue_token  CC=2  out:6
     run_agent  CC=2  out:7
-  api.policy  [1 funcs]
-    get_engine  CC=2  out:1
   api.protocols  [2 funcs]
     get_registry  CC=1  out:0
     register_default_protocols  CC=1  out:9
-  api.queries  [3 funcs]
-    list  CC=2  out:1
+  api.queries  [2 funcs]
     get_registry  CC=1  out:0
     register_default_queries  CC=1  out:5
   api.queries.from_url  [1 funcs]
@@ -90,17 +90,17 @@ MODULES:
     list_workflows  CC=1  out:3
     update_workflow  CC=2  out:4
     validate_workflow  CC=2  out:2
-  cqrs-workflow-editor.src.App  [16 funcs]
+  cqrs-workflow-editor.src.App  [21 funcs]
     blob  CC=1  out:2
     exportWorkflow  CC=1  out:4
+    fetchBackendWorkflows  CC=4  out:5
+    fetchExampleFiles  CC=4  out:5
     fetchPreview  CC=13  out:14
-    file  CC=2  out:6
-    json  CC=2  out:0
-    loadPredefinedWorkflow  CC=2  out:5
-    mapToEdges  CC=4  out:2
-    mapToNodes  CC=1  out:1
-    mime  CC=3  out:2
-    onDownloadWorkflow  CC=1  out:6
+    file  CC=2  out:8
+    json  CC=1  out:1
+    loadBackendWorkflow  CC=3  out:11
+    loadExampleFile  CC=3  out:11
+    loadPredefinedWorkflow  CC=2  out:7
   frontend.html.js.api  [10 funcs]
     API  CC=9  out:14
     catalog  CC=1  out:1
@@ -115,8 +115,6 @@ MODULES:
   frontend.html.js.app  [2 funcs]
     decodeB64  CC=3  out:3
     renderDecoded  CC=9  out:10
-  project.map.toon  [1 funcs]
-    get_registry  CC=0  out:0
 
 EDGES:
   frontend.html.js.api.API → frontend.html.js.api.getToken
@@ -129,13 +127,35 @@ EDGES:
   frontend.html.js.api.runCommand → frontend.html.js.api.request
   frontend.html.js.api.runQuery → frontend.html.js.api.request
   frontend.html.js.app.renderDecoded → frontend.html.js.app.decodeB64
-  api.commands.fetch.FetchCommand.execute → project.map.toon.get_registry
-  api.commands.converttojson.ConvertToJsonCommand._convert → api.queries.QueryRegistry.list
-  api.commands.converttobase64.ConvertToBase64Command.execute → project.map.toon.get_registry
-  api.commands.pipeline._substitute → api.commands.pipeline._to_data_uri
-  api.commands.pipeline.PipelineCommand.execute → api.commands.pipeline._substitute
-  api.validators.validate_against_schema_uri → api.queries.QueryRegistry.list
-  api.queries.from_url.FromUrlQuery.execute → project.map.toon.get_registry
+  cqrs-backend-workflows.server._handle_command → cqrs-backend-workflows.server._result_to_data_uri
+  cqrs-backend-workflows.server._handle_render → cqrs-backend-workflows.server._result_to_data_uri
+  cqrs-backend-workflows.server.list_workflows → api.commands.CommandRegistry.list
+  cqrs-backend-workflows.server.create_workflow → cqrs-backend-workflows.server.validate_workflow
+  cqrs-backend-workflows.server.update_workflow → cqrs-backend-workflows.server.validate_workflow
+  api.main.issue_token → api.SUMD.authenticate
+  api.main.issue_token → api.SUMD.get_jwt_manager
+  api.main.execute_command → api.SUMD.get_engine
+  api.main.execute_query → api.SUMD.get_engine
+  api.main.execute_query_get → api.main.execute_query
+  api.main.run_agent → api.SUMD.execute_agent
+  api.main.run_agent → api.SUMD.get_engine
+  api.commands.fetch.FetchCommand.execute → api.SUMD.get_registry
+  api.commands.register_default_commands → api.commands.get_registry
+  api.commands.converttojson.ConvertToJsonCommand._convert → api.commands.CommandRegistry.list
+  api.commands.converttobase64.ConvertToBase64Command.execute → api.SUMD.get_registry
+  api.validators.validate_against_schema_uri → api.commands.CommandRegistry.list
+  api.protocols.register_default_protocols → api.protocols.get_registry
+  api.queries.from_url.FromUrlQuery.execute → api.SUMD.get_registry
+  api.queries.register_default_queries → api.queries.get_registry
+  cqrs-workflow-editor.src.App.fetchBackendWorkflows → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.runBackendWorkflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.fetchExampleFiles → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.mapToEdges
   cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToNodes
   cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToEdges
   cqrs-workflow-editor.src.App.fetchPreview → cqrs-workflow-editor.src.App.blob
@@ -147,21 +167,3 @@ EDGES:
   cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToNodes
   cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToEdges
   cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToNodes
-  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToEdges
-  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToNodes
-  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToEdges
-  api.main.issue_token → api.auth.authenticate
-  api.main.issue_token → api.auth.get_jwt_manager
-  api.main.execute_command → api.policy.get_engine
-  api.main.execute_query → api.policy.get_engine
-  api.main.execute_query_get → api.main.execute_query
-  api.main.run_agent → api.agent.execute_agent
-  api.main.run_agent → api.policy.get_engine
-  api.queries.register_default_queries → api.queries.get_registry
-  api.commands.register_default_commands → api.commands.get_registry
-  api.protocols.register_default_protocols → api.protocols.get_registry
-  cqrs-backend-workflows.server._handle_command → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server._handle_render → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server.list_workflows → api.queries.QueryRegistry.list
-  cqrs-backend-workflows.server.create_workflow → cqrs-backend-workflows.server.validate_workflow
-  cqrs-backend-workflows.server.update_workflow → cqrs-backend-workflows.server.validate_workflow

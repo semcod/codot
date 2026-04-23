@@ -15,6 +15,7 @@ elif ! head -1 "$PIP" | grep -q "$(pwd)"; then
 fi
 
 #$PIP install -e . --quiet
+
 $PIP install regix --upgrade --quiet
 $PIP install pyqual --upgrade --quiet
 $PIP install prefact --upgrade --quiet
@@ -31,6 +32,9 @@ $VENV/bin/code2llm ./ -f all -o ./project --no-chunk
 $VENV/bin/redup scan . --format toon --output ./project
 #$VENV/bin/vallm batch . --recursive --format toon --output ./project
 #$VENV/bin/prefact -a -e "examples/**"
+$PIP install doql --upgrade --quiet
+$VENV/bin/doql adopt . --format less --output app.doql.less --force
+
 $PIP install sumd --upgrade --quiet
 $VENV/bin/sumd .
 $VENV/bin/sumr .

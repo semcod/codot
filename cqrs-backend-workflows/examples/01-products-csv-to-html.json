@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "description": "Fetch products CSV from data service, convert to JSON using schema, render HTML table",
+  "nodes": [
+    {
+      "id": "fetch_csv",
+      "label": "Fetch Products CSV",
+      "type": "fetch",
+      "uri": "http://localhost:18091/products.csv",
+      "mime_type": "text/csv",
+      "description": "Load product catalog from local data volume"
+    },
+    {
+      "id": "convert_json",
+      "label": "Convert CSV → JSON",
+      "type": "command",
+      "command_type": "converttojson",
+      "input": "fetch_csv",
+      "schema_uri": "http://localhost:18090/public-products.json",
+      "description": "Parse CSV rows and validate against public-products schema"
+    },
+    {
+      "id": "render_html",
+      "label": "Render HTML Table",
+      "type": "command",
+      "command_type": "render",
+      "input": "convert_json",
+      "mime_type": "text/html",
+      "description": "Generate responsive HTML table from validated JSON",
+      "meta": { "title": "Products Catalog" }
+    }
+  ],
+  "outputs": [
+    { "id": "catalog_view", "label": "Catalog View", "source": "render_html", "description": "Interactive products table" }
+  ]
+}

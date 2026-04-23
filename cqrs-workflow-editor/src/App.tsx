@@ -10,9 +10,10 @@ import {
   Node,
   Edge,
   Connection,
-  OnNodeClick,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { PrismAsync as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 // Node palette configuration
 const NODE_TYPES = [
@@ -79,10 +80,10 @@ type RFEdge = Edge & {
 };
 
 const mapToNodes = (nodes: WorkflowNode[]): RFNode[] => {
-  return nodes.map((n) => ({
+  return nodes.map((n, index) => ({
     id: n.id,
     type: "default",
-    position: { x: 100, y: 100 },
+    position: { x: 20, y: 20 + index * 110 },
     data: n,
   }));
 };
@@ -111,19 +112,130 @@ const mapToEdges = (nodes: WorkflowNode[]): RFEdge[] => {
 };
 
 export default function App() {
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, setViewport } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState<RFNode>(
     mapToNodes(defaultWorkflow.nodes)
   );
   const [edges, setEdges, onEdgesChange] = useEdgesState(mapToEdges(defaultWorkflow.nodes));
   const initialNodes = mapToNodes(defaultWorkflow.nodes);
-  const [selectedNode, setSelectedNode] = useState<RFNode | null>(initialNodes[0] || null);
+  const [selectedNode, setSelectedNode] = useState<RFNode | null>(null);
   const [preview, setPreview] = useState<{ content: string; mime: string; size: number } | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [workflowId, setWorkflowId] = useState<string>("current");
   const [runResult, setRunResult] = useState<string | null>(null);
   const [runLoading, setRunLoading] = useState(false);
+  const [backendWorkflows, setBackendWorkflows] = useState<string[]>([]);
+  const [backendWorkflowsLoading, setBackendWorkflowsLoading] = useState(false);
+  const [exampleFiles, setExampleFiles] = useState<string[]>([]);
+  const [exampleFilesLoading, setExampleFilesLoading] = useState(false);
+
+  // Fetch workflows list from backend
+  const fetchBackendWorkflows = async () => {
+    setBackendWorkflowsLoading(true);
+    try {
+      const res = await fetch("/api/v1/workflows");
+      if (res.ok) {
+        const data = await res.json();
+        setBackendWorkflows(data.workflows || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch workflows list", err);
+    } finally {
+      setBackendWorkflowsLoading(false);
+    }
+  };
+
+  // Load workflow from backend
+  const loadBackendWorkflow = async (id: string) => {
+    try {
+      const res = await fetch(`/api/v1/workflows/${id}`);
+      if (res.ok) {
+        const wf = await res.json();
+        setNodes(mapToNodes(wf.nodes));
+        setEdges(mapToEdges(wf.nodes));
+        setWorkflowId(id);
+        setRunResult(null);
+        setSelectedNode(null);
+        setViewport({ x: 0, y: 0, zoom: 1 });
+      }
+    } catch (err) {
+      alert("Failed to load workflow");
+    }
+  };
+
+  // Run workflow from backend
+  const runBackendWorkflow = async (id: string) => {
+    setRunLoading(true);
+    setRunResult(null);
+    try {
+      const res = await fetch(`/api/v1/workflows/${id}/run`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workflow_id: id }),
+      });
+      const result = await res.json();
+      setRunResult(JSON.stringify(result, null, 2));
+    } catch (err) {
+      setRunResult(`Error: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setRunLoading(false);
+    }
+  };
+
+  // Load workflows list on mount
+  useEffect(() => {
+    fetchBackendWorkflows();
+    fetchExampleFiles();
+  }, []);
+
+  // Delete selected node with keyboard
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedNode) {
+        e.preventDefault();
+        setNodes((nds) => nds.filter((n) => n.id !== selectedNode.id));
+        setEdges((eds) => eds.filter((e) => e.source !== selectedNode.id && e.target !== selectedNode.id));
+        setSelectedNode(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedNode]);
+
+  // Fetch example files list from backend
+  const fetchExampleFiles = async () => {
+    setExampleFilesLoading(true);
+    try {
+      const res = await fetch("/api/v1/examples");
+      if (res.ok) {
+        const data = await res.json();
+        setExampleFiles(data.files || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch example files list", err);
+    } finally {
+      setExampleFilesLoading(false);
+    }
+  };
+
+  // Load example file to editor
+  const loadExampleFile = async (filename: string) => {
+    try {
+      const res = await fetch(`/api/v1/examples/${filename}`);
+      if (res.ok) {
+        const wf = await res.json();
+        setNodes(mapToNodes(wf.nodes));
+        setEdges(mapToEdges(wf.nodes));
+        setWorkflowId(filename);
+        setRunResult(null);
+        setSelectedNode(null);
+        setViewport({ x: 0, y: 0, zoom: 1 });
+      }
+    } catch (err) {
+      alert("Failed to load example file");
+    }
+  };
 
   const loadPredefinedWorkflow = (name: string) => {
     const predefined: Record<string, Workflow> = {
@@ -150,6 +262,8 @@ export default function App() {
     setNodes(mapToNodes(wf.nodes));
     setEdges(mapToEdges(wf.nodes));
     setRunResult(null);
+    setSelectedNode(null);
+    setViewport({ x: 0, y: 0, zoom: 1 });
   };
 
   const onConnect = useCallback(
@@ -159,7 +273,7 @@ export default function App() {
     [setEdges]
   );
 
-  const onNodeClick: OnNodeClick = useCallback((_, node) => {
+  const onNodeClick = useCallback((_: any, node: Node) => {
     setSelectedNode(node as RFNode);
     setPreview(null);
     setPreviewError(null);
@@ -231,7 +345,7 @@ export default function App() {
   useEffect(() => {
     if (selectedNode?.data.type === "fetch" && selectedNode.data.uri) {
       const timer = setTimeout(() => {
-        fetchPreview(selectedNode.data.uri);
+        fetchPreview(selectedNode.data.uri!);
       }, 500); // Debounce 500ms to avoid too many requests
       return () => clearTimeout(timer);
     }
@@ -297,6 +411,8 @@ export default function App() {
 
         setNodes(newNodes);
         setEdges(newEdges);
+        setSelectedNode(null);
+        setViewport({ x: 0, y: 0, zoom: 1 });
       } catch (err) {
         alert("Invalid JSON");
       }
@@ -326,9 +442,9 @@ export default function App() {
   };
 
   return (
-    <div style={{ width: "100vw", height: "100vh", display: "flex" }}>
+    <div style={{ width: "100%", height: "100vh", display: "flex", overflow: "hidden" }}>
       {/* Node Palette Sidebar */}
-      <div style={{ width: 200, padding: 12, background: "#f3f4f6", borderRight: "1px solid #e5e7eb" }}>
+      <div style={{ width: 180, padding: 8, background: "#f3f4f6", borderRight: "1px solid #e5e7eb", boxSizing: "border-box" }}>
         <h3 style={{ marginTop: 0, marginBottom: 16 }}>Node Palette</h3>
         {NODE_TYPES.map((nt) => (
           <button
@@ -363,6 +479,64 @@ export default function App() {
               onClick={() => loadPredefinedWorkflow("http_fetch_pipeline")}
               style={{ width: "100%", padding: 6, marginTop: 4, fontSize: 11 }}
             >HTTP Fetch</button>
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            <strong style={{ fontSize: 12 }}>Example Files (examples/)</strong>
+            {exampleFilesLoading && <div style={{ fontSize: 11, marginTop: 4 }}>Loading...</div>}
+            {exampleFiles.length === 0 && !exampleFilesLoading && (
+              <button onClick={fetchExampleFiles} style={{ width: "100%", padding: 6, marginTop: 4, fontSize: 11 }}>
+                Refresh
+              </button>
+            )}
+            {exampleFiles.map((filename) => (
+              <div key={filename} style={{ marginTop: 4 }}>
+                <button
+                  onClick={() => loadExampleFile(filename)}
+                  style={{ width: "100%", padding: 6, fontSize: 11 }}
+                >
+                  {filename}
+                </button>
+              </div>
+            ))}
+            {exampleFiles.length > 0 && (
+              <button onClick={fetchExampleFiles} style={{ width: "100%", padding: 6, marginTop: 4, fontSize: 11 }}>
+                Refresh
+              </button>
+            )}
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            <strong style={{ fontSize: 12 }}>Backend Workflows</strong>
+            {backendWorkflowsLoading && <div style={{ fontSize: 11, marginTop: 4 }}>Loading...</div>}
+            {backendWorkflows.length === 0 && !backendWorkflowsLoading && (
+              <button onClick={fetchBackendWorkflows} style={{ width: "100%", padding: 6, marginTop: 4, fontSize: 11 }}>
+                Refresh
+              </button>
+            )}
+            {backendWorkflows.map((id) => (
+              <div key={id} style={{ marginTop: 4 }}>
+                <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                  <button
+                    onClick={() => loadBackendWorkflow(id)}
+                    style={{ flex: 1, padding: 6, fontSize: 11 }}
+                  >
+                    Load
+                  </button>
+                  <button
+                    onClick={() => runBackendWorkflow(id)}
+                    style={{ flex: 1, padding: 6, fontSize: 11, background: "#10b981", color: "white", border: "none", borderRadius: 4, cursor: "pointer" }}
+                    disabled={runLoading}
+                  >
+                    {runLoading ? "..." : "Run"}
+                  </button>
+                </div>
+                <div style={{ fontSize: 10, color: "#6b7280", marginTop: 2 }}>{id}</div>
+              </div>
+            ))}
+            {backendWorkflows.length > 0 && (
+              <button onClick={fetchBackendWorkflows} style={{ width: "100%", padding: 6, marginTop: 4, fontSize: 11 }}>
+                Refresh
+              </button>
+            )}
           </div>
           <button
             onClick={() => {
@@ -431,7 +605,7 @@ export default function App() {
           onConnect={onConnect}
           onNodeClick={onNodeClick}
           onEdgeClick={onEdgeClick}
-          fitView
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         >
           <Controls />
           <Background />
@@ -440,7 +614,7 @@ export default function App() {
 
       {/* Property Editor Panel */}
       {selectedNode && (
-        <div style={{ width: 280, padding: 12, background: "#f9fafb", borderLeft: "1px solid #e5e7eb", overflowY: "auto" }}>
+        <div style={{ width: 340, padding: 8, background: "#f9fafb", borderLeft: "1px solid #e5e7eb", overflowY: "auto", boxSizing: "border-box" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <h3 style={{ marginTop: 0, marginBottom: 0 }}>Properties</h3>
             <button
@@ -630,6 +804,20 @@ export default function App() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {!selectedNode && (
+        <div style={{ width: 340, padding: 8, background: "#f9fafb", borderLeft: "1px solid #e5e7eb", overflowY: "auto", boxSizing: "border-box" }}>
+          <h3 style={{ marginTop: 0, marginBottom: 12, fontSize: 14 }}>Workflow JSON</h3>
+          <SyntaxHighlighter
+            language="json"
+            style={oneDark}
+            customStyle={{ fontSize: 10, margin: 0, borderRadius: 4, maxHeight: "calc(100vh - 120px)" }}
+            wrapLongLines
+          >
+            {JSON.stringify(exportWorkflow(), null, 2)}
+          </SyntaxHighlighter>
         </div>
       )}
     </div>

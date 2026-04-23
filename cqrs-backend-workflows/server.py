@@ -279,7 +279,7 @@ async def get_workflow(workflow_id: str):
 @app.post("/v1/workflows")
 async def create_workflow(workflow: Workflow):
     """Create a new workflow"""
-    workflow_dict = workflow.model_dump()
+    workflow_dict = workflow.model_dump(exclude_none=True)
     validate_workflow(workflow_dict)
     
     workflow_id = workflow_dict.get("id") or f"workflow_{len(workflow_store) + 1}"
@@ -294,7 +294,7 @@ async def update_workflow(workflow_id: str, workflow: Workflow):
     if workflow_id not in workflow_store:
         raise HTTPException(status_code=404, detail="Workflow not found")
     
-    workflow_dict = workflow.model_dump()
+    workflow_dict = workflow.model_dump(exclude_none=True)
     validate_workflow(workflow_dict)
     
     workflow_store[workflow_id] = workflow_dict
@@ -309,6 +309,30 @@ async def delete_workflow(workflow_id: str):
     
     del workflow_store[workflow_id]
     return {"id": workflow_id, "status": "deleted"}
+
+
+@app.get("/v1/examples")
+async def list_examples():
+    """List example workflow files from examples/ folder"""
+    examples_path = Path(__file__).parent / "examples"
+    if not examples_path.exists():
+        return {"files": []}
+    
+    files = sorted([f.name for f in examples_path.glob("*.json") if f.is_file()])
+    return {"files": files}
+
+
+@app.get("/v1/examples/{filename}")
+async def get_example(filename: str):
+    """Get example workflow file content"""
+    examples_path = Path(__file__).parent / "examples"
+    file_path = examples_path / filename
+    
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="Example file not found")
+    
+    with open(file_path, "r") as f:
+        return json.load(f)
 
 
 @app.post("/v1/workflows/{workflow_id}/run")
