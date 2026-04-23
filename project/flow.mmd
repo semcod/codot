@@ -20,10 +20,8 @@ flowchart TD
 
     subgraph Core
         frontend__html__js__api__API["API"]
-        frontend__html__js__api__getToken["getToken"]
         frontend__html__js__api__clearToken["clearToken"]
         frontend__html__js__api__getRole["getRole"]
-        frontend__html__js__api__request("request CC=9")
         frontend__html__js__api__resp["resp"]
         frontend__html__js__api__ct["ct"]
         frontend__html__js__api__err["err"]
@@ -34,7 +32,9 @@ flowchart TD
         frontend__html__js__api__runQuery["runQuery"]
         frontend__html__js__app__showAuthed["showAuthed"]
         frontend__html__js__app__showAnonymous["showAnonymous"]
-        ...["+374 more"]
+        frontend__html__js__app__r["r"]
+        frontend__html__js__app__loadCatalog["loadCatalog"]
+        ...["+512 more"]
     end
 
     subgraph Exporters

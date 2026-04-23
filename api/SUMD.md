@@ -153,13 +153,13 @@ pip install -e .[dev]
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# api | 25f 2155L | python:24,less:1 | 2026-04-23
-# stats: 39 func | 42 cls | 25 mod | CC̄=2.4 | critical:1 | cycles:0
+# api | 27f 2338L | python:26,less:1 | 2026-04-23
+# stats: 45 func | 42 cls | 27 mod | CC̄=2.4 | critical:1 | cycles:0
 # alerts[5]: CC _mcp_execute=10; CC _substitute=8; CC validate_against_schema_uri=7; CC _websocket_execute=6; CC _bash_cli_execute=5
-# hotspots[5]: _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _mcp_execute fan=10; _litellm_execute fan=10
+# hotspots[5]: test_litellm_mock fan=14; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _mcp_execute fan=10
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[25]:
+M[27]:
   agent.py,363
   app.doql.less,60
   auth/__init__.py,103
@@ -183,6 +183,8 @@ M[25]:
   queries/__init__.py,57
   queries/from_url.py,46
   queries/introspect.py,23
+  test_all_agents.py,141
+  test_mcp_agent.py,42
   tests/test_api.py,12
   validators/__init__.py,49
 D:
@@ -307,6 +309,16 @@ D:
   queries/introspect.py:
     e: IntrospectQuery
     IntrospectQuery: execute(1)
+  test_all_agents.py:
+    e: test_mcp,test_bash,test_litellm_mock,test_pipeline_with_agent,main
+    test_mcp()
+    test_bash()
+    test_litellm_mock()
+    test_pipeline_with_agent()
+    main()
+  test_mcp_agent.py:
+    e: main
+    main()
   tests/test_api.py:
     e: test_placeholder,test_import
     test_placeholder()

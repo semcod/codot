@@ -1,89 +1,118 @@
 flowchart LR
-    subgraph api__agent
-        api__agent__execute_agent["execute_agent"]
-    end
-    subgraph api__auth
-        api__auth__get_jwt_manager["get_jwt_manager"]
-        api__auth__authenticate["authenticate"]
-    end
     subgraph api__commands
-        api__commands__get_registry["get_registry"]
-        api__commands__CommandRegistry__list["list"]
-        api__commands__register_default_commands["register_default_commands"]
-        api__commands__pipeline__PipelineCommand__execute["execute"]
         api__commands__fetch__FetchCommand__execute["execute"]
-        api__commands__converttobase64__ConvertToBase64Command__execute["execute"]
-        api__commands__pipeline___substitute["_substitute"]
-        api__commands__pipeline___to_data_uri["_to_data_uri"]
         api__commands__converttojson__ConvertToJsonCommand___convert["_convert"]
+        api__commands__register_default_commands["register_default_commands"]
+        api__commands__pipeline___substitute["_substitute"]
+        api__commands__pipeline__PipelineCommand__execute["execute"]
+        api__commands__converttobase64__ConvertToBase64Command__execute["execute"]
+        api__commands__pipeline___to_data_uri["_to_data_uri"]
+        api__commands__get_registry["get_registry"]
     end
     subgraph api__main
-        api__main__issue_token["issue_token"]
-        api__main__run_agent["run_agent"]
         api__main__execute_query_get["execute_query_get"]
-        api__main__execute_query["execute_query"]
         api__main__execute_command["execute_command"]
-    end
-    subgraph api__policy
-        api__policy__get_engine["get_engine"]
+        api__main__execute_query["execute_query"]
+        api__main__run_agent["run_agent"]
+        api__main__issue_token["issue_token"]
     end
     subgraph api__protocols
-        api__protocols__get_registry["get_registry"]
         api__protocols__register_default_protocols["register_default_protocols"]
+        api__protocols__get_registry["get_registry"]
     end
     subgraph api__queries
+        api__queries__from_url__FromUrlQuery__execute["execute"]
         api__queries__get_registry["get_registry"]
         api__queries__register_default_queries["register_default_queries"]
-        api__queries__from_url__FromUrlQuery__execute["execute"]
     end
     subgraph api__validators
         api__validators__validate_against_schema_uri["validate_against_schema_uri"]
     end
     subgraph cqrs_backend_workflows__server
+        cqrs_backend_workflows__server___handle_render["_handle_render"]
+        cqrs_backend_workflows__server___handle_command["_handle_command"]
         cqrs_backend_workflows__server__validate_workflow["validate_workflow"]
         cqrs_backend_workflows__server__create_workflow["create_workflow"]
-        cqrs_backend_workflows__server___handle_command["_handle_command"]
+        cqrs_backend_workflows__server__list_workflows["list_workflows"]
         cqrs_backend_workflows__server___result_to_data_uri["_result_to_data_uri"]
         cqrs_backend_workflows__server__update_workflow["update_workflow"]
-        cqrs_backend_workflows__server___handle_render["_handle_render"]
-        cqrs_backend_workflows__server__list_workflows["list_workflows"]
     end
     subgraph cqrs_workflow_editor__src
-        cqrs_workflow_editor__src__App__blob["blob"]
-        cqrs_workflow_editor__src__App__loadPredefinedWorkflow["loadPredefinedWorkflow"]
-        cqrs_workflow_editor__src__App__onDownloadWorkflow["onDownloadWorkflow"]
-        cqrs_workflow_editor__src__App__loadBackendWorkflow["loadBackendWorkflow"]
         cqrs_workflow_editor__src__App__fetchPreview["fetchPreview"]
+        cqrs_workflow_editor__src__App__sizeKB["sizeKB"]
+        cqrs_workflow_editor__src__App__workflow["workflow"]
         cqrs_workflow_editor__src__App__loadExampleFile["loadExampleFile"]
-        cqrs_workflow_editor__src__App__json["json"]
-        cqrs_workflow_editor__src__App__exportWorkflow["exportWorkflow"]
-        cqrs_workflow_editor__src__App__timer["timer"]
-        cqrs_workflow_editor__src__App__mapToEdges["mapToEdges"]
-        cqrs_workflow_editor__src__App__reader["reader"]
         cqrs_workflow_editor__src__App__mapToNodes["mapToNodes"]
-        cqrs_workflow_editor__src__App__runBackendWorkflow["runBackendWorkflow"]
+        cqrs_workflow_editor__src__App__mapToEdges["mapToEdges"]
         cqrs_workflow_editor__src__App__text["text"]
+        cqrs_workflow_editor__src__App__loadBackendWorkflow["loadBackendWorkflow"]
+        cqrs_workflow_editor__src__App__reader["reader"]
+        cqrs_workflow_editor__src__App__onUploadWorkflow["onUploadWorkflow"]
+        cqrs_workflow_editor__src__App__onDownloadWorkflow["onDownloadWorkflow"]
+        cqrs_workflow_editor__src__App__runBackendWorkflow["runBackendWorkflow"]
+        cqrs_workflow_editor__src__App__fetchBackendWorkflows["fetchBackendWorkflows"]
+        cqrs_workflow_editor__src__App__blob["blob"]
+        cqrs_workflow_editor__src__App__exportWorkflow["exportWorkflow"]
+        cqrs_workflow_editor__src__App__loadPredefinedWorkflow["loadPredefinedWorkflow"]
+        cqrs_workflow_editor__src__App__timer["timer"]
+        cqrs_workflow_editor__src__App__json["json"]
         cqrs_workflow_editor__src__App__mime["mime"]
         cqrs_workflow_editor__src__App__fetchExampleFiles["fetchExampleFiles"]
         cqrs_workflow_editor__src__App__file["file"]
-        cqrs_workflow_editor__src__App__workflow["workflow"]
-        cqrs_workflow_editor__src__App__onUploadWorkflow["onUploadWorkflow"]
-        cqrs_workflow_editor__src__App__fetchBackendWorkflows["fetchBackendWorkflows"]
-        cqrs_workflow_editor__src__App__sizeKB["sizeKB"]
     end
     subgraph frontend__html
-        frontend__html__js__app__decodeB64["decodeB64"]
+        frontend__html__js__api__request["request"]
         frontend__html__js__api__runQuery["runQuery"]
-        frontend__html__js__api__runCommand["runCommand"]
-        frontend__html__js__app__renderDecoded["renderDecoded"]
+        frontend__html__js__api__setToken["setToken"]
+        frontend__html__js__app__decodeB64["decodeB64"]
         frontend__html__js__api__setRole["setRole"]
+        frontend__html__js__api__API["API"]
         frontend__html__js__api__data["data"]
         frontend__html__js__api__getToken["getToken"]
         frontend__html__js__api__catalog["catalog"]
-        frontend__html__js__api__setToken["setToken"]
         frontend__html__js__api__login["login"]
-        frontend__html__js__api__API["API"]
-        frontend__html__js__api__request["request"]
+        frontend__html__js__app__renderDecoded["renderDecoded"]
+        frontend__html__js__api__runCommand["runCommand"]
+    end
+    subgraph mcp_servers__summary_server
+        mcp_servers__summary_server___handle["_handle"]
+        mcp_servers__summary_server___send["_send"]
+        mcp_servers__summary_server__main["main"]
+    end
+    subgraph project__map
+        project__map__toon__get_engine["get_engine"]
+        project__map__toon__execute_agent["execute_agent"]
+        project__map__toon__authenticate["authenticate"]
+        project__map__toon__get_jwt_manager["get_jwt_manager"]
+        project__map__toon___substitute["_substitute"]
+    end
+    subgraph service_factory__factory
+        service_factory__factory__GeneratorRegistry__list["list"]
+        service_factory__factory__generators__wire__openapi___schema_from_fields["_schema_from_fields"]
+        service_factory__factory__generators__code__python_fastapi___command_route["_command_route"]
+        service_factory__factory__register_default_generators["register_default_generators"]
+        service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___events["_events"]
+        service_factory__factory__generators__code__python_fastapi___pydantic_model["_pydantic_model"]
+        service_factory__factory__generators__code__python_fastapi___snake["_snake"]
+        service_factory__factory__cli__cmd_compile["cmd_compile"]
+        service_factory__factory__get_registry["get_registry"]
+        service_factory__factory__generators__wire__openapi___path_item["_path_item"]
+        service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___ts_interface["_ts_interface"]
+        service_factory__factory__generators__code__python_fastapi___event_model["_event_model"]
+        service_factory__factory__generators__code__node_fastify___schema_object["_schema_object"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___compose["_compose"]
+        service_factory__factory__generators__code__python_fastapi___query_route["_query_route"]
+        service_factory__factory__generators__types__ts_type["ts_type"]
+        service_factory__factory__cli__cmd_list["cmd_list"]
+        service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___models["_models"]
+        service_factory__factory__generators__code__node_fastify___command_route_lines["_command_route_lines"]
+        service_factory__factory__generators__code__node_fastify___camel["_camel"]
+        service_factory__factory__generators__types__py_type["py_type"]
+        service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___server["_server"]
+        service_factory__factory__generators__code__node_fastify___query_route_lines["_query_route_lines"]
+        service_factory__factory__generators__wire__openapi__OpenApiGenerator__generate["generate"]
+        service_factory__factory__generators__types__openapi_type["openapi_type"]
+        service_factory__factory__generators__infra__docker___indent_block["_indent_block"]
     end
     frontend__html__js__api__API --> frontend__html__js__api__getToken
     frontend__html__js__api__request --> frontend__html__js__api__getToken
@@ -118,25 +147,50 @@ flowchart LR
     cqrs_workflow_editor__src__App__file --> cqrs_workflow_editor__src__App__mapToEdges
     cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToNodes
     cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToEdges
+    service_factory__factory__cli__cmd_compile --> service_factory__factory__register_default_generators
+    service_factory__factory__cli__cmd_compile --> service_factory__factory__get_registry
+    service_factory__factory__cli__cmd_list --> service_factory__factory__register_default_generators
+    service_factory__factory__cli__cmd_list --> service_factory__factory__get_registry
+    service_factory__factory__register_default_generators --> service_factory__factory__get_registry
+    service_factory__factory__generators__infra__docker__DockerGenerator___compose --> service_factory__factory__generators__infra__docker___indent_block
+    service_factory__factory__generators__wire__openapi___schema_from_fields --> service_factory__factory__generators__types__openapi_type
+    service_factory__factory__generators__wire__openapi___path_item --> service_factory__factory__generators__types__openapi_type
+    service_factory__factory__generators__wire__openapi__OpenApiGenerator__generate --> service_factory__factory__generators__wire__openapi___schema_from_fields
+    service_factory__factory__generators__wire__openapi__OpenApiGenerator__generate --> service_factory__factory__generators__wire__openapi___path_item
+    service_factory__factory__generators__code__node_fastify___command_route_lines --> service_factory__factory__generators__code__node_fastify___schema_object
+    service_factory__factory__generators__code__node_fastify___command_route_lines --> service_factory__factory__generators__code__node_fastify___camel
+    service_factory__factory__generators__code__node_fastify___query_route_lines --> service_factory__factory__generators__code__node_fastify___camel
+    service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___server --> service_factory__factory__generators__code__node_fastify___command_route_lines
+    service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___server --> service_factory__factory__generators__code__node_fastify___query_route_lines
+    service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___ts_interface --> service_factory__factory__generators__types__ts_type
+    service_factory__factory__generators__code__python_fastapi___pydantic_model --> service_factory__factory__generators__types__py_type
+    service_factory__factory__generators__code__python_fastapi___command_route --> service_factory__factory__generators__code__python_fastapi___snake
+    service_factory__factory__generators__code__python_fastapi___query_route --> service_factory__factory__generators__code__python_fastapi___snake
+    service_factory__factory__generators__code__python_fastapi___query_route --> service_factory__factory__generators__types__py_type
+    service_factory__factory__generators__code__python_fastapi___event_model --> service_factory__factory__generators__code__python_fastapi___pydantic_model
+    service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___models --> service_factory__factory__generators__code__python_fastapi___pydantic_model
+    service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___events --> service_factory__factory__generators__code__python_fastapi___event_model
+    mcp_servers__summary_server__main --> mcp_servers__summary_server___handle
+    mcp_servers__summary_server__main --> mcp_servers__summary_server___send
     cqrs_backend_workflows__server___handle_command --> cqrs_backend_workflows__server___result_to_data_uri
     cqrs_backend_workflows__server___handle_render --> cqrs_backend_workflows__server___result_to_data_uri
-    cqrs_backend_workflows__server__list_workflows --> api__commands__CommandRegistry__list
+    cqrs_backend_workflows__server__list_workflows --> service_factory__factory__GeneratorRegistry__list
     cqrs_backend_workflows__server__create_workflow --> cqrs_backend_workflows__server__validate_workflow
     cqrs_backend_workflows__server__update_workflow --> cqrs_backend_workflows__server__validate_workflow
-    api__main__issue_token --> api__auth__authenticate
-    api__main__issue_token --> api__auth__get_jwt_manager
-    api__main__execute_command --> api__policy__get_engine
-    api__main__execute_query --> api__policy__get_engine
+    api__main__issue_token --> project__map__toon__authenticate
+    api__main__issue_token --> project__map__toon__get_jwt_manager
+    api__main__execute_command --> project__map__toon__get_engine
+    api__main__execute_query --> project__map__toon__get_engine
     api__main__execute_query_get --> api__main__execute_query
-    api__main__run_agent --> api__agent__execute_agent
-    api__main__run_agent --> api__policy__get_engine
-    api__commands__fetch__FetchCommand__execute --> api__commands__get_registry
+    api__main__run_agent --> project__map__toon__execute_agent
+    api__main__run_agent --> project__map__toon__get_engine
+    api__commands__fetch__FetchCommand__execute --> service_factory__factory__get_registry
     api__commands__register_default_commands --> api__commands__get_registry
-    api__commands__converttojson__ConvertToJsonCommand___convert --> api__commands__CommandRegistry__list
-    api__commands__converttobase64__ConvertToBase64Command__execute --> api__commands__get_registry
+    api__commands__converttojson__ConvertToJsonCommand___convert --> service_factory__factory__GeneratorRegistry__list
+    api__commands__converttobase64__ConvertToBase64Command__execute --> service_factory__factory__get_registry
     api__commands__pipeline___substitute --> api__commands__pipeline___to_data_uri
-    api__commands__pipeline__PipelineCommand__execute --> api__commands__pipeline___substitute
-    api__validators__validate_against_schema_uri --> api__commands__CommandRegistry__list
+    api__commands__pipeline__PipelineCommand__execute --> project__map__toon___substitute
+    api__validators__validate_against_schema_uri --> service_factory__factory__GeneratorRegistry__list
     api__protocols__register_default_protocols --> api__protocols__get_registry
-    api__queries__from_url__FromUrlQuery__execute --> api__commands__get_registry
+    api__queries__from_url__FromUrlQuery__execute --> service_factory__factory__get_registry
     api__queries__register_default_queries --> api__queries__get_registry

@@ -1,9 +1,29 @@
-# redup/duplication | 0 groups | 24f 2460L | 2026-04-23
+# redup/duplication | 1 groups | 37f 3642L | 2026-04-23
 
 SUMMARY:
-  files_scanned: 24
-  total_lines:   2460
-  dup_groups:    0
-  dup_fragments: 0
-  saved_lines:   0
-  scan_ms:       8744
+  files_scanned: 37
+  total_lines:   3642
+  dup_groups:    1
+  dup_fragments: 2
+  saved_lines:   3
+  scan_ms:       9474
+
+HOTSPOTS[1] (files with most duplication):
+  service-factory/factory/generators/types.py  dup=6L  groups=1  frags=2  (0.2%)
+
+DUPLICATES[1] (ranked by impact):
+  [65816a4a09f45ef7]   STRU  py_type  L=3 N=2 saved=3 sim=1.00
+      service-factory/factory/generators/types.py:40-42  (py_type)
+      service-factory/factory/generators/types.py:45-47  (ts_type)
+
+REFACTOR[1] (ranked by priority):
+  [1] ○ extract_function   → service-factory/factory/generators/utils/py_type.py
+      WHY: 2 occurrences of 3-line block across 1 files — saves 3 lines
+      FILES: service-factory/factory/generators/types.py
+
+EFFORT_ESTIMATE (total ≈ 0.1h):
+  easy   py_type                             saved=3L  ~6min
+
+METRICS-TARGET:
+  dup_groups:  1 → 0
+  saved_lines: 3 lines recoverable

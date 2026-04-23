@@ -34,6 +34,11 @@ flowchart TD
         SUMD__reload_engine["reload_engine"]
         SUMD__register_default_protocols["register_default_protocols"]
         SUMD__register_default_queries["register_default_queries"]
+        SUMD__test_mcp["test_mcp"]
+        SUMD__test_bash["test_bash"]
+        SUMD__test_litellm_mock["test_litellm_mock"]
+        SUMD__test_pipeline_with_agent["test_pipeline_with_agent"]
+        SUMD__main["main"]
         SUMD__test_placeholder["test_placeholder"]
         SUMD__test_import["test_import"]
         SUMD__validate_against_schema_uri["validate_against_schema_uri"]
@@ -54,12 +59,7 @@ flowchart TD
         SUMD__list_examples["list_examples"]
         SUMD__get_example["get_example"]
         SUMD__run_workflow["run_workflow"]
-        SUMD___engine["_engine"]
-        SUMD___user["_user"]
-        SUMD__test_admin_can_do_anything["test_admin_can_do_anything"]
-        SUMD__test_user_denied_internal_path["test_user_denied_internal_path"]
-        SUMD__test_user_allowed_public_path["test_user_allowed_public_path"]
-        SUMD__test_unknown_role_denied["test_unknown_role_denied"]
+        SUMD___send["_send"]
     end
     subgraph api__SUMD
         api__SUMD__register_backend["register_backend"]
@@ -96,6 +96,11 @@ flowchart TD
         api__SUMD__reload_engine["reload_engine"]
         api__SUMD__register_default_protocols["register_default_protocols"]
         api__SUMD__register_default_queries["register_default_queries"]
+        api__SUMD__test_mcp["test_mcp"]
+        api__SUMD__test_bash["test_bash"]
+        api__SUMD__test_litellm_mock["test_litellm_mock"]
+        api__SUMD__test_pipeline_with_agent["test_pipeline_with_agent"]
+        api__SUMD__main["main"]
         api__SUMD__test_placeholder["test_placeholder"]
         api__SUMD__test_import["test_import"]
         api__SUMD__validate_against_schema_uri["validate_against_schema_uri"]
@@ -222,6 +227,11 @@ flowchart TD
         api__project__map__toon__reload_engine["reload_engine"]
         api__project__map__toon__register_default_protocols["register_default_protocols"]
         api__project__map__toon__register_default_queries["register_default_queries"]
+        api__project__map__toon__test_mcp["test_mcp"]
+        api__project__map__toon__test_bash["test_bash"]
+        api__project__map__toon__test_litellm_mock["test_litellm_mock"]
+        api__project__map__toon__test_pipeline_with_agent["test_pipeline_with_agent"]
+        api__project__map__toon__main["main"]
         api__project__map__toon__test_placeholder["test_placeholder"]
         api__project__map__toon__test_import["test_import"]
         api__project__map__toon__validate_against_schema_uri["validate_against_schema_uri"]
@@ -401,6 +411,11 @@ flowchart TD
         frontend__html__js__app__img["img"]
         frontend__html__js__app__pre["pre"]
     end
+    subgraph mcp_servers__summary_server
+        mcp_servers__summary_server___send["_send"]
+        mcp_servers__summary_server___handle("_handle CC=8")
+        mcp_servers__summary_server__main["main"]
+    end
     subgraph project__map
         project__map__toon__register_backend["register_backend"]
         project__map__toon___mcp_execute["_mcp_execute"]
@@ -436,6 +451,11 @@ flowchart TD
         project__map__toon__reload_engine["reload_engine"]
         project__map__toon__register_default_protocols["register_default_protocols"]
         project__map__toon__register_default_queries["register_default_queries"]
+        project__map__toon__test_mcp["test_mcp"]
+        project__map__toon__test_bash["test_bash"]
+        project__map__toon__test_litellm_mock["test_litellm_mock"]
+        project__map__toon__test_pipeline_with_agent["test_pipeline_with_agent"]
+        project__map__toon__main["main"]
         project__map__toon__test_placeholder["test_placeholder"]
         project__map__toon__test_import["test_import"]
         project__map__toon__validate_against_schema_uri["validate_against_schema_uri"]
@@ -456,12 +476,73 @@ flowchart TD
         project__map__toon__list_examples["list_examples"]
         project__map__toon__get_example["get_example"]
         project__map__toon__run_workflow["run_workflow"]
-        project__map__toon___engine["_engine"]
-        project__map__toon___user["_user"]
-        project__map__toon__test_admin_can_do_anything["test_admin_can_do_anything"]
-        project__map__toon__test_user_denied_internal_path["test_user_denied_internal_path"]
-        project__map__toon__test_user_allowed_public_path["test_user_allowed_public_path"]
-        project__map__toon__test_unknown_role_denied["test_unknown_role_denied"]
+        project__map__toon___send["_send"]
+    end
+    subgraph service_factory__README
+        service_factory__README__generate["generate"]
+    end
+    subgraph service_factory__articles
+        service_factory__articles__01_service_factory_status__generate["generate"]
+    end
+    subgraph service_factory__factory
+        service_factory__factory__cli__cmd_compile("cmd_compile CC=9")
+        service_factory__factory__cli__cmd_list["cmd_list"]
+        service_factory__factory__cli__cmd_hash["cmd_hash"]
+        service_factory__factory__cli__main["main"]
+        service_factory__factory__Generator__generate["generate"]
+        service_factory__factory__GeneratorRegistry____init__["__init__"]
+        service_factory__factory__GeneratorRegistry__register["register"]
+        service_factory__factory__GeneratorRegistry__get["get"]
+        service_factory__factory__GeneratorRegistry__by_category["by_category"]
+        service_factory__factory__GeneratorRegistry__list["list"]
+        service_factory__factory__get_registry["get_registry"]
+        service_factory__factory__register_default_generators["register_default_generators"]
+        service_factory__factory__ir__Bundle__contract_hash["contract_hash"]
+        service_factory__factory__ir__BundleLoader____init__["__init__"]
+        service_factory__factory__ir__BundleLoader__load["load"]
+        service_factory__factory__ir__BundleLoader___resolve_contract["_resolve_contract"]
+        service_factory__factory__ir__BundleLoader___validate["_validate"]
+        service_factory__factory__generators__types__py_type["py_type"]
+        service_factory__factory__generators__types__ts_type["ts_type"]
+        service_factory__factory__generators__types__openapi_type["openapi_type"]
+        service_factory__factory__generators__infra__docker___indent_block["_indent_block"]
+        service_factory__factory__generators__infra__docker__DockerGenerator__generate["generate"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___dockerfile["_dockerfile"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___python_dockerfile["_python_dockerfile"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___node_dockerfile["_node_dockerfile"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___dockerignore["_dockerignore"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___compose["_compose"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___main_service_block["_main_service_block"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___companion_block["_companion_block"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___storage_block["_storage_block"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___cpu_to_docker["_cpu_to_docker"]
+        service_factory__factory__generators__infra__docker__DockerGenerator___mem_to_docker["_mem_to_docker"]
+        service_factory__factory__generators__infra__kubernetes__KubernetesGenerator__generate["generate"]
+        service_factory__factory__generators__infra__kubernetes__KubernetesGenerator___deployment["_deployment"]
+        service_factory__factory__generators__infra__kubernetes__KubernetesGenerator___service["_service"]
+        service_factory__factory__generators__infra__kubernetes__KubernetesGenerator___kustomization["_kustomization"]
+        service_factory__factory__generators__wire__openapi___schema_from_fields["_schema_from_fields"]
+        service_factory__factory__generators__wire__openapi___path_item("_path_item CC=10")
+        service_factory__factory__generators__wire__openapi__OpenApiGenerator__generate["generate"]
+        service_factory__factory__generators__code__node_fastify___camel["_camel"]
+        service_factory__factory__generators__code__node_fastify___schema_object("_schema_object CC=8")
+        service_factory__factory__generators__code__node_fastify___command_route_lines["_command_route_lines"]
+        service_factory__factory__generators__code__node_fastify___query_route_lines["_query_route_lines"]
+        service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator__generate["generate"]
+        service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___package_json["_package_json"]
+        service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___server["_server"]
+        service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___types["_types"]
+        service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___ts_interface["_ts_interface"]
+        service_factory__factory__generators__code__python_fastapi___snake["_snake"]
+        service_factory__factory__generators__code__python_fastapi___pydantic_model["_pydantic_model"]
+        service_factory__factory__generators__code__python_fastapi___command_route["_command_route"]
+        service_factory__factory__generators__code__python_fastapi___query_route["_query_route"]
+        service_factory__factory__generators__code__python_fastapi___event_model["_event_model"]
+        service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator__generate["generate"]
+        service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___requirements["_requirements"]
+        service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___models["_models"]
+        service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___events["_events"]
+        service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___main("_main CC=9")
     end
     frontend__html__js__api__API --> frontend__html__js__api__getToken
     frontend__html__js__api__API --> frontend__html__js__api__request
@@ -500,34 +581,61 @@ flowchart TD
     cqrs_workflow_editor__src__App__file --> cqrs_workflow_editor__src__App__mapToEdges
     cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToNodes
     cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToEdges
+    service_factory__factory__cli__cmd_compile --> service_factory__factory__register_default_generators
+    service_factory__factory__cli__cmd_compile --> service_factory__factory__get_registry
+    service_factory__factory__cli__cmd_list --> service_factory__factory__register_default_generators
+    service_factory__factory__cli__cmd_list --> service_factory__factory__get_registry
+    service_factory__factory__register_default_generators --> service_factory__factory__get_registry
+    service_factory__factory__generators__infra__docker__DockerGenerator___compose --> service_factory__factory__generators__infra__docker___indent_block
+    service_factory__factory__generators__wire__openapi___schema_from_fields --> service_factory__factory__generators__types__openapi_type
+    service_factory__factory__generators__wire__openapi___path_item --> service_factory__factory__generators__types__openapi_type
+    service_factory__factory__generators__wire__openapi__OpenApiGenerator__generate --> service_factory__factory__generators__wire__openapi___schema_from_fields
+    service_factory__factory__generators__wire__openapi__OpenApiGenerator__generate --> service_factory__factory__generators__wire__openapi___path_item
+    service_factory__factory__generators__code__node_fastify___command_route_lines --> service_factory__factory__generators__code__node_fastify___schema_object
+    service_factory__factory__generators__code__node_fastify___command_route_lines --> service_factory__factory__generators__code__node_fastify___camel
+    service_factory__factory__generators__code__node_fastify___query_route_lines --> service_factory__factory__generators__code__node_fastify___camel
+    service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___server --> service_factory__factory__generators__code__node_fastify___command_route_lines
+    service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___server --> service_factory__factory__generators__code__node_fastify___query_route_lines
+    service_factory__factory__generators__code__node_fastify__NodeFastifyGenerator___ts_interface --> service_factory__factory__generators__types__ts_type
+    service_factory__factory__generators__code__python_fastapi___pydantic_model --> service_factory__factory__generators__types__py_type
+    service_factory__factory__generators__code__python_fastapi___command_route --> service_factory__factory__generators__code__python_fastapi___snake
+    service_factory__factory__generators__code__python_fastapi___query_route --> service_factory__factory__generators__code__python_fastapi___snake
+    service_factory__factory__generators__code__python_fastapi___query_route --> service_factory__factory__generators__types__py_type
+    service_factory__factory__generators__code__python_fastapi___event_model --> service_factory__factory__generators__code__python_fastapi___pydantic_model
+    service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___models --> service_factory__factory__generators__code__python_fastapi___pydantic_model
+    service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___events --> service_factory__factory__generators__code__python_fastapi___event_model
+    service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___main --> service_factory__factory__generators__code__python_fastapi___command_route
+    service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___main --> service_factory__factory__generators__code__python_fastapi___query_route
+    mcp_servers__summary_server__main --> mcp_servers__summary_server___handle
+    mcp_servers__summary_server__main --> mcp_servers__summary_server___send
     cqrs_backend_workflows__server___handle_command --> cqrs_backend_workflows__server___result_to_data_uri
     cqrs_backend_workflows__server___handle_render --> cqrs_backend_workflows__server___result_to_data_uri
-    cqrs_backend_workflows__server__list_workflows --> api__commands__CommandRegistry__list
+    cqrs_backend_workflows__server__list_workflows --> service_factory__factory__GeneratorRegistry__list
     cqrs_backend_workflows__server__create_workflow --> cqrs_backend_workflows__server__validate_workflow
     cqrs_backend_workflows__server__update_workflow --> cqrs_backend_workflows__server__validate_workflow
     cqrs_backend_workflows__server__run_workflow --> cqrs_backend_workflows__server__execute_node
-    api__main__issue_token --> api__auth__authenticate
-    api__main__issue_token --> api__auth__get_jwt_manager
-    api__main__execute_command --> api__policy__get_engine
-    api__main__execute_query --> api__policy__get_engine
+    api__main__issue_token --> project__map__toon__authenticate
+    api__main__issue_token --> project__map__toon__get_jwt_manager
+    api__main__execute_command --> project__map__toon__get_engine
+    api__main__execute_query --> project__map__toon__get_engine
     api__main__execute_query_get --> api__main__execute_query
-    api__main__run_agent --> api__agent__execute_agent
-    api__main__run_agent --> api__policy__get_engine
-    api__commands__fetch__FetchCommand__execute --> api__commands__get_registry
-    api__commands__converttocsv__ConvertToCsvCommand__execute --> api__commands__CommandRegistry__list
+    api__main__run_agent --> project__map__toon__execute_agent
+    api__main__run_agent --> project__map__toon__get_engine
+    api__commands__fetch__FetchCommand__execute --> service_factory__factory__get_registry
+    api__commands__converttocsv__ConvertToCsvCommand__execute --> service_factory__factory__GeneratorRegistry__list
     api__commands__register_default_commands --> api__commands__get_registry
-    api__commands__converttojson__ConvertToJsonCommand___convert --> api__commands__CommandRegistry__list
-    api__commands__converttojson__ConvertToJsonCommand__execute --> api__commands__get_registry
-    api__commands__converttojson__ConvertToJsonCommand__execute --> api__validators__validate_against_schema_uri
-    api__commands__converttobase64__ConvertToBase64Command__execute --> api__commands__get_registry
+    api__commands__converttojson__ConvertToJsonCommand___convert --> service_factory__factory__GeneratorRegistry__list
+    api__commands__converttojson__ConvertToJsonCommand__execute --> service_factory__factory__get_registry
+    api__commands__converttojson__ConvertToJsonCommand__execute --> project__map__toon__validate_against_schema_uri
+    api__commands__converttobase64__ConvertToBase64Command__execute --> service_factory__factory__get_registry
     api__commands__pipeline___substitute --> api__commands__pipeline___to_data_uri
-    api__commands__pipeline__PipelineCommand__execute --> api__commands__pipeline___substitute
-    api__validators__validate_against_schema_uri --> api__commands__CommandRegistry__list
-    api__validators__validate_against_schema_uri --> api__commands__get_registry
+    api__commands__pipeline__PipelineCommand__execute --> project__map__toon___substitute
+    api__validators__validate_against_schema_uri --> service_factory__factory__GeneratorRegistry__list
+    api__validators__validate_against_schema_uri --> service_factory__factory__get_registry
     api__protocols__register_default_protocols --> api__protocols__get_registry
-    api__queries__from_url__FromUrlQuery__execute --> api__commands__get_registry
+    api__queries__from_url__FromUrlQuery__execute --> service_factory__factory__get_registry
     api__queries__register_default_queries --> api__queries__get_registry
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class frontend__html__js__api__API,frontend__html__js__api__request,frontend__html__js__app__renderDecoded,cqrs_workflow_editor__src__App__fetchPreview,cqrs_backend_workflows__server__run_workflow,api__agent___mcp_execute,api__commands__converttocsv__ConvertToCsvCommand__execute,api__commands__converttojson__ConvertToJsonCommand___detect_mode,api__commands__converttojson__ConvertToJsonCommand___convert,api__commands__pipeline___substitute,api__commands__pipeline__PipelineCommand__execute,api__commands__converttoxml__ConvertToXmlCommand__execute,api__policy__PolicyEngine__can_execute_command,api__policy__PolicyEngine__can_execute_query,api__protocols__data_protocol__DataProtocol__fetch,api__protocols__file_protocol__FileProtocol___resolve,api__queries__from_url__FromUrlQuery__execute medCC
+    class frontend__html__js__api__API,frontend__html__js__api__request,frontend__html__js__app__renderDecoded,cqrs_workflow_editor__src__App__fetchPreview,service_factory__factory__cli__cmd_compile,service_factory__factory__generators__wire__openapi___path_item,service_factory__factory__generators__code__node_fastify___schema_object,service_factory__factory__generators__code__python_fastapi__PythonFastApiGenerator___main,mcp_servers__summary_server___handle,cqrs_backend_workflows__server__run_workflow,api__agent___mcp_execute,api__commands__converttocsv__ConvertToCsvCommand__execute,api__commands__converttojson__ConvertToJsonCommand___detect_mode,api__commands__converttojson__ConvertToJsonCommand___convert,api__commands__pipeline___substitute,api__commands__pipeline__PipelineCommand__execute,api__commands__converttoxml__ConvertToXmlCommand__execute,api__policy__PolicyEngine__can_execute_command,api__policy__PolicyEngine__can_execute_query,api__protocols__data_protocol__DataProtocol__fetch,api__protocols__file_protocol__FileProtocol___resolve,api__queries__from_url__FromUrlQuery__execute medCC

@@ -1,10 +1,10 @@
-# codot | 47f 3823L | python:28,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
-# stats: 71 func | 47 cls | 47 mod | CC̄=2.4 | critical:1 | cycles:0
-# alerts[5]: CC _mcp_execute=10; CC _substitute=8; CC run_workflow=8; CC validate_against_schema_uri=7; CC _websocket_execute=6
-# hotspots[5]: _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _mcp_execute fan=10; _litellm_execute fan=10
+# codot | 64f 5611L | python:45,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
+# stats: 118 func | 62 cls | 64 mod | CC̄=2.9 | critical:2 | cycles:0
+# alerts[5]: CC _mcp_execute=10; CC _path_item=10; CC cmd_compile=9; CC _substitute=8; CC run_workflow=8
+# hotspots[5]: cmd_compile fan=15; test_litellm_mock fan=14; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[47]:
+M[64]:
   api/agent.py,363
   api/app.doql.less,60
   api/auth/__init__.py,103
@@ -28,6 +28,8 @@ M[47]:
   api/queries/__init__.py,57
   api/queries/from_url.py,46
   api/queries/introspect.py,23
+  api/test_all_agents.py,141
+  api/test_mcp_agent.py,42
   api/tests/test_api.py,12
   api/validators/__init__.py,49
   app.doql.less,104
@@ -36,7 +38,7 @@ M[47]:
   cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py,16
   cqrs-workflow-editor/app.doql.less,65
   cqrs-workflow-editor/test/cqrs-workflow-editor.test.js,8
-  cqrs-workflow-editor/vite.config.ts,36
+  cqrs-workflow-editor/vite.config.ts,41
   examples/01-fetch.sh,49
   examples/02-convert-to-json.sh,49
   examples/03-render-html.sh,41
@@ -48,7 +50,22 @@ M[47]:
   frontend/html/js/api.js,62
   frontend/html/js/app.js,188
   frontend/test/codot.test.js,8
+  mcp_servers/summary_server.py,110
   project.sh,40
+  service-factory/factory/__init__.py,73
+  service-factory/factory/cli.py,106
+  service-factory/factory/generators/__init__.py,1
+  service-factory/factory/generators/code/__init__.py,1
+  service-factory/factory/generators/code/node_fastify.py,166
+  service-factory/factory/generators/code/python_fastapi.py,207
+  service-factory/factory/generators/infra/__init__.py,1
+  service-factory/factory/generators/infra/docker.py,208
+  service-factory/factory/generators/infra/kubernetes.py,110
+  service-factory/factory/generators/types.py,55
+  service-factory/factory/generators/wire/__init__.py,1
+  service-factory/factory/generators/wire/openapi.py,125
+  service-factory/factory/ir/__init__.py,238
+  service-factory/tests/test_factory.py,198
   tests/smoke.sh,79
   tests/test_policy.py,63
   tests/test_protocols.py,61
@@ -174,6 +191,16 @@ D:
   api/queries/introspect.py:
     e: IntrospectQuery
     IntrospectQuery: execute(1)
+  api/test_all_agents.py:
+    e: test_mcp,test_bash,test_litellm_mock,test_pipeline_with_agent,main
+    test_mcp()
+    test_bash()
+    test_litellm_mock()
+    test_pipeline_with_agent()
+    main()
+  api/test_mcp_agent.py:
+    e: main
+    main()
   api/tests/test_api.py:
     e: test_placeholder,test_import
     test_placeholder()
@@ -211,6 +238,88 @@ D:
     e: test_placeholder,test_import
     test_placeholder()
     test_import()
+  mcp_servers/summary_server.py:
+    e: _send,_handle,main
+    _send(msg)
+    _handle(req)
+    main()
+  service-factory/factory/__init__.py:
+    e: get_registry,register_default_generators,Generator,GeneratorRegistry
+    Generator: generate(1)
+    GeneratorRegistry: __init__(0),register(1),get(1),by_category(1),list(0)
+    get_registry()
+    register_default_generators()
+  service-factory/factory/cli.py:
+    e: cmd_compile,cmd_list,cmd_hash,main
+    cmd_compile(args)
+    cmd_list(args)
+    cmd_hash(args)
+    main(argv)
+  service-factory/factory/generators/__init__.py:
+  service-factory/factory/generators/code/__init__.py:
+  service-factory/factory/generators/code/node_fastify.py:
+    e: _camel,_schema_object,_command_route_lines,_query_route_lines,NodeFastifyGenerator
+    NodeFastifyGenerator: generate(1),_package_json(1),_server(1),_types(1),_ts_interface(2)
+    _camel(name)
+    _schema_object(fields;indent)
+    _command_route_lines(c)
+    _query_route_lines(c)
+  service-factory/factory/generators/code/python_fastapi.py:
+    e: _snake,_pydantic_model,_command_route,_query_route,_event_model,PythonFastApiGenerator
+    PythonFastApiGenerator: generate(1),_requirements(0),_models(1),_events(1),_main(1)
+    _snake(name)
+    _pydantic_model(name;fields)
+    _command_route(c)
+    _query_route(c)
+    _event_model(c)
+  service-factory/factory/generators/infra/__init__.py:
+  service-factory/factory/generators/infra/docker.py:
+    e: _indent_block,DockerGenerator
+    DockerGenerator: generate(1),_dockerfile(1),_python_dockerfile(1),_node_dockerfile(1),_dockerignore(0),_compose(1),_main_service_block(3),_companion_block(1),_storage_block(1),_cpu_to_docker(1),_mem_to_docker(1)
+    _indent_block(block;spaces)
+  service-factory/factory/generators/infra/kubernetes.py:
+    e: KubernetesGenerator
+    KubernetesGenerator: generate(1),_deployment(1),_service(1),_kustomization(1)
+  service-factory/factory/generators/types.py:
+    e: py_type,ts_type,openapi_type
+    py_type(t;required)
+    ts_type(t;required)
+    openapi_type(t;fmt)
+  service-factory/factory/generators/wire/__init__.py:
+  service-factory/factory/generators/wire/openapi.py:
+    e: _schema_from_fields,_path_item,OpenApiGenerator
+    OpenApiGenerator: generate(1)
+    _schema_from_fields(fields)
+    _path_item(c)
+  service-factory/factory/ir/__init__.py:
+    e: Contract,Runtime,Storage,Companion,Resources,Exposure,Bundle,BundleLoader
+    Contract: kind(0),name(0),is_command(0),is_query(0),is_event(0),module(0),description(0),version(0),http_method(0),http_endpoint(0),ws_channel(0),input_fields(0),output_fields(0),payload_fields(0),success_event(0),failure_event(0)  # Unified view over command/query/event contract JSON.
+    Runtime:
+    Storage:
+    Companion:
+    Resources:
+    Exposure:
+    Bundle: commands(0),queries(0),events(0),contract_hash(0)
+    BundleLoader: __init__(1),load(1),_resolve_contract(2),_validate(2)  # Reads a bundle.json plus referenced contract files from disk
+  service-factory/tests/test_factory.py:
+    e: _register,bundle,test_bundle_loads_with_contracts,test_hash_is_deterministic,test_hash_changes_when_runtime_changes,test_contract_accessors,test_missing_contract_raises_clear_error,test_all_generators_registered,test_python_fastapi_generates_valid_python,test_python_fastapi_routes_match_contracts,test_node_fastify_generates_valid_json,test_docker_generates_valid_yaml,test_docker_dockerfile_has_healthcheck,test_kubernetes_generates_valid_yaml,test_openapi_generates_valid_json,test_same_bundle_compiles_to_different_languages,test_same_bundle_compiles_to_different_infra
+    _register()
+    bundle()
+    test_bundle_loads_with_contracts(bundle)
+    test_hash_is_deterministic(bundle)
+    test_hash_changes_when_runtime_changes(bundle)
+    test_contract_accessors()
+    test_missing_contract_raises_clear_error()
+    test_all_generators_registered()
+    test_python_fastapi_generates_valid_python(bundle;tmp_path)
+    test_python_fastapi_routes_match_contracts(bundle)
+    test_node_fastify_generates_valid_json(bundle)
+    test_docker_generates_valid_yaml(bundle)
+    test_docker_dockerfile_has_healthcheck(bundle)
+    test_kubernetes_generates_valid_yaml(bundle)
+    test_openapi_generates_valid_json(bundle)
+    test_same_bundle_compiles_to_different_languages(bundle)
+    test_same_bundle_compiles_to_different_infra(bundle)
   tests/test_policy.py:
     e: _engine,_user,test_admin_can_do_anything,test_user_denied_internal_path,test_user_allowed_public_path,test_unknown_role_denied,test_analyst_can_run_pipeline,test_query_access_respects_uris
     _engine()

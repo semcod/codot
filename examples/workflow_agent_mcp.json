@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "nodes": [
+    {
+      "id": "fetch1",
+      "label": "Fetch text",
+      "type": "fetch",
+      "uri": "data:text/plain;base64,cXVhbnR1bSBjb21wdXRpbmcgaXMgcmV2b2x1dGlvbmFyeS4=",
+      "mime_type": "text/plain"
+    },
+    {
+      "id": "agent_mcp",
+      "label": "Summarize via MCP",
+      "type": "agent",
+      "role": "summarizer",
+      "goal": "Summarize the provided text",
+      "tools": ["summarize"],
+      "backend": "mcp",
+      "backend_config": {
+        "stdio_command": ["python3", "mcp_servers/summary_server.py"]
+      },
+      "input": "fetch1"
+    }
+  ],
+  "outputs": [
+    { "id": "report", "label": "Summary", "source": "agent_mcp" }
+  ],
+  "ui": { "layout": "LR" }
+}

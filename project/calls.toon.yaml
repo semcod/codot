@@ -1,57 +1,51 @@
 # code2llm call graph | /home/tom/github/semcod/codot
-# nodes: 64 | edges: 55 | modules: 17
+# nodes: 93 | edges: 80 | modules: 23
 # CC̄=1.2
 
 HUBS[20]:
+  service-factory.factory.cli.cmd_compile
+    CC=9  in:0  out:24  total:24
   api.commands.pipeline.PipelineCommand.execute
     CC=9  in:0  out:22  total:22
-  api.commands.register_default_commands
-    CC=1  in:0  out:15  total:15
   cqrs-workflow-editor.src.App.fetchPreview
     CC=13  in:1  out:14  total:15
-  api.validators.validate_against_schema_uri
-    CC=7  in:1  out:13  total:14
-  frontend.html.js.api.API
-    CC=9  in:0  out:14  total:14
+  api.commands.register_default_commands
+    CC=1  in:0  out:15  total:15
+  service-factory.factory.generators.code.node_fastify._schema_object
+    CC=8  in:2  out:13  total:15
   frontend.html.js.api.request
     CC=9  in:6  out:8  total:14
+  service-factory.factory.generators.code.python_fastapi._pydantic_model
+    CC=5  in:3  out:11  total:14
+  frontend.html.js.api.API
+    CC=9  in:0  out:14  total:14
+  service-factory.factory.generators.infra.docker.DockerGenerator._compose
+    CC=3  in:0  out:14  total:14
   api.queries.from_url.FromUrlQuery.execute
     CC=9  in:0  out:13  total:13
-  cqrs-workflow-editor.src.App.loadBackendWorkflow
-    CC=3  in:0  out:11  total:11
+  service-factory.factory.register_default_generators
+    CC=1  in:2  out:11  total:13
+  api.validators.validate_against_schema_uri
+    CC=7  in:0  out:13  total:13
+  service-factory.factory.get_registry
+    CC=1  in:12  out:0  total:12
   cqrs-workflow-editor.src.App.loadExampleFile
+    CC=3  in:0  out:11  total:11
+  cqrs-workflow-editor.src.App.loadBackendWorkflow
     CC=3  in:0  out:11  total:11
   api.main.execute_command
     CC=3  in:0  out:11  total:11
-  api.commands.get_registry
-    CC=1  in:10  out:0  total:10
-  frontend.html.js.app.renderDecoded
-    CC=9  in:0  out:10  total:10
-  api.main.execute_query
-    CC=3  in:1  out:9  total:10
-  cqrs-workflow-editor.src.App.onUploadWorkflow
-    CC=4  in:0  out:10  total:10
+  service-factory.factory.generators.code.python_fastapi._query_route
+    CC=7  in:1  out:10  total:11
+  service-factory.factory.generators.wire.openapi._schema_from_fields
+    CC=7  in:3  out:7  total:10
   api.commands.converttobase64.ConvertToBase64Command.execute
     CC=2  in:0  out:10  total:10
-  api.commands.pipeline._substitute
-    CC=8  in:3  out:7  total:10
-  api.protocols.register_default_protocols
-    CC=1  in:0  out:9  total:9
-  cqrs-workflow-editor.src.App.mapToEdges
-    CC=4  in:6  out:2  total:8
-  cqrs-workflow-editor.src.App.reader
-    CC=2  in:0  out:8  total:8
-  cqrs-workflow-editor.src.App.file
-    CC=2  in:0  out:8  total:8
+  cqrs-workflow-editor.src.App.onUploadWorkflow
+    CC=4  in:0  out:10  total:10
 
 MODULES:
-  api.agent  [1 funcs]
-    execute_agent  CC=2  out:3
-  api.auth  [2 funcs]
-    authenticate  CC=3  out:1
-    get_jwt_manager  CC=1  out:0
-  api.commands  [3 funcs]
-    list  CC=2  out:1
+  api.commands  [2 funcs]
     get_registry  CC=1  out:0
     register_default_commands  CC=1  out:15
   api.commands.converttobase64  [1 funcs]
@@ -70,8 +64,6 @@ MODULES:
     execute_query_get  CC=1  out:5
     issue_token  CC=2  out:6
     run_agent  CC=2  out:7
-  api.policy  [1 funcs]
-    get_engine  CC=2  out:1
   api.protocols  [2 funcs]
     get_registry  CC=1  out:0
     register_default_protocols  CC=1  out:9
@@ -115,6 +107,49 @@ MODULES:
   frontend.html.js.app  [2 funcs]
     decodeB64  CC=3  out:3
     renderDecoded  CC=9  out:10
+  mcp_servers.summary_server  [3 funcs]
+    _handle  CC=8  out:7
+    _send  CC=1  out:3
+    main  CC=5  out:5
+  project.map.toon  [5 funcs]
+    _substitute  CC=0  out:0
+    authenticate  CC=0  out:0
+    execute_agent  CC=0  out:0
+    get_engine  CC=0  out:0
+    get_jwt_manager  CC=0  out:0
+  service-factory.factory  [3 funcs]
+    list  CC=2  out:1
+    get_registry  CC=1  out:0
+    register_default_generators  CC=1  out:11
+  service-factory.factory.cli  [2 funcs]
+    cmd_compile  CC=9  out:24
+    cmd_list  CC=2  out:5
+  service-factory.factory.generators.code.node_fastify  [6 funcs]
+    _server  CC=3  out:5
+    _ts_interface  CC=3  out:8
+    _camel  CC=2  out:1
+    _command_route_lines  CC=2  out:4
+    _query_route_lines  CC=3  out:2
+    _schema_object  CC=8  out:13
+  service-factory.factory.generators.code.python_fastapi  [7 funcs]
+    _events  CC=2  out:4
+    _models  CC=4  out:7
+    _command_route  CC=6  out:6
+    _event_model  CC=1  out:1
+    _pydantic_model  CC=5  out:11
+    _query_route  CC=7  out:10
+    _snake  CC=4  out:6
+  service-factory.factory.generators.infra.docker  [2 funcs]
+    _compose  CC=3  out:14
+    _indent_block  CC=3  out:2
+  service-factory.factory.generators.types  [3 funcs]
+    openapi_type  CC=2  out:2
+    py_type  CC=2  out:1
+    ts_type  CC=2  out:1
+  service-factory.factory.generators.wire.openapi  [3 funcs]
+    generate  CC=6  out:6
+    _path_item  CC=10  out:8
+    _schema_from_fields  CC=7  out:7
 
 EDGES:
   frontend.html.js.api.API → frontend.html.js.api.getToken
@@ -150,20 +185,20 @@ EDGES:
   cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToEdges
   cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToNodes
   cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToEdges
-  cqrs-backend-workflows.server._handle_command → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server._handle_render → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server.list_workflows → api.commands.CommandRegistry.list
-  cqrs-backend-workflows.server.create_workflow → cqrs-backend-workflows.server.validate_workflow
-  cqrs-backend-workflows.server.update_workflow → cqrs-backend-workflows.server.validate_workflow
-  api.main.issue_token → api.auth.authenticate
-  api.main.issue_token → api.auth.get_jwt_manager
-  api.main.execute_command → api.policy.get_engine
-  api.main.execute_query → api.policy.get_engine
-  api.main.execute_query_get → api.main.execute_query
-  api.main.run_agent → api.agent.execute_agent
-  api.main.run_agent → api.policy.get_engine
-  api.commands.fetch.FetchCommand.execute → api.commands.get_registry
-  api.commands.register_default_commands → api.commands.get_registry
-  api.commands.converttojson.ConvertToJsonCommand._convert → api.commands.CommandRegistry.list
-  api.commands.converttobase64.ConvertToBase64Command.execute → api.commands.get_registry
-  api.commands.pipeline._substitute → api.commands.pipeline._to_data_uri
+  service-factory.factory.cli.cmd_compile → service-factory.factory.register_default_generators
+  service-factory.factory.cli.cmd_compile → service-factory.factory.get_registry
+  service-factory.factory.cli.cmd_list → service-factory.factory.register_default_generators
+  service-factory.factory.cli.cmd_list → service-factory.factory.get_registry
+  service-factory.factory.register_default_generators → service-factory.factory.get_registry
+  service-factory.factory.generators.infra.docker.DockerGenerator._compose → service-factory.factory.generators.infra.docker._indent_block
+  service-factory.factory.generators.wire.openapi._schema_from_fields → service-factory.factory.generators.types.openapi_type
+  service-factory.factory.generators.wire.openapi._path_item → service-factory.factory.generators.types.openapi_type
+  service-factory.factory.generators.wire.openapi.OpenApiGenerator.generate → service-factory.factory.generators.wire.openapi._schema_from_fields
+  service-factory.factory.generators.wire.openapi.OpenApiGenerator.generate → service-factory.factory.generators.wire.openapi._path_item
+  service-factory.factory.generators.code.node_fastify._command_route_lines → service-factory.factory.generators.code.node_fastify._schema_object
+  service-factory.factory.generators.code.node_fastify._command_route_lines → service-factory.factory.generators.code.node_fastify._camel
+  service-factory.factory.generators.code.node_fastify._query_route_lines → service-factory.factory.generators.code.node_fastify._camel
+  service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server → service-factory.factory.generators.code.node_fastify._command_route_lines
+  service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server → service-factory.factory.generators.code.node_fastify._query_route_lines
+  service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface → service-factory.factory.generators.types.ts_type
+  service-factory.factory.generators.code.python_fastapi._pydantic_model → service-factory.factory.generators.types.py_type

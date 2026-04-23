@@ -1,114 +1,23 @@
 project: /home/tom/github/semcod/codot
 generated_from: code2llm call graph analysis
 stats:
-  total_nodes: 64
-  total_edges: 55
-  modules_count: 17
+  total_nodes: 93
+  total_edges: 80
+  modules_count: 23
 nodes:
-  cqrs-backend-workflows.server.validate_workflow:
-    name: validate_workflow
-    module: cqrs-backend-workflows.server
-    line: 121
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 2
-  api.main.issue_token:
-    name: issue_token
-    module: api.main
-    line: 93
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 0
-  frontend.html.js.app.decodeB64:
-    name: decodeB64
-    module: frontend.html.js.app
-    line: 87
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 1
-  frontend.html.js.api.runQuery:
-    name: runQuery
-    module: frontend.html.js.api
-    line: 56
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  api.commands.get_registry:
-    name: get_registry
-    module: api.commands
-    line: 57
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 10
-  cqrs-workflow-editor.src.App.blob:
-    name: blob
-    module: cqrs-workflow-editor.src.App
-    line: 390
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 1
-  frontend.html.js.api.runCommand:
-    name: runCommand
-    module: frontend.html.js.api
-    line: 52
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  api.commands.CommandRegistry.list:
-    name: list
-    module: api.commands
-    line: 43
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 5
-  cqrs-workflow-editor.src.App.loadPredefinedWorkflow:
-    name: loadPredefinedWorkflow
-    module: cqrs-workflow-editor.src.App
-    line: 240
+  api.commands.fetch.FetchCommand.execute:
+    name: execute
+    module: api.commands.fetch
+    line: 15
     cyclomatic_complexity: 2
     calls_out: 7
     calls_in: 0
-  api.queries.get_registry:
-    name: get_registry
-    module: api.queries
-    line: 43
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
-  cqrs-workflow-editor.src.App.onDownloadWorkflow:
-    name: onDownloadWorkflow
-    module: cqrs-workflow-editor.src.App
-    line: 388
-    cyclomatic_complexity: 1
-    calls_out: 6
-    calls_in: 0
-  cqrs-workflow-editor.src.App.loadBackendWorkflow:
-    name: loadBackendWorkflow
-    module: cqrs-workflow-editor.src.App
-    line: 150
-    cyclomatic_complexity: 3
-    calls_out: 11
-    calls_in: 0
-  api.commands.register_default_commands:
-    name: register_default_commands
-    module: api.commands
-    line: 61
-    cyclomatic_complexity: 1
-    calls_out: 15
-    calls_in: 0
-  frontend.html.js.app.renderDecoded:
-    name: renderDecoded
-    module: frontend.html.js.app
-    line: 94
-    cyclomatic_complexity: 9
-    calls_out: 10
-    calls_in: 0
-  api.main.run_agent:
-    name: run_agent
-    module: api.main
-    line: 199
-    cyclomatic_complexity: 2
-    calls_out: 7
+  api.commands.converttojson.ConvertToJsonCommand._convert:
+    name: _convert
+    module: api.commands.converttojson
+    line: 40
+    cyclomatic_complexity: 8
+    calls_out: 8
     calls_in: 0
   cqrs-workflow-editor.src.App.fetchPreview:
     name: fetchPreview
@@ -117,6 +26,27 @@ nodes:
     cyclomatic_complexity: 13
     calls_out: 14
     calls_in: 1
+  cqrs-backend-workflows.server._handle_render:
+    name: _handle_render
+    module: cqrs-backend-workflows.server
+    line: 187
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
+  project.map.toon.get_engine:
+    name: get_engine
+    module: project.map.toon
+    line: 164
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 3
+  frontend.html.js.api.request:
+    name: request
+    module: frontend.html.js.api
+    line: 15
+    cyclomatic_complexity: 9
+    calls_out: 8
+    calls_in: 6
   api.main.execute_query_get:
     name: execute_query_get
     module: api.main
@@ -124,19 +54,89 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 5
     calls_in: 0
-  frontend.html.js.api.setRole:
-    name: setRole
+  frontend.html.js.api.runQuery:
+    name: runQuery
     module: frontend.html.js.api
-    line: 13
+    line: 56
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  api.queries.from_url.FromUrlQuery.execute:
+    name: execute
+    module: api.queries.from_url
+    line: 18
+    cyclomatic_complexity: 9
+    calls_out: 13
+    calls_in: 0
+  api.commands.register_default_commands:
+    name: register_default_commands
+    module: api.commands
+    line: 61
+    cyclomatic_complexity: 1
+    calls_out: 15
+    calls_in: 0
+  cqrs-workflow-editor.src.App.sizeKB:
+    name: sizeKB
+    module: cqrs-workflow-editor.src.App
+    line: 318
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  service-factory.factory.GeneratorRegistry.list:
+    name: list
+    module: service-factory.factory
+    line: 48
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 5
+  service-factory.factory.generators.wire.openapi._schema_from_fields:
+    name: _schema_from_fields
+    module: service-factory.factory.generators.wire.openapi
+    line: 15
+    cyclomatic_complexity: 7
+    calls_out: 7
+    calls_in: 3
+  cqrs-workflow-editor.src.App.workflow:
+    name: workflow
+    module: cqrs-workflow-editor.src.App
+    line: 552
+    cyclomatic_complexity: 5
+    calls_out: 7
+    calls_in: 0
+  api.commands.pipeline._substitute:
+    name: _substitute
+    module: api.commands.pipeline
+    line: 23
+    cyclomatic_complexity: 8
+    calls_out: 7
+    calls_in: 2
+  service-factory.factory.generators.code.python_fastapi._command_route:
+    name: _command_route
+    module: service-factory.factory.generators.code.python_fastapi
+    line: 46
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 1
+  frontend.html.js.api.setToken:
+    name: setToken
+    module: frontend.html.js.api
+    line: 7
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 2
-  api.agent.execute_agent:
+  service-factory.factory.register_default_generators:
+    name: register_default_generators
+    module: service-factory.factory
+    line: 59
+    cyclomatic_complexity: 1
+    calls_out: 11
+    calls_in: 2
+  project.map.toon.execute_agent:
     name: execute_agent
-    module: api.agent
-    line: 348
-    cyclomatic_complexity: 2
-    calls_out: 3
+    module: project.map.toon
+    line: 81
+    cyclomatic_complexity: 0
+    calls_out: 0
     calls_in: 2
   cqrs-workflow-editor.src.App.loadExampleFile:
     name: loadExampleFile
@@ -145,6 +145,188 @@ nodes:
     cyclomatic_complexity: 3
     calls_out: 11
     calls_in: 0
+  cqrs-backend-workflows.server._handle_command:
+    name: _handle_command
+    module: cqrs-backend-workflows.server
+    line: 166
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 0
+  api.validators.validate_against_schema_uri:
+    name: validate_against_schema_uri
+    module: api.validators
+    line: 21
+    cyclomatic_complexity: 7
+    calls_out: 13
+    calls_in: 0
+  frontend.html.js.app.decodeB64:
+    name: decodeB64
+    module: frontend.html.js.app
+    line: 87
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  cqrs-workflow-editor.src.App.mapToNodes:
+    name: mapToNodes
+    module: cqrs-workflow-editor.src.App
+    line: 82
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 6
+  cqrs-workflow-editor.src.App.mapToEdges:
+    name: mapToEdges
+    module: cqrs-workflow-editor.src.App
+    line: 91
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 6
+  mcp_servers.summary_server._handle:
+    name: _handle
+    module: mcp_servers.summary_server
+    line: 22
+    cyclomatic_complexity: 8
+    calls_out: 7
+    calls_in: 1
+  service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._events:
+    name: _events
+    module: service-factory.factory.generators.code.python_fastapi
+    line: 139
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 0
+  api.commands.pipeline.PipelineCommand.execute:
+    name: execute
+    module: api.commands.pipeline
+    line: 46
+    cyclomatic_complexity: 9
+    calls_out: 22
+    calls_in: 0
+  service-factory.factory.generators.code.python_fastapi._pydantic_model:
+    name: _pydantic_model
+    module: service-factory.factory.generators.code.python_fastapi
+    line: 29
+    cyclomatic_complexity: 5
+    calls_out: 11
+    calls_in: 3
+  cqrs-workflow-editor.src.App.text:
+    name: text
+    module: cqrs-workflow-editor.src.App
+    line: 323
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 3
+  cqrs-backend-workflows.server.validate_workflow:
+    name: validate_workflow
+    module: cqrs-backend-workflows.server
+    line: 121
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 2
+  api.commands.converttobase64.ConvertToBase64Command.execute:
+    name: execute
+    module: api.commands.converttobase64
+    line: 15
+    cyclomatic_complexity: 2
+    calls_out: 10
+    calls_in: 0
+  frontend.html.js.api.setRole:
+    name: setRole
+    module: frontend.html.js.api
+    line: 13
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  service-factory.factory.generators.code.python_fastapi._snake:
+    name: _snake
+    module: service-factory.factory.generators.code.python_fastapi
+    line: 19
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 2
+  cqrs-workflow-editor.src.App.loadBackendWorkflow:
+    name: loadBackendWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 150
+    cyclomatic_complexity: 3
+    calls_out: 11
+    calls_in: 0
+  service-factory.factory.cli.cmd_compile:
+    name: cmd_compile
+    module: service-factory.factory.cli
+    line: 20
+    cyclomatic_complexity: 9
+    calls_out: 24
+    calls_in: 0
+  project.map.toon.authenticate:
+    name: authenticate
+    module: project.map.toon
+    line: 86
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 1
+  cqrs-workflow-editor.src.App.reader:
+    name: reader
+    module: cqrs-workflow-editor.src.App
+    line: 404
+    cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 0
+  api.protocols.register_default_protocols:
+    name: register_default_protocols
+    module: api.protocols
+    line: 57
+    cyclomatic_complexity: 1
+    calls_out: 9
+    calls_in: 0
+  cqrs-workflow-editor.src.App.onUploadWorkflow:
+    name: onUploadWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 400
+    cyclomatic_complexity: 4
+    calls_out: 10
+    calls_in: 0
+  service-factory.factory.get_registry:
+    name: get_registry
+    module: service-factory.factory
+    line: 55
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 12
+  service-factory.factory.generators.wire.openapi._path_item:
+    name: _path_item
+    module: service-factory.factory.generators.wire.openapi
+    line: 35
+    cyclomatic_complexity: 10
+    calls_out: 8
+    calls_in: 1
+  service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface:
+    name: _ts_interface
+    module: service-factory.factory.generators.code.node_fastify
+    line: 156
+    cyclomatic_complexity: 3
+    calls_out: 8
+    calls_in: 0
+  service-factory.factory.generators.code.python_fastapi._event_model:
+    name: _event_model
+    module: service-factory.factory.generators.code.python_fastapi
+    line: 90
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  frontend.html.js.api.API:
+    name: API
+    module: frontend.html.js.api
+    line: 2
+    cyclomatic_complexity: 9
+    calls_out: 14
+    calls_in: 0
+  api.queries.get_registry:
+    name: get_registry
+    module: api.queries
+    line: 43
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
   cqrs-backend-workflows.server.create_workflow:
     name: create_workflow
     module: cqrs-backend-workflows.server
@@ -152,13 +334,111 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 5
     calls_in: 0
-  cqrs-workflow-editor.src.App.json:
-    name: json
-    module: cqrs-workflow-editor.src.App
-    line: 407
+  api.main.execute_command:
+    name: execute_command
+    module: api.main
+    line: 116
+    cyclomatic_complexity: 3
+    calls_out: 11
+    calls_in: 0
+  frontend.html.js.api.data:
+    name: data
+    module: frontend.html.js.api
+    line: 40
     cyclomatic_complexity: 1
     calls_out: 1
-    calls_in: 6
+    calls_in: 0
+  cqrs-workflow-editor.src.App.onDownloadWorkflow:
+    name: onDownloadWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 388
+    cyclomatic_complexity: 1
+    calls_out: 6
+    calls_in: 0
+  cqrs-workflow-editor.src.App.runBackendWorkflow:
+    name: runBackendWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 168
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 0
+  cqrs-workflow-editor.src.App.fetchBackendWorkflows:
+    name: fetchBackendWorkflows
+    module: cqrs-workflow-editor.src.App
+    line: 134
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  service-factory.factory.generators.code.node_fastify._schema_object:
+    name: _schema_object
+    module: service-factory.factory.generators.code.node_fastify
+    line: 17
+    cyclomatic_complexity: 8
+    calls_out: 13
+    calls_in: 2
+  frontend.html.js.api.getToken:
+    name: getToken
+    module: frontend.html.js.api
+    line: 6
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  service-factory.factory.generators.infra.docker.DockerGenerator._compose:
+    name: _compose
+    module: service-factory.factory.generators.infra.docker
+    line: 105
+    cyclomatic_complexity: 3
+    calls_out: 14
+    calls_in: 0
+  frontend.html.js.api.catalog:
+    name: catalog
+    module: frontend.html.js.api
+    line: 50
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  cqrs-workflow-editor.src.App.blob:
+    name: blob
+    module: cqrs-workflow-editor.src.App
+    line: 390
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  mcp_servers.summary_server._send:
+    name: _send
+    module: mcp_servers.summary_server
+    line: 16
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 2
+  service-factory.factory.generators.code.python_fastapi._query_route:
+    name: _query_route
+    module: service-factory.factory.generators.code.python_fastapi
+    line: 65
+    cyclomatic_complexity: 7
+    calls_out: 10
+    calls_in: 1
+  api.main.execute_query:
+    name: execute_query
+    module: api.main
+    line: 150
+    cyclomatic_complexity: 3
+    calls_out: 9
+    calls_in: 1
+  service-factory.factory.generators.types.ts_type:
+    name: ts_type
+    module: service-factory.factory.generators.types
+    line: 45
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  project.map.toon.get_jwt_manager:
+    name: get_jwt_manager
+    module: project.map.toon
+    line: 85
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 1
   api.queries.register_default_queries:
     name: register_default_queries
     module: api.queries
@@ -166,12 +446,89 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 5
     calls_in: 0
+  service-factory.factory.cli.cmd_list:
+    name: cmd_list
+    module: service-factory.factory.cli
+    line: 60
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 0
+  frontend.html.js.api.login:
+    name: login
+    module: frontend.html.js.api
+    line: 39
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._models:
+    name: _models
+    module: service-factory.factory.generators.code.python_fastapi
+    line: 115
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 0
+  service-factory.factory.generators.code.node_fastify._command_route_lines:
+    name: _command_route_lines
+    module: service-factory.factory.generators.code.node_fastify
+    line: 56
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  api.commands.pipeline._to_data_uri:
+    name: _to_data_uri
+    module: api.commands.pipeline
+    line: 18
+    cyclomatic_complexity: 3
+    calls_out: 0
+    calls_in: 1
+  service-factory.factory.generators.code.node_fastify._camel:
+    name: _camel
+    module: service-factory.factory.generators.code.node_fastify
+    line: 12
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 2
+  service-factory.factory.generators.types.py_type:
+    name: py_type
+    module: service-factory.factory.generators.types
+    line: 40
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 2
   cqrs-workflow-editor.src.App.exportWorkflow:
     name: exportWorkflow
     module: cqrs-workflow-editor.src.App
     line: 355
     cyclomatic_complexity: 1
     calls_out: 4
+    calls_in: 1
+  service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server:
+    name: _server
+    module: service-factory.factory.generators.code.node_fastify
+    line: 115
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 0
+  cqrs-backend-workflows.server.list_workflows:
+    name: list_workflows
+    module: cqrs-backend-workflows.server
+    line: 266
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  cqrs-workflow-editor.src.App.loadPredefinedWorkflow:
+    name: loadPredefinedWorkflow
+    module: cqrs-workflow-editor.src.App
+    line: 240
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 0
+  service-factory.factory.generators.code.node_fastify._query_route_lines:
+    name: _query_route_lines
+    module: service-factory.factory.generators.code.node_fastify
+    line: 76
+    cyclomatic_complexity: 3
+    calls_out: 2
     calls_in: 1
   cqrs-workflow-editor.src.App.timer:
     name: timer
@@ -180,89 +537,12 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 2
     calls_in: 0
-  cqrs-workflow-editor.src.App.mapToEdges:
-    name: mapToEdges
-    module: cqrs-workflow-editor.src.App
-    line: 91
-    cyclomatic_complexity: 4
-    calls_out: 2
-    calls_in: 6
-  cqrs-workflow-editor.src.App.reader:
-    name: reader
-    module: cqrs-workflow-editor.src.App
-    line: 404
-    cyclomatic_complexity: 2
-    calls_out: 8
-    calls_in: 0
-  cqrs-backend-workflows.server._handle_command:
-    name: _handle_command
-    module: cqrs-backend-workflows.server
-    line: 166
-    cyclomatic_complexity: 5
-    calls_out: 3
-    calls_in: 0
-  cqrs-workflow-editor.src.App.mapToNodes:
-    name: mapToNodes
-    module: cqrs-workflow-editor.src.App
-    line: 82
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 6
-  cqrs-workflow-editor.src.App.runBackendWorkflow:
-    name: runBackendWorkflow
-    module: cqrs-workflow-editor.src.App
-    line: 168
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 0
-  cqrs-workflow-editor.src.App.text:
-    name: text
-    module: cqrs-workflow-editor.src.App
-    line: 323
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 3
-  api.protocols.get_registry:
-    name: get_registry
-    module: api.protocols
-    line: 53
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
-  frontend.html.js.api.data:
-    name: data
-    module: frontend.html.js.api
-    line: 40
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  cqrs-workflow-editor.src.App.mime:
-    name: mime
-    module: cqrs-workflow-editor.src.App
-    line: 319
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 0
-  api.main.execute_query:
-    name: execute_query
+  api.main.run_agent:
+    name: run_agent
     module: api.main
-    line: 150
-    cyclomatic_complexity: 3
-    calls_out: 9
-    calls_in: 1
-  frontend.html.js.api.getToken:
-    name: getToken
-    module: frontend.html.js.api
-    line: 6
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
-  frontend.html.js.api.catalog:
-    name: catalog
-    module: frontend.html.js.api
-    line: 50
-    cyclomatic_complexity: 1
-    calls_out: 1
+    line: 199
+    cyclomatic_complexity: 2
+    calls_out: 7
     calls_in: 0
   cqrs-backend-workflows.server._result_to_data_uri:
     name: _result_to_data_uri
@@ -271,19 +551,26 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 2
     calls_in: 2
-  api.auth.get_jwt_manager:
-    name: get_jwt_manager
-    module: api.auth
-    line: 73
+  cqrs-workflow-editor.src.App.json:
+    name: json
+    module: cqrs-workflow-editor.src.App
+    line: 407
     cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
-  api.commands.pipeline.PipelineCommand.execute:
-    name: execute
-    module: api.commands.pipeline
-    line: 46
+    calls_out: 1
+    calls_in: 6
+  cqrs-workflow-editor.src.App.mime:
+    name: mime
+    module: cqrs-workflow-editor.src.App
+    line: 319
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  frontend.html.js.app.renderDecoded:
+    name: renderDecoded
+    module: frontend.html.js.app
+    line: 94
     cyclomatic_complexity: 9
-    calls_out: 22
+    calls_out: 10
     calls_in: 0
   cqrs-workflow-editor.src.App.fetchExampleFiles:
     name: fetchExampleFiles
@@ -291,6 +578,48 @@ nodes:
     line: 207
     cyclomatic_complexity: 4
     calls_out: 5
+    calls_in: 0
+  service-factory.factory.generators.wire.openapi.OpenApiGenerator.generate:
+    name: generate
+    module: service-factory.factory.generators.wire.openapi
+    line: 82
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 0
+  api.main.issue_token:
+    name: issue_token
+    module: api.main
+    line: 93
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 0
+  api.commands.get_registry:
+    name: get_registry
+    module: api.commands
+    line: 57
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  service-factory.factory.generators.types.openapi_type:
+    name: openapi_type
+    module: service-factory.factory.generators.types
+    line: 50
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 2
+  api.protocols.get_registry:
+    name: get_registry
+    module: api.protocols
+    line: 53
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  frontend.html.js.api.runCommand:
+    name: runCommand
+    module: frontend.html.js.api
+    line: 52
+    cyclomatic_complexity: 1
+    calls_out: 1
     calls_in: 0
   cqrs-workflow-editor.src.App.file:
     name: file
@@ -306,153 +635,27 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 4
     calls_in: 0
-  api.policy.get_engine:
-    name: get_engine
-    module: api.policy
-    line: 139
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 3
-  api.validators.validate_against_schema_uri:
-    name: validate_against_schema_uri
-    module: api.validators
-    line: 21
-    cyclomatic_complexity: 7
-    calls_out: 13
-    calls_in: 1
-  api.commands.fetch.FetchCommand.execute:
-    name: execute
-    module: api.commands.fetch
-    line: 15
-    cyclomatic_complexity: 2
-    calls_out: 7
-    calls_in: 0
-  cqrs-backend-workflows.server._handle_render:
-    name: _handle_render
-    module: cqrs-backend-workflows.server
-    line: 187
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 0
-  api.main.execute_command:
-    name: execute_command
-    module: api.main
-    line: 116
-    cyclomatic_complexity: 3
-    calls_out: 11
-    calls_in: 0
-  api.protocols.register_default_protocols:
-    name: register_default_protocols
-    module: api.protocols
-    line: 57
-    cyclomatic_complexity: 1
-    calls_out: 9
-    calls_in: 0
-  cqrs-backend-workflows.server.list_workflows:
-    name: list_workflows
-    module: cqrs-backend-workflows.server
-    line: 266
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  cqrs-workflow-editor.src.App.workflow:
-    name: workflow
-    module: cqrs-workflow-editor.src.App
-    line: 552
+  mcp_servers.summary_server.main:
+    name: main
+    module: mcp_servers.summary_server
+    line: 90
     cyclomatic_complexity: 5
-    calls_out: 7
-    calls_in: 0
-  cqrs-workflow-editor.src.App.onUploadWorkflow:
-    name: onUploadWorkflow
-    module: cqrs-workflow-editor.src.App
-    line: 400
-    cyclomatic_complexity: 4
-    calls_out: 10
-    calls_in: 0
-  frontend.html.js.api.setToken:
-    name: setToken
-    module: frontend.html.js.api
-    line: 7
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
-  api.auth.authenticate:
-    name: authenticate
-    module: api.auth
-    line: 77
-    cyclomatic_complexity: 3
-    calls_out: 1
-    calls_in: 1
-  api.commands.converttobase64.ConvertToBase64Command.execute:
-    name: execute
-    module: api.commands.converttobase64
-    line: 15
-    cyclomatic_complexity: 2
-    calls_out: 10
-    calls_in: 0
-  api.commands.pipeline._substitute:
-    name: _substitute
-    module: api.commands.pipeline
-    line: 23
-    cyclomatic_complexity: 8
-    calls_out: 7
-    calls_in: 3
-  api.commands.pipeline._to_data_uri:
-    name: _to_data_uri
-    module: api.commands.pipeline
-    line: 18
-    cyclomatic_complexity: 3
-    calls_out: 0
-    calls_in: 1
-  cqrs-workflow-editor.src.App.fetchBackendWorkflows:
-    name: fetchBackendWorkflows
-    module: cqrs-workflow-editor.src.App
-    line: 134
-    cyclomatic_complexity: 4
     calls_out: 5
     calls_in: 0
-  api.commands.converttojson.ConvertToJsonCommand._convert:
-    name: _convert
-    module: api.commands.converttojson
-    line: 40
-    cyclomatic_complexity: 8
-    calls_out: 8
-    calls_in: 0
-  frontend.html.js.api.login:
-    name: login
-    module: frontend.html.js.api
-    line: 39
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  frontend.html.js.api.API:
-    name: API
-    module: frontend.html.js.api
-    line: 2
-    cyclomatic_complexity: 9
-    calls_out: 14
-    calls_in: 0
-  cqrs-workflow-editor.src.App.sizeKB:
-    name: sizeKB
-    module: cqrs-workflow-editor.src.App
-    line: 318
+  service-factory.factory.generators.infra.docker._indent_block:
+    name: _indent_block
+    module: service-factory.factory.generators.infra.docker
+    line: 22
     cyclomatic_complexity: 3
     calls_out: 2
-    calls_in: 0
-  frontend.html.js.api.request:
-    name: request
-    module: frontend.html.js.api
-    line: 15
-    cyclomatic_complexity: 9
-    calls_out: 8
-    calls_in: 6
-  api.queries.from_url.FromUrlQuery.execute:
-    name: execute
-    module: api.queries.from_url
-    line: 18
-    cyclomatic_complexity: 9
-    calls_out: 13
-    calls_in: 0
+    calls_in: 3
+  project.map.toon._substitute:
+    name: _substitute
+    module: project.map.toon
+    line: 113
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 1
 edges:
 - caller: frontend.html.js.api.API
   callee: frontend.html.js.api.getToken
@@ -553,6 +756,81 @@ edges:
 - caller: cqrs-workflow-editor.src.App.reader
   callee: cqrs-workflow-editor.src.App.mapToEdges
   call_type: resolved
+- caller: service-factory.factory.cli.cmd_compile
+  callee: service-factory.factory.register_default_generators
+  call_type: resolved
+- caller: service-factory.factory.cli.cmd_compile
+  callee: service-factory.factory.get_registry
+  call_type: resolved
+- caller: service-factory.factory.cli.cmd_list
+  callee: service-factory.factory.register_default_generators
+  call_type: resolved
+- caller: service-factory.factory.cli.cmd_list
+  callee: service-factory.factory.get_registry
+  call_type: resolved
+- caller: service-factory.factory.register_default_generators
+  callee: service-factory.factory.get_registry
+  call_type: resolved
+- caller: service-factory.factory.generators.infra.docker.DockerGenerator._compose
+  callee: service-factory.factory.generators.infra.docker._indent_block
+  call_type: resolved
+- caller: service-factory.factory.generators.wire.openapi._schema_from_fields
+  callee: service-factory.factory.generators.types.openapi_type
+  call_type: resolved
+- caller: service-factory.factory.generators.wire.openapi._path_item
+  callee: service-factory.factory.generators.types.openapi_type
+  call_type: resolved
+- caller: service-factory.factory.generators.wire.openapi.OpenApiGenerator.generate
+  callee: service-factory.factory.generators.wire.openapi._schema_from_fields
+  call_type: resolved
+- caller: service-factory.factory.generators.wire.openapi.OpenApiGenerator.generate
+  callee: service-factory.factory.generators.wire.openapi._path_item
+  call_type: resolved
+- caller: service-factory.factory.generators.code.node_fastify._command_route_lines
+  callee: service-factory.factory.generators.code.node_fastify._schema_object
+  call_type: resolved
+- caller: service-factory.factory.generators.code.node_fastify._command_route_lines
+  callee: service-factory.factory.generators.code.node_fastify._camel
+  call_type: resolved
+- caller: service-factory.factory.generators.code.node_fastify._query_route_lines
+  callee: service-factory.factory.generators.code.node_fastify._camel
+  call_type: resolved
+- caller: service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server
+  callee: service-factory.factory.generators.code.node_fastify._command_route_lines
+  call_type: resolved
+- caller: service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server
+  callee: service-factory.factory.generators.code.node_fastify._query_route_lines
+  call_type: resolved
+- caller: service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface
+  callee: service-factory.factory.generators.types.ts_type
+  call_type: resolved
+- caller: service-factory.factory.generators.code.python_fastapi._pydantic_model
+  callee: service-factory.factory.generators.types.py_type
+  call_type: resolved
+- caller: service-factory.factory.generators.code.python_fastapi._command_route
+  callee: service-factory.factory.generators.code.python_fastapi._snake
+  call_type: resolved
+- caller: service-factory.factory.generators.code.python_fastapi._query_route
+  callee: service-factory.factory.generators.code.python_fastapi._snake
+  call_type: resolved
+- caller: service-factory.factory.generators.code.python_fastapi._query_route
+  callee: service-factory.factory.generators.types.py_type
+  call_type: resolved
+- caller: service-factory.factory.generators.code.python_fastapi._event_model
+  callee: service-factory.factory.generators.code.python_fastapi._pydantic_model
+  call_type: resolved
+- caller: service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._models
+  callee: service-factory.factory.generators.code.python_fastapi._pydantic_model
+  call_type: resolved
+- caller: service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._events
+  callee: service-factory.factory.generators.code.python_fastapi._event_model
+  call_type: resolved
+- caller: mcp_servers.summary_server.main
+  callee: mcp_servers.summary_server._handle
+  call_type: resolved
+- caller: mcp_servers.summary_server.main
+  callee: mcp_servers.summary_server._send
+  call_type: resolved
 - caller: cqrs-backend-workflows.server._handle_command
   callee: cqrs-backend-workflows.server._result_to_data_uri
   call_type: resolved
@@ -560,7 +838,7 @@ edges:
   callee: cqrs-backend-workflows.server._result_to_data_uri
   call_type: resolved
 - caller: cqrs-backend-workflows.server.list_workflows
-  callee: api.commands.CommandRegistry.list
+  callee: service-factory.factory.GeneratorRegistry.list
   call_type: resolved
 - caller: cqrs-backend-workflows.server.create_workflow
   callee: cqrs-backend-workflows.server.validate_workflow
@@ -569,64 +847,58 @@ edges:
   callee: cqrs-backend-workflows.server.validate_workflow
   call_type: resolved
 - caller: api.main.issue_token
-  callee: api.auth.authenticate
+  callee: project.map.toon.authenticate
   call_type: resolved
 - caller: api.main.issue_token
-  callee: api.auth.get_jwt_manager
+  callee: project.map.toon.get_jwt_manager
   call_type: resolved
 - caller: api.main.execute_command
-  callee: api.policy.get_engine
+  callee: project.map.toon.get_engine
   call_type: resolved
 - caller: api.main.execute_query
-  callee: api.policy.get_engine
+  callee: project.map.toon.get_engine
   call_type: resolved
 - caller: api.main.execute_query_get
   callee: api.main.execute_query
   call_type: resolved
 - caller: api.main.run_agent
-  callee: api.agent.execute_agent
+  callee: project.map.toon.execute_agent
   call_type: resolved
 - caller: api.main.run_agent
-  callee: api.policy.get_engine
+  callee: project.map.toon.get_engine
   call_type: resolved
 - caller: api.commands.fetch.FetchCommand.execute
-  callee: api.commands.get_registry
+  callee: service-factory.factory.get_registry
   call_type: resolved
 - caller: api.commands.register_default_commands
   callee: api.commands.get_registry
   call_type: resolved
 - caller: api.commands.converttojson.ConvertToJsonCommand._convert
-  callee: api.commands.CommandRegistry.list
+  callee: service-factory.factory.GeneratorRegistry.list
   call_type: resolved
 - caller: api.commands.converttobase64.ConvertToBase64Command.execute
-  callee: api.commands.get_registry
+  callee: service-factory.factory.get_registry
   call_type: resolved
 - caller: api.commands.pipeline._substitute
   callee: api.commands.pipeline._to_data_uri
   call_type: resolved
 - caller: api.commands.pipeline.PipelineCommand.execute
-  callee: api.commands.pipeline._substitute
+  callee: project.map.toon._substitute
   call_type: resolved
 - caller: api.validators.validate_against_schema_uri
-  callee: api.commands.CommandRegistry.list
+  callee: service-factory.factory.GeneratorRegistry.list
   call_type: resolved
 - caller: api.protocols.register_default_protocols
   callee: api.protocols.get_registry
   call_type: resolved
 - caller: api.queries.from_url.FromUrlQuery.execute
-  callee: api.commands.get_registry
+  callee: service-factory.factory.get_registry
   call_type: resolved
 - caller: api.queries.register_default_queries
   callee: api.queries.get_registry
   call_type: resolved
 modules:
-  api.agent:
-  - api.agent.execute_agent
-  api.auth:
-  - api.auth.authenticate
-  - api.auth.get_jwt_manager
   api.commands:
-  - api.commands.CommandRegistry.list
   - api.commands.get_registry
   - api.commands.register_default_commands
   api.commands.converttobase64:
@@ -645,8 +917,6 @@ modules:
   - api.main.execute_query_get
   - api.main.issue_token
   - api.main.run_agent
-  api.policy:
-  - api.policy.get_engine
   api.protocols:
   - api.protocols.get_registry
   - api.protocols.register_default_protocols
@@ -701,28 +971,90 @@ modules:
   frontend.html.js.app:
   - frontend.html.js.app.decodeB64
   - frontend.html.js.app.renderDecoded
+  mcp_servers.summary_server:
+  - mcp_servers.summary_server._handle
+  - mcp_servers.summary_server._send
+  - mcp_servers.summary_server.main
+  project.map.toon:
+  - project.map.toon._substitute
+  - project.map.toon.authenticate
+  - project.map.toon.execute_agent
+  - project.map.toon.get_engine
+  - project.map.toon.get_jwt_manager
+  service-factory.factory:
+  - service-factory.factory.GeneratorRegistry.list
+  - service-factory.factory.get_registry
+  - service-factory.factory.register_default_generators
+  service-factory.factory.cli:
+  - service-factory.factory.cli.cmd_compile
+  - service-factory.factory.cli.cmd_list
+  service-factory.factory.generators.code.node_fastify:
+  - service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server
+  - service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface
+  - service-factory.factory.generators.code.node_fastify._camel
+  - service-factory.factory.generators.code.node_fastify._command_route_lines
+  - service-factory.factory.generators.code.node_fastify._query_route_lines
+  - service-factory.factory.generators.code.node_fastify._schema_object
+  service-factory.factory.generators.code.python_fastapi:
+  - service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._events
+  - service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._models
+  - service-factory.factory.generators.code.python_fastapi._command_route
+  - service-factory.factory.generators.code.python_fastapi._event_model
+  - service-factory.factory.generators.code.python_fastapi._pydantic_model
+  - service-factory.factory.generators.code.python_fastapi._query_route
+  - service-factory.factory.generators.code.python_fastapi._snake
+  service-factory.factory.generators.infra.docker:
+  - service-factory.factory.generators.infra.docker.DockerGenerator._compose
+  - service-factory.factory.generators.infra.docker._indent_block
+  service-factory.factory.generators.types:
+  - service-factory.factory.generators.types.openapi_type
+  - service-factory.factory.generators.types.py_type
+  - service-factory.factory.generators.types.ts_type
+  service-factory.factory.generators.wire.openapi:
+  - service-factory.factory.generators.wire.openapi.OpenApiGenerator.generate
+  - service-factory.factory.generators.wire.openapi._path_item
+  - service-factory.factory.generators.wire.openapi._schema_from_fields
 entry_points:
 - SUMD._bash_cli_execute
+- SUMD._camel
+- SUMD._command_route
+- SUMD._command_route_lines
 - SUMD._engine
+- SUMD._event_model
+- SUMD._handle
 - SUMD._handle_agent
 - SUMD._handle_command
 - SUMD._handle_fetch
 - SUMD._handle_http
 - SUMD._handle_render
 - SUMD._http_api_execute
+- SUMD._indent_block
 - SUMD._key_error
 - SUMD._litellm_execute
 - SUMD._mcp_execute
 - SUMD._nf_error
+- SUMD._path_item
 - SUMD._perm_error
+- SUMD._pydantic_model
+- SUMD._query_route
+- SUMD._query_route_lines
+- SUMD._register
 - SUMD._result_to_data_uri
+- SUMD._schema_from_fields
+- SUMD._schema_object
+- SUMD._send
+- SUMD._snake
 - SUMD._substitute
 - SUMD._to_data_uri
 - SUMD._user
 - SUMD._value_error
 - SUMD._websocket_execute
 - SUMD.authenticate
+- SUMD.bundle
 - SUMD.catalog
+- SUMD.cmd_compile
+- SUMD.cmd_hash
+- SUMD.cmd_list
 - SUMD.create_workflow
 - SUMD.current_user
 - SUMD.delete_workflow
@@ -744,9 +1076,13 @@ entry_points:
 - SUMD.list_queries
 - SUMD.list_workflows
 - SUMD.load_settings
+- SUMD.main
 - SUMD.me
+- SUMD.openapi_type
+- SUMD.py_type
 - SUMD.register_backend
 - SUMD.register_default_commands
+- SUMD.register_default_generators
 - SUMD.register_default_protocols
 - SUMD.register_default_queries
 - SUMD.reload_engine
@@ -754,17 +1090,37 @@ entry_points:
 - SUMD.run_agent
 - SUMD.run_workflow
 - SUMD.test_admin_can_do_anything
+- SUMD.test_all_generators_registered
 - SUMD.test_analyst_can_run_pipeline
+- SUMD.test_bash
+- SUMD.test_bundle_loads_with_contracts
+- SUMD.test_contract_accessors
 - SUMD.test_data_uri_base64
 - SUMD.test_data_uri_plain
+- SUMD.test_docker_dockerfile_has_healthcheck
+- SUMD.test_docker_generates_valid_yaml
 - SUMD.test_file_protocol_reads_inside_root
 - SUMD.test_file_protocol_rejects_outside_root
+- SUMD.test_hash_changes_when_runtime_changes
+- SUMD.test_hash_is_deterministic
 - SUMD.test_import
+- SUMD.test_kubernetes_generates_valid_yaml
+- SUMD.test_litellm_mock
+- SUMD.test_mcp
+- SUMD.test_missing_contract_raises_clear_error
+- SUMD.test_node_fastify_generates_valid_json
+- SUMD.test_openapi_generates_valid_json
+- SUMD.test_pipeline_with_agent
 - SUMD.test_placeholder
+- SUMD.test_python_fastapi_generates_valid_python
+- SUMD.test_python_fastapi_routes_match_contracts
 - SUMD.test_query_access_respects_uris
+- SUMD.test_same_bundle_compiles_to_different_infra
+- SUMD.test_same_bundle_compiles_to_different_languages
 - SUMD.test_unknown_role_denied
 - SUMD.test_user_allowed_public_path
 - SUMD.test_user_denied_internal_path
+- SUMD.ts_type
 - SUMD.update_workflow
 - SUMD.validate_against_schema_uri
 - SUMD.validate_workflow
@@ -795,6 +1151,7 @@ entry_points:
 - api.SUMD.list_commands
 - api.SUMD.list_queries
 - api.SUMD.load_settings
+- api.SUMD.main
 - api.SUMD.me
 - api.SUMD.register_backend
 - api.SUMD.register_default_commands
@@ -802,7 +1159,11 @@ entry_points:
 - api.SUMD.register_default_queries
 - api.SUMD.reload_engine
 - api.SUMD.run_agent
+- api.SUMD.test_bash
 - api.SUMD.test_import
+- api.SUMD.test_litellm_mock
+- api.SUMD.test_mcp
+- api.SUMD.test_pipeline_with_agent
 - api.SUMD.test_placeholder
 - api.SUMD.validate_against_schema_uri
 - api.agent._bash_cli_execute
@@ -810,14 +1171,18 @@ entry_points:
 - api.agent._litellm_execute
 - api.agent._mcp_execute
 - api.agent._websocket_execute
+- api.agent.execute_agent
 - api.agent.register_backend
 - api.auth.JWTManager.__init__
 - api.auth.JWTManager.issue
 - api.auth.JWTManager.verify
+- api.auth.authenticate
 - api.auth.current_user
+- api.auth.get_jwt_manager
 - api.commands.Command.execute
 - api.commands.CommandRegistry.__init__
 - api.commands.CommandRegistry.get
+- api.commands.CommandRegistry.list
 - api.commands.CommandRegistry.register
 - api.commands.converttobase64.ConvertToBase64Command.execute
 - api.commands.converttocsv.ConvertToCsvCommand.execute
@@ -868,6 +1233,7 @@ entry_points:
 - api.policy.PolicyEngine.can_execute_query
 - api.policy.PolicyEngine.from_file
 - api.policy.User.has_role
+- api.policy.get_engine
 - api.policy.reload_engine
 - api.project.map.toon._bash_cli_execute
 - api.project.map.toon._http_api_execute
@@ -896,6 +1262,7 @@ entry_points:
 - api.project.map.toon.list_commands
 - api.project.map.toon.list_queries
 - api.project.map.toon.load_settings
+- api.project.map.toon.main
 - api.project.map.toon.me
 - api.project.map.toon.register_backend
 - api.project.map.toon.register_default_commands
@@ -903,7 +1270,11 @@ entry_points:
 - api.project.map.toon.register_default_queries
 - api.project.map.toon.reload_engine
 - api.project.map.toon.run_agent
+- api.project.map.toon.test_bash
 - api.project.map.toon.test_import
+- api.project.map.toon.test_litellm_mock
+- api.project.map.toon.test_mcp
+- api.project.map.toon.test_pipeline_with_agent
 - api.project.map.toon.test_placeholder
 - api.project.map.toon.validate_against_schema_uri
 - api.protocols.Protocol.fetch
@@ -926,6 +1297,7 @@ entry_points:
 - api.queries.introspect.IntrospectQuery.execute
 - api.queries.register_default_queries
 - api.validators.SchemaValidationError.__init__
+- api.validators.validate_against_schema_uri
 - cqrs-backend-workflows.SUMD._handle_agent
 - cqrs-backend-workflows.SUMD._handle_command
 - cqrs-backend-workflows.SUMD._handle_fetch
@@ -1045,38 +1417,53 @@ entry_points:
 - frontend.html.js.app.renderDecoded
 - frontend.html.js.app.showAnonymous
 - frontend.html.js.app.showAuthed
+- mcp_servers.summary_server.main
 - project.map.toon._bash_cli_execute
+- project.map.toon._camel
+- project.map.toon._command_route
+- project.map.toon._command_route_lines
 - project.map.toon._engine
+- project.map.toon._event_model
+- project.map.toon._handle
 - project.map.toon._handle_agent
 - project.map.toon._handle_command
 - project.map.toon._handle_fetch
 - project.map.toon._handle_http
 - project.map.toon._handle_render
 - project.map.toon._http_api_execute
+- project.map.toon._indent_block
 - project.map.toon._key_error
 - project.map.toon._litellm_execute
 - project.map.toon._mcp_execute
 - project.map.toon._nf_error
+- project.map.toon._path_item
 - project.map.toon._perm_error
+- project.map.toon._pydantic_model
+- project.map.toon._query_route
+- project.map.toon._query_route_lines
+- project.map.toon._register
 - project.map.toon._result_to_data_uri
-- project.map.toon._substitute
+- project.map.toon._schema_from_fields
+- project.map.toon._schema_object
+- project.map.toon._send
+- project.map.toon._snake
 - project.map.toon._to_data_uri
 - project.map.toon._user
 - project.map.toon._value_error
 - project.map.toon._websocket_execute
-- project.map.toon.authenticate
+- project.map.toon.bundle
 - project.map.toon.catalog
+- project.map.toon.cmd_compile
+- project.map.toon.cmd_hash
+- project.map.toon.cmd_list
 - project.map.toon.create_workflow
 - project.map.toon.current_user
 - project.map.toon.delete_workflow
-- project.map.toon.execute_agent
 - project.map.toon.execute_command
 - project.map.toon.execute_node
 - project.map.toon.execute_query
 - project.map.toon.execute_query_get
-- project.map.toon.get_engine
 - project.map.toon.get_example
-- project.map.toon.get_jwt_manager
 - project.map.toon.get_registry
 - project.map.toon.get_workflow
 - project.map.toon.health
@@ -1087,9 +1474,13 @@ entry_points:
 - project.map.toon.list_queries
 - project.map.toon.list_workflows
 - project.map.toon.load_settings
+- project.map.toon.main
 - project.map.toon.me
+- project.map.toon.openapi_type
+- project.map.toon.py_type
 - project.map.toon.register_backend
 - project.map.toon.register_default_commands
+- project.map.toon.register_default_generators
 - project.map.toon.register_default_protocols
 - project.map.toon.register_default_queries
 - project.map.toon.reload_engine
@@ -1097,17 +1488,78 @@ entry_points:
 - project.map.toon.run_agent
 - project.map.toon.run_workflow
 - project.map.toon.test_admin_can_do_anything
+- project.map.toon.test_all_generators_registered
 - project.map.toon.test_analyst_can_run_pipeline
+- project.map.toon.test_bash
+- project.map.toon.test_bundle_loads_with_contracts
+- project.map.toon.test_contract_accessors
 - project.map.toon.test_data_uri_base64
 - project.map.toon.test_data_uri_plain
+- project.map.toon.test_docker_dockerfile_has_healthcheck
+- project.map.toon.test_docker_generates_valid_yaml
 - project.map.toon.test_file_protocol_reads_inside_root
 - project.map.toon.test_file_protocol_rejects_outside_root
+- project.map.toon.test_hash_changes_when_runtime_changes
+- project.map.toon.test_hash_is_deterministic
 - project.map.toon.test_import
+- project.map.toon.test_kubernetes_generates_valid_yaml
+- project.map.toon.test_litellm_mock
+- project.map.toon.test_mcp
+- project.map.toon.test_missing_contract_raises_clear_error
+- project.map.toon.test_node_fastify_generates_valid_json
+- project.map.toon.test_openapi_generates_valid_json
+- project.map.toon.test_pipeline_with_agent
 - project.map.toon.test_placeholder
+- project.map.toon.test_python_fastapi_generates_valid_python
+- project.map.toon.test_python_fastapi_routes_match_contracts
 - project.map.toon.test_query_access_respects_uris
+- project.map.toon.test_same_bundle_compiles_to_different_infra
+- project.map.toon.test_same_bundle_compiles_to_different_languages
 - project.map.toon.test_unknown_role_denied
 - project.map.toon.test_user_allowed_public_path
 - project.map.toon.test_user_denied_internal_path
+- project.map.toon.ts_type
 - project.map.toon.update_workflow
-- project.map.toon.validate_against_schema_uri
 - project.map.toon.validate_workflow
+- service-factory.README.generate
+- service-factory.articles.01-service-factory-status.generate
+- service-factory.factory.Generator.generate
+- service-factory.factory.GeneratorRegistry.__init__
+- service-factory.factory.GeneratorRegistry.by_category
+- service-factory.factory.GeneratorRegistry.get
+- service-factory.factory.GeneratorRegistry.register
+- service-factory.factory.cli.cmd_compile
+- service-factory.factory.cli.cmd_hash
+- service-factory.factory.cli.cmd_list
+- service-factory.factory.cli.main
+- service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._package_json
+- service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server
+- service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface
+- service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._types
+- service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator.generate
+- service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._events
+- service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._main
+- service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._models
+- service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._requirements
+- service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator.generate
+- service-factory.factory.generators.infra.docker.DockerGenerator._companion_block
+- service-factory.factory.generators.infra.docker.DockerGenerator._compose
+- service-factory.factory.generators.infra.docker.DockerGenerator._cpu_to_docker
+- service-factory.factory.generators.infra.docker.DockerGenerator._dockerfile
+- service-factory.factory.generators.infra.docker.DockerGenerator._dockerignore
+- service-factory.factory.generators.infra.docker.DockerGenerator._main_service_block
+- service-factory.factory.generators.infra.docker.DockerGenerator._mem_to_docker
+- service-factory.factory.generators.infra.docker.DockerGenerator._node_dockerfile
+- service-factory.factory.generators.infra.docker.DockerGenerator._python_dockerfile
+- service-factory.factory.generators.infra.docker.DockerGenerator._storage_block
+- service-factory.factory.generators.infra.docker.DockerGenerator.generate
+- service-factory.factory.generators.infra.kubernetes.KubernetesGenerator._deployment
+- service-factory.factory.generators.infra.kubernetes.KubernetesGenerator._kustomization
+- service-factory.factory.generators.infra.kubernetes.KubernetesGenerator._service
+- service-factory.factory.generators.infra.kubernetes.KubernetesGenerator.generate
+- service-factory.factory.generators.wire.openapi.OpenApiGenerator.generate
+- service-factory.factory.ir.Bundle.contract_hash
+- service-factory.factory.ir.BundleLoader.__init__
+- service-factory.factory.ir.BundleLoader._resolve_contract
+- service-factory.factory.ir.BundleLoader._validate
+- service-factory.factory.ir.BundleLoader.load

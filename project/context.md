@@ -4,33 +4,33 @@
 
 - **Project**: /home/tom/github/semcod/codot
 - **Primary Language**: python
-- **Languages**: python: 24, md: 20, json: 16, yaml: 13, shell: 7
+- **Languages**: python: 35, md: 22, json: 21, yaml: 13, shell: 7
 - **Analysis Mode**: static
-- **Total Functions**: 436
-- **Total Classes**: 52
-- **Modules**: 101
-- **Entry Points**: 409
+- **Total Functions**: 595
+- **Total Classes**: 69
+- **Modules**: 120
+- **Entry Points**: 548
 
 ## Architecture by Module
 
-### SUMD
-- **Functions**: 71
-- **File**: `SUMD.md`
-
 ### project.map.toon
-- **Functions**: 71
+- **Functions**: 118
 - **File**: `map.toon.yaml`
+
+### SUMD
+- **Functions**: 118
+- **File**: `SUMD.md`
 
 ### cqrs-workflow-editor.src.App
 - **Functions**: 55
 - **File**: `App.tsx`
 
 ### api.SUMD
-- **Functions**: 39
+- **Functions**: 45
 - **File**: `SUMD.md`
 
 ### api.project.map.toon
-- **Functions**: 39
+- **Functions**: 45
 - **File**: `map.toon.yaml`
 
 ### cqrs-backend-workflows.SUMD
@@ -63,9 +63,29 @@
 - **Functions**: 15
 - **File**: `main.py`
 
+### service-factory.factory.generators.infra.docker
+- **Functions**: 12
+- **Classes**: 1
+- **File**: `docker.py`
+
 ### api.policy
 - **Functions**: 11
 - **Classes**: 3
+- **File**: `__init__.py`
+
+### service-factory.factory.generators.code.python_fastapi
+- **Functions**: 10
+- **Classes**: 1
+- **File**: `python_fastapi.py`
+
+### service-factory.factory.generators.code.node_fastify
+- **Functions**: 9
+- **Classes**: 1
+- **File**: `node_fastify.py`
+
+### service-factory.factory
+- **Functions**: 8
+- **Classes**: 2
 - **File**: `__init__.py`
 
 ### api.agent
@@ -82,26 +102,6 @@
 - **Classes**: 3
 - **File**: `__init__.py`
 
-### api.queries
-- **Functions**: 7
-- **Classes**: 2
-- **File**: `__init__.py`
-
-### api.auth
-- **Functions**: 6
-- **Classes**: 1
-- **File**: `__init__.py`
-
-### api.commands.converttojson
-- **Functions**: 3
-- **Classes**: 1
-- **File**: `converttojson.py`
-
-### api.commands.pipeline
-- **Functions**: 3
-- **Classes**: 1
-- **File**: `pipeline.py`
-
 ## Key Entry Points
 
 Main execution flows into the system:
@@ -113,6 +113,12 @@ backend_config keys:
     - server_url: SSE endpoint URL
     - stdio_command: list[str] command to spawn MCP serv
 - **Calls**: cfg.get, cfg.get, cfg.get, cfg.get, AgentResponse, trace.append, trace.append, trace.append
+
+### service-factory.factory.cli.cmd_compile
+- **Calls**: service-factory.factory.register_default_generators, service-factory.factory.get_registry, BundleLoader, loader.load, Path, out_root.mkdir, print, Path
+
+### service-factory.factory.ir.BundleLoader.load
+- **Calls**: json.loads, self._validate, raw.get, Bundle, bundle_path.read_text, self._resolve_contract, json.loads, contracts.append
 
 ### api.agent._litellm_execute
 > Execute agent via LiteLLM proxy.
@@ -138,7 +144,7 @@ backend_config keys:
 - **Calls**: meta.get, Environment, env.from_string, template.render, html.encode, CommandResponse, meta.get, t.content.decode
 
 ### api.commands.pipeline.PipelineCommand.execute
-- **Calls**: get_command_registry, enumerate, CommandResponse, None.get, ValueError, step.get, api.commands.pipeline._substitute, CommandRequest
+- **Calls**: get_command_registry, enumerate, CommandResponse, None.get, ValueError, step.get, project.map.toon._substitute, CommandRequest
 
 ### api.commands.converttoxml.ConvertToXmlCommand.execute
 - **Calls**: None.get, None.lower, fetched.content.decode, isinstance, xmltodict.unparse, xml.encode, CommandResponse, ValueError
@@ -153,6 +159,9 @@ backend_config keys:
 
 ### api.commands.converttojson.ConvertToJsonCommand.execute
 - **Calls**: None.lower, fetched.content.decode, self._detect_mode, self._convert, None.encode, CommandResponse, ValueError, None.fetch
+
+### service-factory.factory.cli.main
+- **Calls**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, p_compile.add_argument, p_compile.add_argument, p_compile.add_argument, p_compile.add_argument, p_compile.add_argument
 
 ### api.config.load_settings
 - **Calls**: os.environ.get, Settings, os.environ.get, os.environ.get, int, os.environ.get, tuple, os.environ.get
@@ -180,8 +189,21 @@ backend_config keys:
 ### frontend.html.js.api.API
 - **Calls**: frontend.html.js.api.getItem, frontend.html.js.api.setItem, frontend.html.js.api.removeItem, frontend.html.js.api.getToken, frontend.html.js.api.fetch, frontend.html.js.api.stringify, frontend.html.js.api.get, frontend.html.js.api.includes
 
+### service-factory.factory.generators.infra.docker.DockerGenerator._compose
+- **Calls**: self._main_service_block, lines.append, lines.append, self._storage_block, None.join, service-factory.factory.generators.infra.docker._indent_block, self._companion_block, lines.append
+
+### service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._main
+- **Calls**: None.join, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append
+
+### api.validators.validate_against_schema_uri
+> Fetch a JSON Schema from the given URI and validate the instance.
+
+The URI is resolved via the protocol registry, so it can live on HTTP,
+in a local f
+- **Calls**: Draft202012Validator, sorted, json.loads, validator.iter_errors, SchemaValidationError, None.fetch, SchemaValidationError, result.content.decode
+
 ### api.queries.from_url.FromUrlQuery.execute
-- **Calls**: api.commands.get_registry, QueryResponse, ValueError, parts.append, registry.fetch, mime.startswith, None.decode, fetched.content.decode
+- **Calls**: service-factory.factory.get_registry, QueryResponse, ValueError, parts.append, registry.fetch, mime.startswith, None.decode, fetched.content.decode
 
 ### cqrs-workflow-editor.src.App.loadBackendWorkflow
 - **Calls**: cqrs-workflow-editor.src.App.fetch, cqrs-workflow-editor.src.App.json, cqrs-workflow-editor.src.App.setNodes, cqrs-workflow-editor.src.App.mapToNodes, cqrs-workflow-editor.src.App.setEdges, cqrs-workflow-editor.src.App.mapToEdges, cqrs-workflow-editor.src.App.setWorkflowId, cqrs-workflow-editor.src.App.setRunResult
@@ -205,25 +227,7 @@ backend_config keys:
 - **Calls**: self._proc.stdin.write, json.dumps, raw.encode, self._proc.stdin.drain, resp.get, asyncio.create_subprocess_exec, asyncio.wait_for, MCPError
 
 ### api.commands.converttobase64.ConvertToBase64Command.execute
-- **Calls**: None.decode, encoded.encode, CommandResponse, ValueError, None.fetch, base64.b64encode, None.decode, api.commands.get_registry
-
-### api.policy.PolicyEngine.can_execute_command
-- **Calls**: self._rules_for, PolicyDecision.deny, PolicyDecision.deny, rule.get, PolicyDecision.allow, self._match_any, rule.get, rule.get
-
-### api.protocols.file_protocol.FileProtocol.fetch
-- **Calls**: self._resolve, path.read_bytes, mimetypes.guess_type, FetchResult, len, ValueError, str, str
-
-### frontend.html.js.app.bytes
-- **Calls**: frontend.html.js.app.startsWith, frontend.html.js.app.createElement, frontend.html.js.app.TextDecoder, frontend.html.js.app.decode, frontend.html.js.app.appendChild, frontend.html.js.app.Blob, frontend.html.js.app.createObjectURL, frontend.html.js.app.includes
-
-### api.protocols.register_default_protocols
-- **Calls**: api.protocols.get_registry, reg.register, reg.register, reg.register, reg.register, HttpProtocol, HttpProtocol, FileProtocol
-
-### api.protocols.http_protocol.HttpProtocol.fetch
-- **Calls**: httpx.AsyncClient, resp.raise_for_status, FetchResult, client.get, len, ValueError, resp.headers.get, dict
-
-### api.protocols.data_protocol.DataProtocol.fetch
-- **Calls**: None.partition, FetchResult, uri.startswith, ValueError, ValueError, header.split, base64.b64decode, None.encode
+- **Calls**: None.decode, encoded.encode, CommandResponse, ValueError, None.fetch, base64.b64encode, None.decode, service-factory.factory.get_registry
 
 ## Process Flows
 
@@ -234,53 +238,64 @@ Key execution flows identified:
 _mcp_execute [api.agent]
 ```
 
-### Flow 2: _litellm_execute
+### Flow 2: cmd_compile
+```
+cmd_compile [service-factory.factory.cli]
+  └─ →> register_default_generators
+      └─> get_registry
+  └─ →> get_registry
+```
+
+### Flow 3: load
+```
+load [service-factory.factory.ir.BundleLoader]
+```
+
+### Flow 4: _litellm_execute
 ```
 _litellm_execute [api.agent]
 ```
 
-### Flow 3: execute
+### Flow 5: execute
 ```
 execute [api.commands.converttocsv.ConvertToCsvCommand]
 ```
 
-### Flow 4: _bash_cli_execute
+### Flow 6: _bash_cli_execute
 ```
 _bash_cli_execute [api.agent]
 ```
 
-### Flow 5: _websocket_execute
+### Flow 7: _websocket_execute
 ```
 _websocket_execute [api.agent]
 ```
 
-### Flow 6: load_settings
+### Flow 8: main
+```
+main [service-factory.factory.cli]
+```
+
+### Flow 9: load_settings
 ```
 load_settings [api.config]
 ```
 
-### Flow 7: _resolve
+### Flow 10: _resolve
 ```
 _resolve [api.protocols.file_protocol.FileProtocol]
 ```
 
-### Flow 8: _http_api_execute
-```
-_http_api_execute [api.agent]
-```
-
-### Flow 9: run_workflow
-```
-run_workflow [cqrs-backend-workflows.server]
-```
-
-### Flow 10: register_default_commands
-```
-register_default_commands [api.commands]
-  └─> get_registry
-```
-
 ## Key Classes
+
+### service-factory.factory.ir.Contract
+> Unified view over command/query/event contract JSON.
+- **Methods**: 16
+- **Key Methods**: service-factory.factory.ir.Contract.kind, service-factory.factory.ir.Contract.name, service-factory.factory.ir.Contract.is_command, service-factory.factory.ir.Contract.is_query, service-factory.factory.ir.Contract.is_event, service-factory.factory.ir.Contract.module, service-factory.factory.ir.Contract.description, service-factory.factory.ir.Contract.version, service-factory.factory.ir.Contract.http_method, service-factory.factory.ir.Contract.http_endpoint
+
+### service-factory.factory.generators.infra.docker.DockerGenerator
+- **Methods**: 11
+- **Key Methods**: service-factory.factory.generators.infra.docker.DockerGenerator.generate, service-factory.factory.generators.infra.docker.DockerGenerator._dockerfile, service-factory.factory.generators.infra.docker.DockerGenerator._python_dockerfile, service-factory.factory.generators.infra.docker.DockerGenerator._node_dockerfile, service-factory.factory.generators.infra.docker.DockerGenerator._dockerignore, service-factory.factory.generators.infra.docker.DockerGenerator._compose, service-factory.factory.generators.infra.docker.DockerGenerator._main_service_block, service-factory.factory.generators.infra.docker.DockerGenerator._companion_block, service-factory.factory.generators.infra.docker.DockerGenerator._storage_block, service-factory.factory.generators.infra.docker.DockerGenerator._cpu_to_docker
 
 ### api.mcp_client.MCPClient
 > Base MCP client (transport-agnostic).
@@ -290,6 +305,31 @@ register_default_commands [api.commands]
 ### api.policy.PolicyEngine
 - **Methods**: 6
 - **Key Methods**: api.policy.PolicyEngine.__init__, api.policy.PolicyEngine.from_file, api.policy.PolicyEngine._rules_for, api.policy.PolicyEngine._match_any, api.policy.PolicyEngine.can_execute_command, api.policy.PolicyEngine.can_execute_query
+
+### service-factory.factory.GeneratorRegistry
+- **Methods**: 5
+- **Key Methods**: service-factory.factory.GeneratorRegistry.__init__, service-factory.factory.GeneratorRegistry.register, service-factory.factory.GeneratorRegistry.get, service-factory.factory.GeneratorRegistry.by_category, service-factory.factory.GeneratorRegistry.list
+
+### service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator
+- **Methods**: 5
+- **Key Methods**: service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator.generate, service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._package_json, service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server, service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._types, service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface
+
+### service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator
+- **Methods**: 5
+- **Key Methods**: service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator.generate, service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._requirements, service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._models, service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._events, service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._main
+
+### service-factory.factory.ir.Bundle
+- **Methods**: 4
+- **Key Methods**: service-factory.factory.ir.Bundle.commands, service-factory.factory.ir.Bundle.queries, service-factory.factory.ir.Bundle.events, service-factory.factory.ir.Bundle.contract_hash
+
+### service-factory.factory.ir.BundleLoader
+> Reads a bundle.json plus referenced contract files from disk.
+- **Methods**: 4
+- **Key Methods**: service-factory.factory.ir.BundleLoader.__init__, service-factory.factory.ir.BundleLoader.load, service-factory.factory.ir.BundleLoader._resolve_contract, service-factory.factory.ir.BundleLoader._validate
+
+### service-factory.factory.generators.infra.kubernetes.KubernetesGenerator
+- **Methods**: 4
+- **Key Methods**: service-factory.factory.generators.infra.kubernetes.KubernetesGenerator.generate, service-factory.factory.generators.infra.kubernetes.KubernetesGenerator._deployment, service-factory.factory.generators.infra.kubernetes.KubernetesGenerator._service, service-factory.factory.generators.infra.kubernetes.KubernetesGenerator._kustomization
 
 ### api.mcp_client.MCPStdioClient
 > Spawn an MCP server as a subprocess and speak JSON-RPC over stdio.
@@ -338,46 +378,6 @@ register_default_commands [api.commands]
 - **Methods**: 2
 - **Key Methods**: api.protocols.file_protocol.FileProtocol._resolve, api.protocols.file_protocol.FileProtocol.fetch
 
-### api.commands.fetch.FetchCommand
-- **Methods**: 1
-- **Key Methods**: api.commands.fetch.FetchCommand.execute
-- **Inherits**: Command
-
-### api.commands.render.RenderCommand
-- **Methods**: 1
-- **Key Methods**: api.commands.render.RenderCommand.execute
-- **Inherits**: Command
-
-### api.commands.converttocsv.ConvertToCsvCommand
-- **Methods**: 1
-- **Key Methods**: api.commands.converttocsv.ConvertToCsvCommand.execute
-- **Inherits**: Command
-
-### api.commands.Command
-- **Methods**: 1
-- **Key Methods**: api.commands.Command.execute
-- **Inherits**: abc.ABC
-
-### api.commands.converttobase64.ConvertToBase64Command
-- **Methods**: 1
-- **Key Methods**: api.commands.converttobase64.ConvertToBase64Command.execute
-- **Inherits**: Command
-
-### api.commands.pipeline.PipelineCommand
-- **Methods**: 1
-- **Key Methods**: api.commands.pipeline.PipelineCommand.execute
-- **Inherits**: Command
-
-### api.commands.converttoxml.ConvertToXmlCommand
-- **Methods**: 1
-- **Key Methods**: api.commands.converttoxml.ConvertToXmlCommand.execute
-- **Inherits**: Command
-
-### api.validators.SchemaValidationError
-- **Methods**: 1
-- **Key Methods**: api.validators.SchemaValidationError.__init__
-- **Inherits**: Exception
-
 ## Data Transformation Functions
 
 Key functions that process and transform data:
@@ -391,6 +391,13 @@ Key functions that process and transform data:
 ### frontend.html.js.app.renderDecoded
 - **Output to**: frontend.html.js.app.decodeB64, frontend.html.js.app.startsWith, frontend.html.js.app.createElement, frontend.html.js.app.TextDecoder, frontend.html.js.app.decode
 
+### service-factory.factory.ir.BundleLoader._validate
+- **Output to**: ValueError, raw.get, ValueError
+
+### project.map.toon.validate_against_schema_uri
+
+### project.map.toon.validate_workflow
+
 ### cqrs-backend-workflows.SUMD.validate_workflow
 
 ### cqrs-backend-workflows.server.validate_workflow
@@ -398,6 +405,8 @@ Key functions that process and transform data:
 - **Output to**: jsonschema.validate, HTTPException
 
 ### cqrs-backend-workflows.project.map.toon.validate_workflow
+
+### api.SUMD.validate_against_schema_uri
 
 ### api.commands.converttojson.ConvertToJsonCommand._convert
 - **Output to**: ValueError, csv.DictReader, json.loads, xmltodict.parse, io.StringIO
@@ -408,17 +417,11 @@ Key functions that process and transform data:
 The URI is resolved via the proto
 - **Output to**: Draft202012Validator, sorted, json.loads, validator.iter_errors, SchemaValidationError
 
+### api.project.map.toon.validate_against_schema_uri
+
 ### SUMD.validate_against_schema_uri
 
 ### SUMD.validate_workflow
-
-### api.SUMD.validate_against_schema_uri
-
-### project.map.toon.validate_against_schema_uri
-
-### project.map.toon.validate_workflow
-
-### api.project.map.toon.validate_against_schema_uri
 
 ## Behavioral Patterns
 
@@ -431,11 +434,14 @@ The URI is resolved via the proto
 
 Functions exposed as public API (no underscore prefix):
 
+- `service-factory.factory.cli.cmd_compile` - 24 calls
+- `service-factory.factory.ir.BundleLoader.load` - 23 calls
 - `api.commands.converttocsv.ConvertToCsvCommand.execute` - 23 calls
 - `api.commands.render.RenderCommand.execute` - 22 calls
 - `api.commands.pipeline.PipelineCommand.execute` - 22 calls
 - `api.commands.converttoxml.ConvertToXmlCommand.execute` - 21 calls
 - `api.commands.converttojson.ConvertToJsonCommand.execute` - 18 calls
+- `service-factory.factory.cli.main` - 17 calls
 - `api.config.load_settings` - 17 calls
 - `cqrs-backend-workflows.server.run_workflow` - 15 calls
 - `api.commands.register_default_commands` - 15 calls
@@ -445,6 +451,7 @@ Functions exposed as public API (no underscore prefix):
 - `api.queries.from_url.FromUrlQuery.execute` - 13 calls
 - `cqrs-workflow-editor.src.App.loadBackendWorkflow` - 11 calls
 - `cqrs-workflow-editor.src.App.loadExampleFile` - 11 calls
+- `service-factory.factory.register_default_generators` - 11 calls
 - `api.main.execute_command` - 11 calls
 - `api.policy.PolicyEngine.can_execute_query` - 11 calls
 - `frontend.html.js.app.renderDecoded` - 10 calls
@@ -464,13 +471,9 @@ Functions exposed as public API (no underscore prefix):
 - `api.auth.JWTManager.issue` - 8 calls
 - `cqrs-workflow-editor.src.App.loadPredefinedWorkflow` - 7 calls
 - `cqrs-workflow-editor.src.App.workflow` - 7 calls
+- `service-factory.factory.cli.cmd_hash` - 7 calls
 - `cqrs-backend-workflows.server.get_example` - 7 calls
 - `api.main.catalog` - 7 calls
-- `api.main.run_agent` - 7 calls
-- `api.commands.fetch.FetchCommand.execute` - 7 calls
-- `api.protocols.ProtocolRegistry.fetch` - 7 calls
-- `api.queries.introspect.IntrospectQuery.execute` - 7 calls
-- `api.auth.current_user` - 7 calls
 
 ## System Interactions
 
@@ -480,6 +483,16 @@ How components interact:
 graph TD
     _mcp_execute --> get
     _mcp_execute --> AgentResponse
+    cmd_compile --> register_default_gen
+    cmd_compile --> get_registry
+    cmd_compile --> BundleLoader
+    cmd_compile --> load
+    cmd_compile --> Path
+    load --> loads
+    load --> _validate
+    load --> get
+    load --> Bundle
+    load --> read_text
     _litellm_execute --> get
     execute --> loads
     execute --> StringIO
@@ -498,16 +511,6 @@ graph TD
     execute --> ValueError
     execute --> lower
     execute --> decode
-    execute --> isinstance
-    execute --> unparse
-    _websocket_execute --> get
-    _websocket_execute --> float
-    _websocket_execute --> dumps
-    _websocket_execute --> AgentResponse
-    execute --> _detect_mode
-    execute --> _convert
-    load_settings --> get
-    load_settings --> Settings
 ```
 
 ## Reverse Engineering Guidelines

@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-04-23
+
+### Docs
+- Update README.md
+- Update SUMD.md
+- Update SUMR.md
+- Update api/SUMD.md
+- Update api/SUMR.md
+- Update cqrs-backend-workflows/SUMR.md
+- Update cqrs-workflow-editor/SUMD.md
+- Update cqrs-workflow-editor/SUMR.md
+- Update frontend/SUMR.md
+- Update project/README.md
+- ... and 1 more files
+
+### Other
+- Update api/project/map.toon.yaml
+- Update app.doql.less
+- Update codot_run.py
+- Update cqrs-workflow-editor/node_modules/.vite/deps/@xyflow_react.js
+- Update cqrs-workflow-editor/node_modules/.vite/deps/@xyflow_react.js.map
+- Update cqrs-workflow-editor/node_modules/.vite/deps/_metadata.json
+- Update cqrs-workflow-editor/node_modules/.vite/deps/chunk-GRWX7YRK.js
+- Update cqrs-workflow-editor/node_modules/.vite/deps/chunk-GRWX7YRK.js.map
+- Update cqrs-workflow-editor/node_modules/.vite/deps/chunk-I4MZPW7S.js
+- Update cqrs-workflow-editor/node_modules/.vite/deps/chunk-I4MZPW7S.js.map
+- ... and 30 more files
+
 ## [0.1.6] - 2026-04-23
 
 ### Docs
