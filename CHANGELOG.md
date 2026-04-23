@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-04-23
+
+### Docs
+- Update README.md
+- Update SUMD.md
+- Update SUMR.md
+- Update cqrs-backend-workflows/SUMD.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update app.doql.less
+- Update cqrs-backend-workflows/examples/04-agent-research-pipeline.json
+- Update cqrs-backend-workflows/project/map.toon.yaml
+- Update cqrs-backend-workflows/server.py
+- Update cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py
+- Update cqrs-backend-workflows/workflow.schema.json
+- Update cqrs-workflow-editor/src/App.tsx
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- ... and 21 more files
+
 ## [0.1.8] - 2026-04-23
 
 ### Docs

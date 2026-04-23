@@ -587,11 +587,6 @@ export default function App() {
           >
             {runLoading ? "Running..." : "Save & Run"}
           </button>
-          {runResult && (
-            <div style={{ marginTop: 8, padding: 8, background: "#e5e7eb", borderRadius: 4, fontSize: 11, maxHeight: 200, overflow: "auto" }}>
-              <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>{runResult}</pre>
-            </div>
-          )}
         </div>
       </div>
 
@@ -804,6 +799,14 @@ export default function App() {
               </div>
             </>
           )}
+          {runResult && (
+            <div style={{ marginTop: 16, borderTop: "1px solid #e5e7eb", paddingTop: 12 }}>
+              <h4 style={{ marginTop: 0, marginBottom: 8, fontSize: 12 }}>Run Result</h4>
+              <div style={{ padding: 8, background: "#e5e7eb", borderRadius: 4, fontSize: 11, maxHeight: 200, overflow: "auto" }}>
+                <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>{runResult}</pre>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -820,6 +823,14 @@ export default function App() {
               {JSON.stringify(exportWorkflow(), null, 2)}
             </SyntaxHighlighter>
           </div>
+          {runResult && (
+            <div style={{ marginTop: 16, flexShrink: 0 }}>
+              <h4 style={{ marginTop: 0, marginBottom: 8, fontSize: 12 }}>Run Result</h4>
+              <div style={{ padding: 8, background: "#e5e7eb", borderRadius: 4, fontSize: 11, maxHeight: 200, overflow: "auto" }}>
+                <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>{runResult}</pre>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

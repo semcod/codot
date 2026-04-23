@@ -1,15 +1,18 @@
-"""Service Bundle — the intermediate representation.
+"""Service & View bundles — the intermediate representation.
 
-A Bundle is a deployable unit composed of existing CQRS contracts
-(*.command.json, *.query.json, *.event.json) plus runtime/infra decisions.
-It is the *only* thing generators consume. Generators never read filesystem
-state directly — they get a fully-loaded Bundle and emit {path: content}.
+Two bundle kinds share the same IR module so they can be compiled by the
+same pipeline:
 
-This decoupling is why the same Bundle can be emitted as:
-  - Python/FastAPI + Docker + OpenAPI
-  - Node/Fastify + k8s + AsyncAPI
-  - Go/Chi + Nomad + Proto
-… without changing the IR.
+- ``SERVICE_BUNDLE`` — a deployable service composed of CQRS contracts
+  (*.command.json, *.query.json, *.event.json) plus runtime/infra decisions.
+- ``VIEW_BUNDLE``   — a read-only aggregation view over existing service URLs.
+  No contracts, no storage; just sources + template + transport.
+
+Both are consumed by Generator instances that emit ``{path: content}`` maps.
+Generators never touch the filesystem — they receive a fully-loaded bundle
+object. This is what lets the same IR be emitted to wildly different targets
+(Python/FastAPI vs Node/Fastify, Docker vs k8s, PHP standalone vs FastAPI SSE)
+without touching the IR itself.
 """
 from __future__ import annotations
 
@@ -17,7 +20,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 
 # ---------- Contract wrappers ------------------------------------------------
@@ -183,18 +186,86 @@ class Bundle:
         return h.hexdigest()[:16]
 
 
+# ---------- View Bundle ------------------------------------------------------
+
+@dataclass(frozen=True)
+class Source:
+    """A URL the view aggregates from. Refresh is advisory metadata used by
+    generators to decide polling / SSE / cache-control behaviour."""
+
+    name: str
+    uri: str
+    refresh: str = "5s"        # e.g. "500ms", "1s", "1m", "never"
+    depends_on: list[str] = field(default_factory=list)
+    method: str = "GET"
+    headers: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class Template:
+    """How the view is rendered. ``engine`` is a hint for generators;
+    each generator is free to ignore engines it cannot honour (e.g. the
+    php-standalone generator always uses PHP itself for templating)."""
+
+    engine: str = "inline"     # inline | jinja2 | mustache
+    source: str = ""           # inline template body
+    source_uri: str = ""       # file:// or http:// reference
+
+
+@dataclass
+class ViewBundle:
+    name: str
+    version: str = "1.0.0"
+    description: str = ""
+    sources: list[Source] = field(default_factory=list)
+    template: Template = field(default_factory=Template)
+    transport: str = "polling"  # polling | sse | static
+    exposure: Exposure = field(default_factory=lambda: Exposure(port=8081))
+
+    def contract_hash(self) -> str:
+        """Stable hash over every input that affects the generated output."""
+        h = hashlib.sha256()
+        payload = {
+            "name": self.name,
+            "version": self.version,
+            "sources": [s.__dict__ for s in self.sources],
+            "template": self.template.__dict__,
+            "transport": self.transport,
+            "exposure": self.exposure.__dict__,
+        }
+        h.update(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8"))
+        return h.hexdigest()[:16]
+
+
+AnyBundle = Union[Bundle, ViewBundle]
+
+
 # ---------- Loader -----------------------------------------------------------
 
 class BundleLoader:
-    """Reads a bundle.json plus referenced contract files from disk."""
+    """Reads a bundle.json from disk.
+
+    Discriminates on the ``kind`` field:
+    - ``SERVICE_BUNDLE`` (default) → returns :class:`Bundle` with resolved contracts.
+    - ``VIEW_BUNDLE``              → returns :class:`ViewBundle` (no contracts).
+    """
 
     def __init__(self, contracts_dir: Path) -> None:
         self.contracts_dir = contracts_dir
 
-    def load(self, bundle_path: Path) -> Bundle:
+    def load(self, bundle_path: Path) -> AnyBundle:
         raw = json.loads(bundle_path.read_text())
-        self._validate(raw, bundle_path)
+        kind = raw.get("kind", "SERVICE_BUNDLE")
+        if kind == "VIEW_BUNDLE":
+            return self._load_view(raw, bundle_path)
+        if kind == "SERVICE_BUNDLE":
+            return self._load_service(raw, bundle_path)
+        raise ValueError(
+            f"{bundle_path}: unknown kind {kind!r} (expected SERVICE_BUNDLE or VIEW_BUNDLE)"
+        )
 
+    def _load_service(self, raw: dict, bundle_path: Path) -> Bundle:
+        self._validate_service(raw, bundle_path)
         contracts: list[Contract] = []
         for ref in raw.get("contracts", []):
             path = self._resolve_contract(ref, bundle_path)
@@ -214,6 +285,20 @@ class BundleLoader:
             exposure=Exposure(**raw.get("exposure", {})),
         )
 
+    def _load_view(self, raw: dict, bundle_path: Path) -> ViewBundle:
+        self._validate_view(raw, bundle_path)
+        sources = [Source(**s) for s in raw.get("sources", [])]
+        template = Template(**raw.get("template", {}))
+        return ViewBundle(
+            name=raw["bundle"],
+            version=raw.get("version", "1.0.0"),
+            description=raw.get("description", ""),
+            sources=sources,
+            template=template,
+            transport=raw.get("transport", "polling"),
+            exposure=Exposure(**raw.get("exposure", {"port": 8081})),
+        )
+
     def _resolve_contract(self, ref: str, bundle_path: Path) -> Path:
         candidates = [
             self.contracts_dir / ref,
@@ -228,10 +313,22 @@ class BundleLoader:
         )
 
     @staticmethod
-    def _validate(raw: dict, path: Path) -> None:
+    def _validate_service(raw: dict, path: Path) -> None:
         required = ["bundle", "contracts"]
         missing = [k for k in required if k not in raw]
         if missing:
-            raise ValueError(f"{path}: bundle missing required fields: {missing}")
-        if raw.get("kind") and raw["kind"] != "SERVICE_BUNDLE":
-            raise ValueError(f"{path}: kind must be SERVICE_BUNDLE")
+            raise ValueError(f"{path}: service bundle missing required fields: {missing}")
+
+    @staticmethod
+    def _validate_view(raw: dict, path: Path) -> None:
+        required = ["bundle", "sources"]
+        missing = [k for k in required if k not in raw]
+        if missing:
+            raise ValueError(f"{path}: view bundle missing required fields: {missing}")
+        if not isinstance(raw["sources"], list) or not raw["sources"]:
+            raise ValueError(f"{path}: view bundle 'sources' must be a non-empty list")
+        transport = raw.get("transport", "polling")
+        if transport not in {"polling", "sse", "static"}:
+            raise ValueError(
+                f"{path}: view bundle transport must be one of polling|sse|static, got {transport!r}"
+            )

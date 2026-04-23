@@ -15,7 +15,7 @@ SUMD - Structured Unified Markdown Descriptor for AI-aware project refactorizati
 ## Metadata
 
 - **name**: `codot`
-- **version**: `0.1.7`
+- **version**: `0.1.8`
 - **python_requires**: `>=3.8`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/qwen/qwen3-coder-next`
@@ -35,7 +35,7 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: codot;
-  version: 0.1.7;
+  version: 0.1.8;
 }
 
 dependencies {
@@ -125,7 +125,7 @@ workflow[name="test-agent"] {
 
 workflow[name="workflow"] {
   trigger: manual;
-  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080;
+  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:28080;
 }
 
 workflow[name="clean"] {
@@ -182,7 +182,7 @@ pfix>=0.1.60
 
 ## Call Graph
 
-*95 nodes · 82 edges · 26 modules · CC̄=1.2*
+*96 nodes · 82 edges · 24 modules · CC̄=1.2*
 
 ### Hubs (by degree)
 
@@ -191,15 +191,15 @@ pfix>=0.1.60
 | `main` *(in codot_run)* | 10 ⚠ | 0 | 33 | **33** |
 | `execute` *(in api.commands.pipeline.PipelineCommand)* | 13 ⚠ | 0 | 31 | **31** |
 | `cmd_compile` *(in service-factory.factory.cli)* | 9 | 0 | 24 | **24** |
-| `fetchPreview` *(in cqrs-workflow-editor.src.App)* | 13 ⚠ | 1 | 14 | **15** |
 | `_schema_object` *(in service-factory.factory.generators.code.node_fastify)* | 8 | 2 | 13 | **15** |
 | `register_default_commands` *(in api.commands)* | 1 | 0 | 15 | **15** |
-| `validate_against_schema_uri` *(in api.validators)* | 7 | 1 | 13 | **14** |
-| `API` *(in frontend.html.js.api)* | 9 | 0 | 14 | **14** |
+| `fetchPreview` *(in cqrs-workflow-editor.src.App)* | 13 ⚠ | 1 | 14 | **15** |
+| `request` *(in frontend.html.js.api)* | 9 | 6 | 8 | **14** |
+| `_compose` *(in service-factory.factory.generators.infra.docker.DockerGenerator)* | 3 | 0 | 14 | **14** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/codot
-# nodes: 95 | edges: 82 | modules: 26
+# nodes: 96 | edges: 82 | modules: 24
 # CC̄=1.2
 
 HUBS[20]:
@@ -209,47 +209,48 @@ HUBS[20]:
     CC=13  in:0  out:31  total:31
   service-factory.factory.cli.cmd_compile
     CC=9  in:0  out:24  total:24
-  cqrs-workflow-editor.src.App.fetchPreview
-    CC=13  in:1  out:14  total:15
   service-factory.factory.generators.code.node_fastify._schema_object
     CC=8  in:2  out:13  total:15
   api.commands.register_default_commands
     CC=1  in:0  out:15  total:15
-  api.validators.validate_against_schema_uri
-    CC=7  in:1  out:13  total:14
-  frontend.html.js.api.API
-    CC=9  in:0  out:14  total:14
+  cqrs-workflow-editor.src.App.fetchPreview
+    CC=13  in:1  out:14  total:15
+  frontend.html.js.api.request
+    CC=9  in:6  out:8  total:14
   service-factory.factory.generators.infra.docker.DockerGenerator._compose
     CC=3  in:0  out:14  total:14
   service-factory.factory.generators.code.python_fastapi._pydantic_model
     CC=5  in:3  out:11  total:14
-  frontend.html.js.api.request
-    CC=9  in:6  out:8  total:14
-  api.queries.from_url.FromUrlQuery.execute
-    CC=9  in:0  out:13  total:13
+  frontend.html.js.api.API
+    CC=9  in:0  out:14  total:14
   service-factory.factory.register_default_generators
     CC=1  in:2  out:11  total:13
+  api.queries.from_url.FromUrlQuery.execute
+    CC=9  in:0  out:13  total:13
+  api.validators.validate_against_schema_uri
+    CC=7  in:0  out:13  total:13
   service-factory.factory.get_registry
     CC=1  in:12  out:0  total:12
   api.main.execute_command
-    CC=3  in:0  out:11  total:11
-  cqrs-workflow-editor.src.App.loadExampleFile
     CC=3  in:0  out:11  total:11
   service-factory.factory.generators.code.python_fastapi._query_route
     CC=7  in:1  out:10  total:11
   cqrs-workflow-editor.src.App.loadBackendWorkflow
     CC=3  in:0  out:11  total:11
+  cqrs-workflow-editor.src.App.loadExampleFile
+    CC=3  in:0  out:11  total:11
   service-factory.factory.generators.wire.openapi._schema_from_fields
     CC=7  in:3  out:7  total:10
-  api.commands.converttobase64.ConvertToBase64Command.execute
-    CC=2  in:0  out:10  total:10
+  api.main.execute_query
+    CC=3  in:1  out:9  total:10
 
 MODULES:
-  api.agent  [1 funcs]
-    execute_agent  CC=2  out:3
-  api.auth  [2 funcs]
-    authenticate  CC=3  out:1
-    get_jwt_manager  CC=1  out:0
+  api.SUMD  [5 funcs]
+    _substitute  CC=0  out:0
+    authenticate  CC=0  out:0
+    execute_agent  CC=0  out:0
+    get_engine  CC=0  out:0
+    get_jwt_manager  CC=0  out:0
   api.commands  [2 funcs]
     get_registry  CC=1  out:0
     register_default_commands  CC=1  out:15
@@ -269,8 +270,6 @@ MODULES:
     execute_query_get  CC=1  out:5
     issue_token  CC=2  out:6
     run_agent  CC=2  out:7
-  api.policy  [1 funcs]
-    get_engine  CC=2  out:1
   api.protocols  [2 funcs]
     get_registry  CC=1  out:0
     register_default_protocols  CC=1  out:9
@@ -369,6 +368,29 @@ EDGES:
   frontend.html.js.api.runCommand → frontend.html.js.api.request
   frontend.html.js.api.runQuery → frontend.html.js.api.request
   frontend.html.js.app.renderDecoded → frontend.html.js.app.decodeB64
+  cqrs-workflow-editor.src.App.fetchBackendWorkflows → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.runBackendWorkflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.fetchExampleFiles → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.fetchPreview → cqrs-workflow-editor.src.App.blob
+  cqrs-workflow-editor.src.App.sizeKB → cqrs-workflow-editor.src.App.text
+  cqrs-workflow-editor.src.App.mime → cqrs-workflow-editor.src.App.text
+  cqrs-workflow-editor.src.App.timer → cqrs-workflow-editor.src.App.fetchPreview
+  cqrs-workflow-editor.src.App.onDownloadWorkflow → cqrs-workflow-editor.src.App.exportWorkflow
+  cqrs-workflow-editor.src.App.workflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToEdges
   service-factory.factory.cli.cmd_compile → service-factory.factory.register_default_generators
   service-factory.factory.cli.cmd_compile → service-factory.factory.get_registry
   service-factory.factory.cli.cmd_list → service-factory.factory.register_default_generators
@@ -384,29 +406,6 @@ EDGES:
   service-factory.factory.generators.code.node_fastify._query_route_lines → service-factory.factory.generators.code.node_fastify._camel
   service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server → service-factory.factory.generators.code.node_fastify._command_route_lines
   service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server → service-factory.factory.generators.code.node_fastify._query_route_lines
-  service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface → service-factory.factory.generators.types.ts_type
-  service-factory.factory.generators.code.python_fastapi._pydantic_model → service-factory.factory.generators.types.py_type
-  service-factory.factory.generators.code.python_fastapi._command_route → service-factory.factory.generators.code.python_fastapi._snake
-  service-factory.factory.generators.code.python_fastapi._query_route → service-factory.factory.generators.code.python_fastapi._snake
-  service-factory.factory.generators.code.python_fastapi._query_route → service-factory.factory.generators.types.py_type
-  service-factory.factory.generators.code.python_fastapi._event_model → service-factory.factory.generators.code.python_fastapi._pydantic_model
-  service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._models → service-factory.factory.generators.code.python_fastapi._pydantic_model
-  service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._events → service-factory.factory.generators.code.python_fastapi._event_model
-  mcp_servers.summary_server.main → mcp_servers.summary_server._handle
-  mcp_servers.summary_server.main → mcp_servers.summary_server._send
-  cqrs-backend-workflows.server._handle_command → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server._handle_render → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server.list_workflows → service-factory.factory.GeneratorRegistry.list
-  cqrs-backend-workflows.server.create_workflow → cqrs-backend-workflows.server.validate_workflow
-  cqrs-backend-workflows.server.update_workflow → cqrs-backend-workflows.server.validate_workflow
-  api.main.issue_token → api.auth.authenticate
-  api.main.issue_token → api.auth.get_jwt_manager
-  api.main.execute_command → api.policy.get_engine
-  api.main.execute_query → api.policy.get_engine
-  api.main.execute_query_get → api.main.execute_query
-  api.main.run_agent → api.agent.execute_agent
-  api.main.run_agent → api.policy.get_engine
-  api.commands.fetch.FetchCommand.execute → service-factory.factory.get_registry
 ```
 
 ## Refactoring Analysis
@@ -417,7 +416,7 @@ EDGES:
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/codot
-# nodes: 95 | edges: 82 | modules: 26
+# nodes: 96 | edges: 82 | modules: 24
 # CC̄=1.2
 
 HUBS[20]:
@@ -427,47 +426,48 @@ HUBS[20]:
     CC=13  in:0  out:31  total:31
   service-factory.factory.cli.cmd_compile
     CC=9  in:0  out:24  total:24
-  cqrs-workflow-editor.src.App.fetchPreview
-    CC=13  in:1  out:14  total:15
   service-factory.factory.generators.code.node_fastify._schema_object
     CC=8  in:2  out:13  total:15
   api.commands.register_default_commands
     CC=1  in:0  out:15  total:15
-  api.validators.validate_against_schema_uri
-    CC=7  in:1  out:13  total:14
-  frontend.html.js.api.API
-    CC=9  in:0  out:14  total:14
+  cqrs-workflow-editor.src.App.fetchPreview
+    CC=13  in:1  out:14  total:15
+  frontend.html.js.api.request
+    CC=9  in:6  out:8  total:14
   service-factory.factory.generators.infra.docker.DockerGenerator._compose
     CC=3  in:0  out:14  total:14
   service-factory.factory.generators.code.python_fastapi._pydantic_model
     CC=5  in:3  out:11  total:14
-  frontend.html.js.api.request
-    CC=9  in:6  out:8  total:14
-  api.queries.from_url.FromUrlQuery.execute
-    CC=9  in:0  out:13  total:13
+  frontend.html.js.api.API
+    CC=9  in:0  out:14  total:14
   service-factory.factory.register_default_generators
     CC=1  in:2  out:11  total:13
+  api.queries.from_url.FromUrlQuery.execute
+    CC=9  in:0  out:13  total:13
+  api.validators.validate_against_schema_uri
+    CC=7  in:0  out:13  total:13
   service-factory.factory.get_registry
     CC=1  in:12  out:0  total:12
   api.main.execute_command
-    CC=3  in:0  out:11  total:11
-  cqrs-workflow-editor.src.App.loadExampleFile
     CC=3  in:0  out:11  total:11
   service-factory.factory.generators.code.python_fastapi._query_route
     CC=7  in:1  out:10  total:11
   cqrs-workflow-editor.src.App.loadBackendWorkflow
     CC=3  in:0  out:11  total:11
+  cqrs-workflow-editor.src.App.loadExampleFile
+    CC=3  in:0  out:11  total:11
   service-factory.factory.generators.wire.openapi._schema_from_fields
     CC=7  in:3  out:7  total:10
-  api.commands.converttobase64.ConvertToBase64Command.execute
-    CC=2  in:0  out:10  total:10
+  api.main.execute_query
+    CC=3  in:1  out:9  total:10
 
 MODULES:
-  api.agent  [1 funcs]
-    execute_agent  CC=2  out:3
-  api.auth  [2 funcs]
-    authenticate  CC=3  out:1
-    get_jwt_manager  CC=1  out:0
+  api.SUMD  [5 funcs]
+    _substitute  CC=0  out:0
+    authenticate  CC=0  out:0
+    execute_agent  CC=0  out:0
+    get_engine  CC=0  out:0
+    get_jwt_manager  CC=0  out:0
   api.commands  [2 funcs]
     get_registry  CC=1  out:0
     register_default_commands  CC=1  out:15
@@ -487,8 +487,6 @@ MODULES:
     execute_query_get  CC=1  out:5
     issue_token  CC=2  out:6
     run_agent  CC=2  out:7
-  api.policy  [1 funcs]
-    get_engine  CC=2  out:1
   api.protocols  [2 funcs]
     get_registry  CC=1  out:0
     register_default_protocols  CC=1  out:9
@@ -587,6 +585,29 @@ EDGES:
   frontend.html.js.api.runCommand → frontend.html.js.api.request
   frontend.html.js.api.runQuery → frontend.html.js.api.request
   frontend.html.js.app.renderDecoded → frontend.html.js.app.decodeB64
+  cqrs-workflow-editor.src.App.fetchBackendWorkflows → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.runBackendWorkflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.fetchExampleFiles → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.fetchPreview → cqrs-workflow-editor.src.App.blob
+  cqrs-workflow-editor.src.App.sizeKB → cqrs-workflow-editor.src.App.text
+  cqrs-workflow-editor.src.App.mime → cqrs-workflow-editor.src.App.text
+  cqrs-workflow-editor.src.App.timer → cqrs-workflow-editor.src.App.fetchPreview
+  cqrs-workflow-editor.src.App.onDownloadWorkflow → cqrs-workflow-editor.src.App.exportWorkflow
+  cqrs-workflow-editor.src.App.workflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToEdges
   service-factory.factory.cli.cmd_compile → service-factory.factory.register_default_generators
   service-factory.factory.cli.cmd_compile → service-factory.factory.get_registry
   service-factory.factory.cli.cmd_list → service-factory.factory.register_default_generators
@@ -602,42 +623,19 @@ EDGES:
   service-factory.factory.generators.code.node_fastify._query_route_lines → service-factory.factory.generators.code.node_fastify._camel
   service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server → service-factory.factory.generators.code.node_fastify._command_route_lines
   service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server → service-factory.factory.generators.code.node_fastify._query_route_lines
-  service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface → service-factory.factory.generators.types.ts_type
-  service-factory.factory.generators.code.python_fastapi._pydantic_model → service-factory.factory.generators.types.py_type
-  service-factory.factory.generators.code.python_fastapi._command_route → service-factory.factory.generators.code.python_fastapi._snake
-  service-factory.factory.generators.code.python_fastapi._query_route → service-factory.factory.generators.code.python_fastapi._snake
-  service-factory.factory.generators.code.python_fastapi._query_route → service-factory.factory.generators.types.py_type
-  service-factory.factory.generators.code.python_fastapi._event_model → service-factory.factory.generators.code.python_fastapi._pydantic_model
-  service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._models → service-factory.factory.generators.code.python_fastapi._pydantic_model
-  service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._events → service-factory.factory.generators.code.python_fastapi._event_model
-  mcp_servers.summary_server.main → mcp_servers.summary_server._handle
-  mcp_servers.summary_server.main → mcp_servers.summary_server._send
-  cqrs-backend-workflows.server._handle_command → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server._handle_render → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server.list_workflows → service-factory.factory.GeneratorRegistry.list
-  cqrs-backend-workflows.server.create_workflow → cqrs-backend-workflows.server.validate_workflow
-  cqrs-backend-workflows.server.update_workflow → cqrs-backend-workflows.server.validate_workflow
-  api.main.issue_token → api.auth.authenticate
-  api.main.issue_token → api.auth.get_jwt_manager
-  api.main.execute_command → api.policy.get_engine
-  api.main.execute_query → api.policy.get_engine
-  api.main.execute_query_get → api.main.execute_query
-  api.main.run_agent → api.agent.execute_agent
-  api.main.run_agent → api.policy.get_engine
-  api.commands.fetch.FetchCommand.execute → service-factory.factory.get_registry
 ```
 
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 128f 16546L | python:36,md:27,json:23,yaml:13,shell:7,txt:4,typescript:3,yml:2,conf:2,javascript:2,toml:1,ini:1,cfg:1 | 2026-04-23
+# code2llm | 129f 16646L | python:36,md:28,json:23,yaml:13,shell:7,txt:4,typescript:3,yml:2,conf:2,javascript:2,toml:1,ini:1,cfg:1 | 2026-04-23
 # CC̄=1.2 | critical:0/603 | dups:0 | cycles:0
 
 HEALTH[0]: ok
 
 REFACTOR[0]: none needed
 
-PIPELINES[174]:
+PIPELINES[178]:
   [1] Src [main]: main → _get_token
       PURITY: 100% pure
   [2] Src [API]: API → getToken
@@ -698,16 +696,16 @@ LAYERS:
   │ map.toon.yaml               11L  0C    0m  CC=0.0    ←0
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
-  api/                            CC̄=1.6    ←in:2  →out:2
-  │ agent                      362L  0C    7m  CC=10     ←2
-  │ SUMD.md                    334L  0C   42m  CC=0.0    ←0
+  api/                            CC̄=1.6    ←in:3  →out:2
+  │ agent                      362L  0C    7m  CC=10     ←0
+  │ SUMD.md                    334L  0C   42m  CC=0.0    ←3
   │ main                       234L  0C   15m  CC=3      ←0
   │ map.toon.yaml              174L  0C   42m  CC=0.0    ←0
   │ mcp_client                 173L  4C   15m  CC=7      ←0
-  │ __init__                   149L  3C   11m  CC=8      ←1
+  │ __init__                   149L  3C   11m  CC=8      ←0
   │ models                     125L  13C    0m  CC=0.0    ←0
   │ pipeline                   111L  1C    3m  CC=13     ←0
-  │ __init__                   102L  1C    6m  CC=3      ←1
+  │ __init__                   102L  1C    6m  CC=3      ←0
   │ SUMR.md                     98L  0C    0m  CC=0.0    ←0
   │ render                      97L  1C    1m  CC=6      ←0
   │ sumd.json                   90L  0C    0m  CC=0.0    ←0
@@ -719,7 +717,7 @@ LAYERS:
   │ __init__                    56L  2C    7m  CC=2      ←0
   │ converttoxml                51L  1C    1m  CC=9      ←0
   │ file_protocol               51L  1C    2m  CC=10     ←0
-  │ __init__                    48L  1C    2m  CC=7      ←1
+  │ __init__                    48L  1C    2m  CC=7      ←0
   │ from_url                    45L  1C    1m  CC=9      ←0
   │ data_protocol               40L  1C    1m  CC=9      ←0
   │ config                      34L  1C    1m  CC=3      ←0
@@ -748,11 +746,11 @@ LAYERS:
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
   ./                              CC̄=0.2    ←in:0  →out:0
-  │ !! SUMR.md                    908L  0C    0m  CC=0.0    ←0
-  │ !! SUMD.md                    820L  0C  111m  CC=0.0    ←0
+  │ !! SUMR.md                    913L  0C    0m  CC=0.0    ←0
+  │ !! SUMD.md                    830L  0C  111m  CC=0.0    ←0
   │ !! goal.yaml                  512L  0C    0m  CC=0.0    ←0
-  │ README.md                  198L  1C    0m  CC=0.0    ←0
-  │ CHANGELOG.md               187L  0C    0m  CC=0.0    ←0
+  │ CHANGELOG.md               222L  0C    0m  CC=0.0    ←0
+  │ README.md                  221L  1C    0m  CC=0.0    ←0
   │ codot_run                  147L  0C    4m  CC=10     ←0
   │ pyproject.toml              94L  0C    0m  CC=0.0    ←0
   │ docker-compose.yml          89L  0C    0m  CC=0.0    ←0
@@ -760,7 +758,7 @@ LAYERS:
   │ Makefile                     0L  0C    0m  CC=0.0    ←0
   │
   docs/                           CC̄=0.0    ←in:0  →out:0
-  │ !! 04-workflow-editor-spec.md   573L  3C    1m  CC=0.0    ←0
+  │ !! 04-workflow-editor-spec.md   567L  3C    1m  CC=0.0    ←0
   │ 02-market-comparison.md    276L  0C    0m  CC=0.0    ←0
   │ 03-multi-agent-architecture.md   205L  4C    0m  CC=0.0    ←0
   │ 01-cqrs-url-platform-status.md    98L  0C    0m  CC=0.0    ←0
@@ -770,12 +768,12 @@ LAYERS:
   │ 04-frontend-playground-status.md    45L  0C    0m  CC=0.0    ←0
   │
   project/                        CC̄=0.0    ←in:0  →out:0
-  │ !! calls.yaml                1600L  0C    0m  CC=0.0    ←0
+  │ !! calls.yaml                1596L  0C    0m  CC=0.0    ←0
   │ !! context.md                 522L  0C    0m  CC=0.0    ←0
   │ map.toon.yaml              345L  0C  111m  CC=0.0    ←0
   │ README.md                  339L  0C    0m  CC=0.0    ←0
-  │ calls.toon.yaml            211L  0C    0m  CC=0.0    ←0
-  │ analysis.toon.yaml         199L  0C    0m  CC=0.0    ←0
+  │ calls.toon.yaml            209L  0C    0m  CC=0.0    ←0
+  │ analysis.toon.yaml         198L  0C    0m  CC=0.0    ←0
   │ project.toon.yaml           51L  0C    0m  CC=0.0    ←0
   │ prompt.txt                  47L  0C    0m  CC=0.0    ←0
   │ evolution.toon.yaml         39L  0C    0m  CC=0.0    ←0
@@ -804,6 +802,9 @@ LAYERS:
   │ test-services.yml          229L  0C    0m  CC=0.0    ←0
   │ ansible.cfg                  4L  0C    0m  CC=0.0    ←0
   │
+  TODO/                           CC̄=0.0    ←in:0  →out:0
+  │ TODO.md                     40L  0C    0m  CC=0.0    ←0
+  │
   ── zero ──
      Makefile                                  0L
      api/Dockerfile                            0L
@@ -816,14 +817,14 @@ LAYERS:
 COUPLING:
                                    service-factory             api.commands                      api  service-factory.factory              api.queries   cqrs-backend-workflows
           service-factory                       ──                      ←10                       ←2                       ←4                       ←1                       ←1  hub
-             api.commands                       10                       ──                        2                                                                             !! fan-out
-                      api                        2                       ←2                       ──                                                                           
+             api.commands                       10                       ──                        3                                                                             !! fan-out
+                      api                        2                       ←3                       ──                                                                           
   service-factory.factory                        4                                                                         ──                                                  
               api.queries                        1                                                                                                  ──                         
    cqrs-backend-workflows                        1                                                                                                                           ──
   CYCLES: none
   HUB: service-factory/ (fan-in=18)
-  SMELL: api.commands/ fan-out=12 → split needed
+  SMELL: api.commands/ fan-out=13 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon
@@ -841,7 +842,7 @@ SUMMARY:
   dup_groups:    1
   dup_fragments: 2
   saved_lines:   3
-  scan_ms:       8760
+  scan_ms:       8069
 
 HOTSPOTS[1] (files with most duplication):
   service-factory/factory/generators/types.py  dup=6L  groups=1  frags=2  (0.2%)

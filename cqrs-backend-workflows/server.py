@@ -88,6 +88,8 @@ class WorkflowNode(BaseModel):
     role: Optional[str] = None
     goal: Optional[str] = None
     tools: Optional[List[str]] = None
+    backend: Optional[str] = None
+    backend_config: Optional[Dict[str, Any]] = None
     memory_uri: Optional[str] = None
 
 
@@ -201,23 +203,61 @@ async def _handle_render(
     return response.json()
 
 
+def _decode_payload_b64(payload_b64: str) -> str | None:
+    """Decode a base64 payload to text, or return None if it cannot be decoded."""
+    if not payload_b64:
+        return None
+    import base64
+    try:
+        return base64.b64decode(payload_b64).decode("utf-8", errors="replace")
+    except Exception:
+        return None
+
+
+def _build_agent_context(
+    node: WorkflowNode, node_results: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Build the context dict passed to an agent from the previous node's result."""
+    if not node.input or node.input not in node_results:
+        return {}
+    prev = node_results[node.input]
+    decoded = _decode_payload_b64(prev.get("payload_b64", ""))
+    if decoded is not None:
+        return {"text": decoded}
+    return {"previous_result": prev}
+
+
+def _build_agent_body(
+    node: WorkflowNode, context: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Build the JSON body sent to /agents/{id}/run."""
+    return {
+        "agent_node": {
+            "id": node.id,
+            "role": node.role or "agent",
+            "goal": node.goal or "",
+            "tools": node.tools or [],
+            "backend": node.backend or "mcp",
+            "backend_config": node.backend_config or {},
+        },
+        "context": context,
+    }
+
+
 async def _handle_agent(
     node: WorkflowNode,
-    _node_results: Dict[str, Any],
-    _headers: Dict[str, str],
-    _client: httpx.AsyncClient,
+    node_results: Dict[str, Any],
+    headers: Dict[str, str],
+    client: httpx.AsyncClient,
 ) -> Dict[str, Any]:
-    return {
-        "ok": True,
-        "payload_b64": "",
-        "mime": "text/plain",
-        "meta": {
-            "agent_role": node.role,
-            "agent_goal": node.goal,
-            "agent_tools": node.tools,
-            "message": "Agent execution not yet fully implemented",
-        },
-    }
+    context = _build_agent_context(node, node_results)
+    body = _build_agent_body(node, context)
+    response = await client.post(
+        f"{CODOT_API_URL}/agents/{node.id}/run",
+        json=body,
+        headers=headers,
+    )
+    return response.json()
 
 
 _NODE_HANDLERS: Dict[str, Any] = {

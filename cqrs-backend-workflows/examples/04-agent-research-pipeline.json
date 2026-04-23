@@ -26,6 +26,10 @@
       "role": "data-analyst",
       "goal": "Analyze product catalog and suggest pricing optimizations",
       "tools": ["fetch", "converttojson", "render"],
+      "backend": "mcp",
+      "backend_config": {
+        "stdio_command": ["python3", "/home/tom/github/semcod/codot/mcp_servers/summary_server.py"]
+      },
       "memory_uri": "http://localhost:18091/products.csv",
       "description": "AI agent analyzing product data for insights"
     },

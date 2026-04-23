@@ -20,7 +20,7 @@ CQRS-URL Platform - Commands and Queries as URL-addressable resources
 ## Metadata
 
 - **name**: `codot`
-- **version**: `0.1.7`
+- **version**: `0.1.8`
 - **python_requires**: `>=3.8`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/qwen/qwen3-coder-next`
@@ -40,7 +40,7 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: codot;
-  version: 0.1.7;
+  version: 0.1.8;
 }
 
 dependencies {
@@ -130,7 +130,7 @@ workflow[name="test-agent"] {
 
 workflow[name="workflow"] {
   trigger: manual;
-  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080;
+  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:28080;
 }
 
 workflow[name="clean"] {
@@ -158,7 +158,7 @@ environment[name="local"] {
 ```yaml
 project:
   name: codot
-  version: 0.1.7
+  version: 0.1.8
   env: local
 ```
 
@@ -249,13 +249,13 @@ pip install -e .[dev]
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# codot | 65f 5795L | python:46,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
-# stats: 122 func | 62 cls | 65 mod | CC̄=3.0 | critical:3 | cycles:0
-# alerts[5]: CC _mcp_execute=10; CC main=10; CC _path_item=10; CC cmd_compile=9; CC _substitute=8
-# hotspots[5]: cmd_compile fan=15; test_litellm_mock fan=14; _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11
+# codot | 69f 6888L | python:50,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
+# stats: 156 func | 67 cls | 69 mod | CC̄=3.1 | critical:4 | cycles:0
+# alerts[5]: CC _php_array=11; CC _mcp_execute=10; CC main=10; CC _path_item=10; CC cmd_compile=9
+# hotspots[5]: test_php_standalone_health_endpoint_runs fan=16; cmd_compile fan=15; test_litellm_mock fan=14; _bash_cli_execute fan=12; test_static_html_parses_as_valid_html fan=12
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[65]:
+M[69]:
   api/agent.py,363
   api/app.doql.less,60
   api/auth/__init__.py,103
@@ -286,8 +286,8 @@ M[65]:
   app.doql.less,114
   codot_run.py,148
   cqrs-backend-workflows/app.doql.less,60
-  cqrs-backend-workflows/server.py,400
-  cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py,16
+  cqrs-backend-workflows/server.py,440
+  cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py,45
   cqrs-workflow-editor/app.doql.less,65
   cqrs-workflow-editor/test/cqrs-workflow-editor.test.js,8
   cqrs-workflow-editor/vite.config.ts,41
@@ -304,7 +304,7 @@ M[65]:
   frontend/test/codot.test.js,8
   mcp_servers/summary_server.py,110
   project.sh,40
-  service-factory/factory/__init__.py,73
+  service-factory/factory/__init__.py,83
   service-factory/factory/cli.py,106
   service-factory/factory/generators/__init__.py,1
   service-factory/factory/generators/code/__init__.py,1
@@ -314,11 +314,15 @@ M[65]:
   service-factory/factory/generators/infra/docker.py,208
   service-factory/factory/generators/infra/kubernetes.py,110
   service-factory/factory/generators/types.py,55
+  service-factory/factory/generators/view/__init__.py,1
+  service-factory/factory/generators/view/_shared.py,34
+  service-factory/factory/generators/view/php_standalone.py,315
+  service-factory/factory/generators/view/static_html.py,241
   service-factory/factory/generators/wire/__init__.py,1
   service-factory/factory/generators/wire/openapi.py,125
-  service-factory/factory/ir/__init__.py,238
-  service-factory/tests/test_factory.py,198
-  tests/smoke.sh,79
+  service-factory/factory/ir/__init__.py,335
+  service-factory/tests/test_factory.py,487
+  tests/smoke.sh,116
   tests/test_policy.py,63
   tests/test_protocols.py,61
 D:
@@ -468,7 +472,7 @@ D:
     run_agent(base;token;agent_path)
     main()
   cqrs-backend-workflows/server.py:
-    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,list_examples,get_example,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_decode_payload_b64,_build_agent_context,_build_agent_body,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,list_examples,get_example,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
     WorkflowNode:
     WorkflowOutput:
     Workflow:
@@ -480,7 +484,10 @@ D:
     _handle_http(node;_node_results;headers;client)
     _handle_command(node;node_results;headers;client)
     _handle_render(node;node_results;headers;client)
-    _handle_agent(node;_node_results;_headers;_client)
+    _decode_payload_b64(payload_b64)
+    _build_agent_context(node;node_results)
+    _build_agent_body(node;context)
+    _handle_agent(node;node_results;headers;client)
     execute_node(node;node_results;client;token)
     root()
     health()
@@ -493,9 +500,11 @@ D:
     get_example(filename)
     run_workflow(workflow_id;request)
   cqrs-backend-workflows/tests/test_cqrs_backend_workflows.py:
-    e: test_placeholder,test_import
+    e: test_placeholder,test_import,test_agent_node_fields,test_workflow_schema_validation
     test_placeholder()
     test_import()
+    test_agent_node_fields()
+    test_workflow_schema_validation()
   mcp_servers/summary_server.py:
     e: _send,_handle,main
     _send(msg)
@@ -543,6 +552,21 @@ D:
     py_type(t;required)
     ts_type(t;required)
     openapi_type(t;fmt)
+  service-factory/factory/generators/view/__init__.py:
+  service-factory/factory/generators/view/_shared.py:
+    e: refresh_to_ms,is_never
+    refresh_to_ms(value)
+    is_never(value)
+  service-factory/factory/generators/view/php_standalone.py:
+    e: _php_quote,_php_array,_sources_php_literal,PhpStandaloneViewGenerator
+    PhpStandaloneViewGenerator: generate(1),_index_php(1),_readme(1)
+    _php_quote(value)
+    _php_array(data;indent)
+    _sources_php_literal(bundle)
+  service-factory/factory/generators/view/static_html.py:
+    e: _source_to_js,StaticHtmlViewGenerator
+    StaticHtmlViewGenerator: generate(1),_index_html(1),_readme(1)
+    _source_to_js(src)
   service-factory/factory/generators/wire/__init__.py:
   service-factory/factory/generators/wire/openapi.py:
     e: _schema_from_fields,_path_item,OpenApiGenerator
@@ -550,7 +574,7 @@ D:
     _schema_from_fields(fields)
     _path_item(c)
   service-factory/factory/ir/__init__.py:
-    e: Contract,Runtime,Storage,Companion,Resources,Exposure,Bundle,BundleLoader
+    e: Contract,Runtime,Storage,Companion,Resources,Exposure,Bundle,Source,Template,ViewBundle,BundleLoader
     Contract: kind(0),name(0),is_command(0),is_query(0),is_event(0),module(0),description(0),version(0),http_method(0),http_endpoint(0),ws_channel(0),input_fields(0),output_fields(0),payload_fields(0),success_event(0),failure_event(0)  # Unified view over command/query/event contract JSON.
     Runtime:
     Storage:
@@ -558,9 +582,12 @@ D:
     Resources:
     Exposure:
     Bundle: commands(0),queries(0),events(0),contract_hash(0)
-    BundleLoader: __init__(1),load(1),_resolve_contract(2),_validate(2)  # Reads a bundle.json plus referenced contract files from disk
+    Source:  # A URL the view aggregates from. Refresh is advisory metadata
+    Template:  # How the view is rendered. ``engine`` is a hint for generator
+    ViewBundle: contract_hash(0)
+    BundleLoader: __init__(1),load(1),_load_service(2),_load_view(2),_resolve_contract(2),_validate_service(2),_validate_view(2)  # Reads a bundle.json from disk.
   service-factory/tests/test_factory.py:
-    e: _register,bundle,test_bundle_loads_with_contracts,test_hash_is_deterministic,test_hash_changes_when_runtime_changes,test_contract_accessors,test_missing_contract_raises_clear_error,test_all_generators_registered,test_python_fastapi_generates_valid_python,test_python_fastapi_routes_match_contracts,test_node_fastify_generates_valid_json,test_docker_generates_valid_yaml,test_docker_dockerfile_has_healthcheck,test_kubernetes_generates_valid_yaml,test_openapi_generates_valid_json,test_same_bundle_compiles_to_different_languages,test_same_bundle_compiles_to_different_infra
+    e: _register,bundle,test_bundle_loads_with_contracts,test_hash_is_deterministic,test_hash_changes_when_runtime_changes,test_contract_accessors,test_missing_contract_raises_clear_error,test_all_generators_registered,test_python_fastapi_generates_valid_python,test_python_fastapi_routes_match_contracts,test_node_fastify_generates_valid_json,test_docker_generates_valid_yaml,test_docker_dockerfile_has_healthcheck,test_kubernetes_generates_valid_yaml,test_openapi_generates_valid_json,test_same_bundle_compiles_to_different_languages,test_same_bundle_compiles_to_different_infra,view_bundle,test_view_bundle_loads_with_sources,test_view_bundle_hash_is_deterministic,test_view_bundle_hash_changes_when_source_changes,test_view_bundle_rejects_missing_sources,test_view_bundle_rejects_unknown_transport,test_service_bundle_still_loads_as_bundle,test_php_standalone_registered,test_php_standalone_rejects_service_bundle,test_php_standalone_emits_expected_files,test_php_standalone_passes_php_lint,_pick_free_port,_wait_for_http,test_static_html_registered,test_static_html_rejects_service_bundle,test_static_html_emits_expected_files,test_static_html_embeds_every_source_uri,test_static_html_parses_as_valid_html,test_static_html_readme_mentions_cors_and_serve,test_static_html_script_is_syntactically_valid,test_static_html_inline_js_is_valid,test_view_bundle_compiles_to_multiple_targets,test_php_standalone_health_endpoint_runs
     _register()
     bundle()
     test_bundle_loads_with_contracts(bundle)
@@ -578,6 +605,29 @@ D:
     test_openapi_generates_valid_json(bundle)
     test_same_bundle_compiles_to_different_languages(bundle)
     test_same_bundle_compiles_to_different_infra(bundle)
+    view_bundle()
+    test_view_bundle_loads_with_sources(view_bundle)
+    test_view_bundle_hash_is_deterministic(view_bundle)
+    test_view_bundle_hash_changes_when_source_changes(view_bundle)
+    test_view_bundle_rejects_missing_sources(tmp_path)
+    test_view_bundle_rejects_unknown_transport(tmp_path)
+    test_service_bundle_still_loads_as_bundle()
+    test_php_standalone_registered()
+    test_php_standalone_rejects_service_bundle(bundle)
+    test_php_standalone_emits_expected_files(view_bundle)
+    test_php_standalone_passes_php_lint(view_bundle;tmp_path)
+    _pick_free_port()
+    _wait_for_http(url;timeout)
+    test_static_html_registered()
+    test_static_html_rejects_service_bundle(bundle)
+    test_static_html_emits_expected_files(view_bundle)
+    test_static_html_embeds_every_source_uri(view_bundle)
+    test_static_html_parses_as_valid_html(view_bundle)
+    test_static_html_readme_mentions_cors_and_serve(view_bundle)
+    test_static_html_script_is_syntactically_valid(view_bundle)
+    test_static_html_inline_js_is_valid(view_bundle;tmp_path)
+    test_view_bundle_compiles_to_multiple_targets(view_bundle)
+    test_php_standalone_health_endpoint_runs(view_bundle;tmp_path)
   tests/test_policy.py:
     e: _engine,_user,test_admin_can_do_anything,test_user_denied_internal_path,test_user_allowed_public_path,test_unknown_role_denied,test_analyst_can_run_pipeline,test_query_access_respects_uris
     _engine()
@@ -598,7 +648,7 @@ D:
 
 ## Call Graph
 
-*95 nodes · 82 edges · 26 modules · CC̄=1.2*
+*96 nodes · 82 edges · 24 modules · CC̄=1.2*
 
 ### Hubs (by degree)
 
@@ -607,15 +657,15 @@ D:
 | `main` *(in codot_run)* | 10 ⚠ | 0 | 33 | **33** |
 | `execute` *(in api.commands.pipeline.PipelineCommand)* | 13 ⚠ | 0 | 31 | **31** |
 | `cmd_compile` *(in service-factory.factory.cli)* | 9 | 0 | 24 | **24** |
-| `fetchPreview` *(in cqrs-workflow-editor.src.App)* | 13 ⚠ | 1 | 14 | **15** |
 | `_schema_object` *(in service-factory.factory.generators.code.node_fastify)* | 8 | 2 | 13 | **15** |
 | `register_default_commands` *(in api.commands)* | 1 | 0 | 15 | **15** |
-| `validate_against_schema_uri` *(in api.validators)* | 7 | 1 | 13 | **14** |
-| `API` *(in frontend.html.js.api)* | 9 | 0 | 14 | **14** |
+| `fetchPreview` *(in cqrs-workflow-editor.src.App)* | 13 ⚠ | 1 | 14 | **15** |
+| `request` *(in frontend.html.js.api)* | 9 | 6 | 8 | **14** |
+| `_compose` *(in service-factory.factory.generators.infra.docker.DockerGenerator)* | 3 | 0 | 14 | **14** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/codot
-# nodes: 95 | edges: 82 | modules: 26
+# nodes: 96 | edges: 82 | modules: 24
 # CC̄=1.2
 
 HUBS[20]:
@@ -625,47 +675,48 @@ HUBS[20]:
     CC=13  in:0  out:31  total:31
   service-factory.factory.cli.cmd_compile
     CC=9  in:0  out:24  total:24
-  cqrs-workflow-editor.src.App.fetchPreview
-    CC=13  in:1  out:14  total:15
   service-factory.factory.generators.code.node_fastify._schema_object
     CC=8  in:2  out:13  total:15
   api.commands.register_default_commands
     CC=1  in:0  out:15  total:15
-  api.validators.validate_against_schema_uri
-    CC=7  in:1  out:13  total:14
-  frontend.html.js.api.API
-    CC=9  in:0  out:14  total:14
+  cqrs-workflow-editor.src.App.fetchPreview
+    CC=13  in:1  out:14  total:15
+  frontend.html.js.api.request
+    CC=9  in:6  out:8  total:14
   service-factory.factory.generators.infra.docker.DockerGenerator._compose
     CC=3  in:0  out:14  total:14
   service-factory.factory.generators.code.python_fastapi._pydantic_model
     CC=5  in:3  out:11  total:14
-  frontend.html.js.api.request
-    CC=9  in:6  out:8  total:14
-  api.queries.from_url.FromUrlQuery.execute
-    CC=9  in:0  out:13  total:13
+  frontend.html.js.api.API
+    CC=9  in:0  out:14  total:14
   service-factory.factory.register_default_generators
     CC=1  in:2  out:11  total:13
+  api.queries.from_url.FromUrlQuery.execute
+    CC=9  in:0  out:13  total:13
+  api.validators.validate_against_schema_uri
+    CC=7  in:0  out:13  total:13
   service-factory.factory.get_registry
     CC=1  in:12  out:0  total:12
   api.main.execute_command
-    CC=3  in:0  out:11  total:11
-  cqrs-workflow-editor.src.App.loadExampleFile
     CC=3  in:0  out:11  total:11
   service-factory.factory.generators.code.python_fastapi._query_route
     CC=7  in:1  out:10  total:11
   cqrs-workflow-editor.src.App.loadBackendWorkflow
     CC=3  in:0  out:11  total:11
+  cqrs-workflow-editor.src.App.loadExampleFile
+    CC=3  in:0  out:11  total:11
   service-factory.factory.generators.wire.openapi._schema_from_fields
     CC=7  in:3  out:7  total:10
-  api.commands.converttobase64.ConvertToBase64Command.execute
-    CC=2  in:0  out:10  total:10
+  api.main.execute_query
+    CC=3  in:1  out:9  total:10
 
 MODULES:
-  api.agent  [1 funcs]
-    execute_agent  CC=2  out:3
-  api.auth  [2 funcs]
-    authenticate  CC=3  out:1
-    get_jwt_manager  CC=1  out:0
+  api.SUMD  [5 funcs]
+    _substitute  CC=0  out:0
+    authenticate  CC=0  out:0
+    execute_agent  CC=0  out:0
+    get_engine  CC=0  out:0
+    get_jwt_manager  CC=0  out:0
   api.commands  [2 funcs]
     get_registry  CC=1  out:0
     register_default_commands  CC=1  out:15
@@ -685,8 +736,6 @@ MODULES:
     execute_query_get  CC=1  out:5
     issue_token  CC=2  out:6
     run_agent  CC=2  out:7
-  api.policy  [1 funcs]
-    get_engine  CC=2  out:1
   api.protocols  [2 funcs]
     get_registry  CC=1  out:0
     register_default_protocols  CC=1  out:9
@@ -785,6 +834,29 @@ EDGES:
   frontend.html.js.api.runCommand → frontend.html.js.api.request
   frontend.html.js.api.runQuery → frontend.html.js.api.request
   frontend.html.js.app.renderDecoded → frontend.html.js.app.decodeB64
+  cqrs-workflow-editor.src.App.fetchBackendWorkflows → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadBackendWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.runBackendWorkflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.fetchExampleFiles → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadExampleFile → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.loadPredefinedWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.fetchPreview → cqrs-workflow-editor.src.App.blob
+  cqrs-workflow-editor.src.App.sizeKB → cqrs-workflow-editor.src.App.text
+  cqrs-workflow-editor.src.App.mime → cqrs-workflow-editor.src.App.text
+  cqrs-workflow-editor.src.App.timer → cqrs-workflow-editor.src.App.fetchPreview
+  cqrs-workflow-editor.src.App.onDownloadWorkflow → cqrs-workflow-editor.src.App.exportWorkflow
+  cqrs-workflow-editor.src.App.workflow → cqrs-workflow-editor.src.App.json
+  cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.onUploadWorkflow → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.file → cqrs-workflow-editor.src.App.mapToEdges
+  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToNodes
+  cqrs-workflow-editor.src.App.reader → cqrs-workflow-editor.src.App.mapToEdges
   service-factory.factory.cli.cmd_compile → service-factory.factory.register_default_generators
   service-factory.factory.cli.cmd_compile → service-factory.factory.get_registry
   service-factory.factory.cli.cmd_list → service-factory.factory.register_default_generators
@@ -800,29 +872,6 @@ EDGES:
   service-factory.factory.generators.code.node_fastify._query_route_lines → service-factory.factory.generators.code.node_fastify._camel
   service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server → service-factory.factory.generators.code.node_fastify._command_route_lines
   service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._server → service-factory.factory.generators.code.node_fastify._query_route_lines
-  service-factory.factory.generators.code.node_fastify.NodeFastifyGenerator._ts_interface → service-factory.factory.generators.types.ts_type
-  service-factory.factory.generators.code.python_fastapi._pydantic_model → service-factory.factory.generators.types.py_type
-  service-factory.factory.generators.code.python_fastapi._command_route → service-factory.factory.generators.code.python_fastapi._snake
-  service-factory.factory.generators.code.python_fastapi._query_route → service-factory.factory.generators.code.python_fastapi._snake
-  service-factory.factory.generators.code.python_fastapi._query_route → service-factory.factory.generators.types.py_type
-  service-factory.factory.generators.code.python_fastapi._event_model → service-factory.factory.generators.code.python_fastapi._pydantic_model
-  service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._models → service-factory.factory.generators.code.python_fastapi._pydantic_model
-  service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._events → service-factory.factory.generators.code.python_fastapi._event_model
-  mcp_servers.summary_server.main → mcp_servers.summary_server._handle
-  mcp_servers.summary_server.main → mcp_servers.summary_server._send
-  cqrs-backend-workflows.server._handle_command → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server._handle_render → cqrs-backend-workflows.server._result_to_data_uri
-  cqrs-backend-workflows.server.list_workflows → service-factory.factory.GeneratorRegistry.list
-  cqrs-backend-workflows.server.create_workflow → cqrs-backend-workflows.server.validate_workflow
-  cqrs-backend-workflows.server.update_workflow → cqrs-backend-workflows.server.validate_workflow
-  api.main.issue_token → api.auth.authenticate
-  api.main.issue_token → api.auth.get_jwt_manager
-  api.main.execute_command → api.policy.get_engine
-  api.main.execute_query → api.policy.get_engine
-  api.main.execute_query_get → api.main.execute_query
-  api.main.run_agent → api.agent.execute_agent
-  api.main.run_agent → api.policy.get_engine
-  api.commands.fetch.FetchCommand.execute → service-factory.factory.get_registry
 ```
 
 ## Intent

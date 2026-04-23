@@ -6,7 +6,7 @@ SUMMARY:
   dup_groups:    1
   dup_fragments: 2
   saved_lines:   3
-  scan_ms:       8760
+  scan_ms:       8069
 
 HOTSPOTS[1] (files with most duplication):
   service-factory/factory/generators/types.py  dup=6L  groups=1  frags=2  (0.2%)

@@ -1,16 +1,16 @@
-# cqrs-backend-workflows | 3f 476L | python:2,less:1 | 2026-04-23
-# stats: 20 func | 5 cls | 3 mod | CC̄=2.5 | critical:0 | cycles:0
-# alerts[5]: CC run_workflow=8; CC _handle_command=5; CC list_examples=4; CC _handle_http=3; CC _handle_render=3
-# hotspots[5]: run_workflow fan=9; get_example fan=7; list_examples fan=6; create_workflow fan=5; update_workflow fan=4
+# cqrs-backend-workflows | 3f 545L | python:2,less:1 | 2026-04-23
+# stats: 25 func | 5 cls | 3 mod | CC̄=2.7 | critical:0 | cycles:0
+# alerts[5]: CC run_workflow=8; CC _build_agent_body=6; CC _handle_command=5; CC _build_agent_context=4; CC list_examples=4
+# hotspots[5]: run_workflow fan=9; get_example fan=7; list_examples fan=6; create_workflow fan=5; test_workflow_schema_validation fan=5
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[3]:
   app.doql.less,60
-  server.py,400
-  tests/test_cqrs_backend_workflows.py,16
+  server.py,440
+  tests/test_cqrs_backend_workflows.py,45
 D:
   server.py:
-    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,list_examples,get_example,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
+    e: validate_workflow,_result_to_data_uri,_handle_fetch,_handle_http,_handle_command,_handle_render,_decode_payload_b64,_build_agent_context,_build_agent_body,_handle_agent,execute_node,root,health,list_workflows,get_workflow,create_workflow,update_workflow,delete_workflow,list_examples,get_example,run_workflow,WorkflowNode,WorkflowOutput,Workflow,WorkflowExecutionRequest,WorkflowExecutionResponse
     WorkflowNode:
     WorkflowOutput:
     Workflow:
@@ -22,7 +22,10 @@ D:
     _handle_http(node;_node_results;headers;client)
     _handle_command(node;node_results;headers;client)
     _handle_render(node;node_results;headers;client)
-    _handle_agent(node;_node_results;_headers;_client)
+    _decode_payload_b64(payload_b64)
+    _build_agent_context(node;node_results)
+    _build_agent_body(node;context)
+    _handle_agent(node;node_results;headers;client)
     execute_node(node;node_results;client;token)
     root()
     health()
@@ -35,6 +38,8 @@ D:
     get_example(filename)
     run_workflow(workflow_id;request)
   tests/test_cqrs_backend_workflows.py:
-    e: test_placeholder,test_import
+    e: test_placeholder,test_import,test_agent_node_fields,test_workflow_schema_validation
     test_placeholder()
     test_import()
+    test_agent_node_fields()
+    test_workflow_schema_validation()

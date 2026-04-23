@@ -9,20 +9,24 @@ from __future__ import annotations
 
 from typing import Any, Protocol, runtime_checkable
 
-from .ir import Bundle
+from .ir import AnyBundle
 
 
 @runtime_checkable
 class Generator(Protocol):
-    target: str          # "python-fastapi", "docker", "openapi", ...
-    category: str        # "code" | "infra" | "wire"
+    target: str          # "python-fastapi", "docker", "openapi", "view/php-standalone", ...
+    category: str        # "code" | "infra" | "wire" | "view"
 
-    def generate(self, bundle: Bundle) -> dict[str, str]:
+    def generate(self, bundle: AnyBundle) -> dict[str, str]:
         """Return a map of {relative_path: file_content}.
 
         Paths are POSIX-style and rooted at the bundle's output directory.
         Content is always text (UTF-8). Binary artifacts are out of scope
         for this layer; they live in templates/ and are copied by the CLI.
+
+        Individual generators declare which bundle kind they accept; passing
+        a mismatched kind (e.g. a :class:`ViewBundle` into python-fastapi)
+        is a caller error and should raise ``TypeError``.
         """
 
 
@@ -63,10 +67,18 @@ def register_default_generators() -> None:
     from .generators.infra.docker import DockerGenerator
     from .generators.infra.kubernetes import KubernetesGenerator
     from .generators.wire.openapi import OpenApiGenerator
+    from .generators.view.php_standalone import PhpStandaloneViewGenerator
+    from .generators.view.fastapi_sse import FastApiSseViewGenerator
+    from .generators.view.static_html import StaticHtmlViewGenerator
 
     reg = get_registry()
+    if "python-fastapi" in {e["target"] for e in reg.list()}:
+        return  # idempotent: already registered
     reg.register(PythonFastApiGenerator())
     reg.register(NodeFastifyGenerator())
     reg.register(DockerGenerator())
     reg.register(KubernetesGenerator())
     reg.register(OpenApiGenerator())
+    reg.register(PhpStandaloneViewGenerator())
+    reg.register(FastApiSseViewGenerator())
+    reg.register(StaticHtmlViewGenerator())

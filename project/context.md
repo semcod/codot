@@ -4,34 +4,34 @@
 
 - **Project**: /home/tom/github/semcod/codot
 - **Primary Language**: python
-- **Languages**: python: 36, md: 27, json: 23, yaml: 13, shell: 7
+- **Languages**: python: 36, md: 28, json: 23, yaml: 13, shell: 7
 - **Analysis Mode**: static
 - **Total Functions**: 603
 - **Total Classes**: 73
-- **Modules**: 128
-- **Entry Points**: 554
+- **Modules**: 129
+- **Entry Points**: 553
 
 ## Architecture by Module
-
-### SUMD
-- **Functions**: 122
-- **File**: `SUMD.md`
 
 ### project.map.toon
 - **Functions**: 122
 - **File**: `map.toon.yaml`
 
+### SUMD
+- **Functions**: 122
+- **File**: `SUMD.md`
+
 ### cqrs-workflow-editor.src.App
 - **Functions**: 55
 - **File**: `App.tsx`
 
-### api.project.map.toon
-- **Functions**: 45
-- **File**: `map.toon.yaml`
-
 ### api.SUMD
 - **Functions**: 45
 - **File**: `SUMD.md`
+
+### api.project.map.toon
+- **Functions**: 45
+- **File**: `map.toon.yaml`
 
 ### cqrs-backend-workflows.SUMD
 - **Functions**: 20
@@ -110,7 +110,7 @@ Main execution flows into the system:
 - **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.parse_args
 
 ### api.commands.pipeline.PipelineCommand.execute
-- **Calls**: get_command_registry, enumerate, CommandResponse, None.get, ValueError, step.get, api.commands.pipeline._substitute, CommandRequest
+- **Calls**: get_command_registry, enumerate, CommandResponse, None.get, ValueError, step.get, api.SUMD._substitute, CommandRequest
 
 ### api.agent._mcp_execute
 > Execute agent via a real MCP server.
@@ -198,14 +198,15 @@ backend_config keys:
 ### service-factory.factory.generators.code.python_fastapi.PythonFastApiGenerator._main
 - **Calls**: None.join, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append
 
+### api.validators.validate_against_schema_uri
+> Fetch a JSON Schema from the given URI and validate the instance.
+
+The URI is resolved via the protocol registry, so it can live on HTTP,
+in a local f
+- **Calls**: Draft202012Validator, sorted, json.loads, validator.iter_errors, SchemaValidationError, None.fetch, SchemaValidationError, result.content.decode
+
 ### api.queries.from_url.FromUrlQuery.execute
 - **Calls**: service-factory.factory.get_registry, QueryResponse, ValueError, parts.append, registry.fetch, mime.startswith, None.decode, fetched.content.decode
-
-### api.main.execute_command
-- **Calls**: app.put, Depends, None.can_execute_command, log.info, log.info, HTTPException, None.get, command.execute
-
-### api.policy.PolicyEngine.can_execute_query
-- **Calls**: self._rules_for, PolicyDecision.deny, PolicyDecision.deny, rule.get, rule.get, PolicyDecision.allow, self._match_any, all
 
 ### cqrs-workflow-editor.src.App.loadBackendWorkflow
 - **Calls**: cqrs-workflow-editor.src.App.fetch, cqrs-workflow-editor.src.App.json, cqrs-workflow-editor.src.App.setNodes, cqrs-workflow-editor.src.App.mapToNodes, cqrs-workflow-editor.src.App.setEdges, cqrs-workflow-editor.src.App.mapToEdges, cqrs-workflow-editor.src.App.setWorkflowId, cqrs-workflow-editor.src.App.setRunResult
@@ -213,17 +214,20 @@ backend_config keys:
 ### cqrs-workflow-editor.src.App.loadExampleFile
 - **Calls**: cqrs-workflow-editor.src.App.fetch, cqrs-workflow-editor.src.App.json, cqrs-workflow-editor.src.App.setNodes, cqrs-workflow-editor.src.App.mapToNodes, cqrs-workflow-editor.src.App.setEdges, cqrs-workflow-editor.src.App.mapToEdges, cqrs-workflow-editor.src.App.setWorkflowId, cqrs-workflow-editor.src.App.setRunResult
 
+### api.main.execute_command
+- **Calls**: app.put, Depends, None.can_execute_command, log.info, log.info, HTTPException, None.get, command.execute
+
+### api.policy.PolicyEngine.can_execute_query
+- **Calls**: self._rules_for, PolicyDecision.deny, PolicyDecision.deny, rule.get, rule.get, PolicyDecision.allow, self._match_any, all
+
 ### frontend.html.js.app.renderDecoded
 - **Calls**: frontend.html.js.app.decodeB64, frontend.html.js.app.startsWith, frontend.html.js.app.createElement, frontend.html.js.app.TextDecoder, frontend.html.js.app.decode, frontend.html.js.app.appendChild, frontend.html.js.app.Blob, frontend.html.js.app.createObjectURL
 
+### cqrs-workflow-editor.src.App.onUploadWorkflow
+- **Calls**: cqrs-workflow-editor.src.App.FileReader, cqrs-workflow-editor.src.App.parse, cqrs-workflow-editor.src.App.mapToNodes, cqrs-workflow-editor.src.App.mapToEdges, cqrs-workflow-editor.src.App.setNodes, cqrs-workflow-editor.src.App.setEdges, cqrs-workflow-editor.src.App.setSelectedNode, cqrs-workflow-editor.src.App.setViewport
+
 ### api.mcp_client.MCPStdioClient._send
 - **Calls**: self._proc.stdin.write, json.dumps, raw.encode, self._proc.stdin.drain, resp.get, asyncio.create_subprocess_exec, asyncio.wait_for, MCPError
-
-### api.commands.converttobase64.ConvertToBase64Command.execute
-- **Calls**: None.decode, encoded.encode, CommandResponse, ValueError, None.fetch, base64.b64encode, None.decode, service-factory.factory.get_registry
-
-### api.policy.PolicyEngine.can_execute_command
-- **Calls**: self._rules_for, PolicyDecision.deny, PolicyDecision.deny, rule.get, PolicyDecision.allow, self._match_any, rule.get, rule.get
 
 ## Process Flows
 
@@ -398,6 +402,8 @@ Key functions that process and transform data:
 
 ### cqrs-backend-workflows.project.map.toon.validate_workflow
 
+### api.SUMD.validate_against_schema_uri
+
 ### api.commands.converttojson.ConvertToJsonCommand._convert
 - **Output to**: ValueError, csv.DictReader, json.loads, xmltodict.parse, io.StringIO
 
@@ -409,15 +415,13 @@ The URI is resolved via the proto
 
 ### api.project.map.toon.validate_against_schema_uri
 
-### api.SUMD.validate_against_schema_uri
+### project.map.toon.validate_against_schema_uri
+
+### project.map.toon.validate_workflow
 
 ### SUMD.validate_against_schema_uri
 
 ### SUMD.validate_workflow
-
-### project.map.toon.validate_against_schema_uri
-
-### project.map.toon.validate_workflow
 
 ## Behavioral Patterns
 
@@ -447,29 +451,29 @@ Functions exposed as public API (no underscore prefix):
 - `cqrs-workflow-editor.src.App.fetchPreview` - 14 calls
 - `api.validators.validate_against_schema_uri` - 13 calls
 - `api.queries.from_url.FromUrlQuery.execute` - 13 calls
+- `cqrs-workflow-editor.src.App.loadBackendWorkflow` - 11 calls
+- `cqrs-workflow-editor.src.App.loadExampleFile` - 11 calls
 - `service-factory.factory.register_default_generators` - 11 calls
 - `api.main.execute_command` - 11 calls
 - `api.policy.PolicyEngine.can_execute_query` - 11 calls
-- `cqrs-workflow-editor.src.App.loadBackendWorkflow` - 11 calls
-- `cqrs-workflow-editor.src.App.loadExampleFile` - 11 calls
 - `frontend.html.js.app.renderDecoded` - 10 calls
+- `cqrs-workflow-editor.src.App.onUploadWorkflow` - 10 calls
 - `api.commands.converttobase64.ConvertToBase64Command.execute` - 10 calls
 - `api.policy.PolicyEngine.can_execute_command` - 10 calls
 - `api.protocols.file_protocol.FileProtocol.fetch` - 10 calls
-- `cqrs-workflow-editor.src.App.onUploadWorkflow` - 10 calls
 - `frontend.html.js.app.bytes` - 9 calls
 - `api.main.execute_query` - 9 calls
 - `api.protocols.register_default_protocols` - 9 calls
 - `api.protocols.http_protocol.HttpProtocol.fetch` - 9 calls
 - `api.protocols.data_protocol.DataProtocol.fetch` - 9 calls
 - `frontend.html.js.api.request` - 8 calls
-- `api.policy.PolicyEngine.from_file` - 8 calls
-- `api.auth.JWTManager.issue` - 8 calls
 - `cqrs-workflow-editor.src.App.file` - 8 calls
 - `cqrs-workflow-editor.src.App.reader` - 8 calls
+- `api.policy.PolicyEngine.from_file` - 8 calls
+- `api.auth.JWTManager.issue` - 8 calls
 - `codot_run.run_agent` - 7 calls
-- `service-factory.factory.cli.cmd_hash` - 7 calls
-- `cqrs-backend-workflows.server.get_example` - 7 calls
+- `cqrs-workflow-editor.src.App.loadPredefinedWorkflow` - 7 calls
+- `cqrs-workflow-editor.src.App.workflow` - 7 calls
 
 ## System Interactions
 

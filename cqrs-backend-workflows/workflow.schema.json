@@ -37,6 +37,8 @@
             "type": "array",
             "items": { "type": "string" }
           },
+          "backend": { "type": "string", "enum": ["mcp", "litellm", "bash_cli", "http_api", "websocket"] },
+          "backend_config": { "type": "object" },
           "memory_uri": { "type": "string", "format": "uri" }
         },
         "required": ["id", "type"]

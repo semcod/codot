@@ -37,14 +37,17 @@ OPENAPI_TYPES = {
 }
 
 
+def _map_type(t: str, mapping: dict[str, str], fallback: str, none_suffix: str, required: bool) -> str:
+    base = mapping.get(t, fallback)
+    return base if required else f"{base} | {none_suffix}"
+
+
 def py_type(t: str, required: bool = True) -> str:
-    base = PYTHON_TYPES.get(t, "Any")
-    return base if required else f"{base} | None"
+    return _map_type(t, PYTHON_TYPES, "Any", "None", required)
 
 
 def ts_type(t: str, required: bool = True) -> str:
-    base = TYPESCRIPT_TYPES.get(t, "unknown")
-    return base if required else f"{base} | null"
+    return _map_type(t, TYPESCRIPT_TYPES, "unknown", "null", required)
 
 
 def openapi_type(t: str, fmt: str | None = None) -> dict:

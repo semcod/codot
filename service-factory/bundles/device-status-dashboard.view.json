@@ -1,0 +1,31 @@
+{
+  "bundle": "device-status-dashboard",
+  "kind": "VIEW_BUNDLE",
+  "version": "1.0.0",
+  "description": "Live catalog and platform health dashboard for the local codot stack",
+
+  "sources": [
+    {
+      "name": "catalog",
+      "uri": "http://localhost:18080/catalog",
+      "refresh": "1s"
+    },
+    {
+      "name": "health",
+      "uri": "http://localhost:18080/health",
+      "refresh": "5s"
+    }
+  ],
+
+  "template": {
+    "engine": "inline",
+    "source": ""
+  },
+
+  "transport": "polling",
+
+  "exposure": {
+    "port": 8090,
+    "health_path": "/health"
+  }
+}

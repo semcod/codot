@@ -2,7 +2,7 @@
 
 app {
   name: codot;
-  version: 0.1.7;
+  version: 0.1.8;
 }
 
 dependencies {
@@ -92,7 +92,7 @@ workflow[name="test-agent"] {
 
 workflow[name="workflow"] {
   trigger: manual;
-  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080;
+  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:28080;
 }
 
 workflow[name="clean"] {
