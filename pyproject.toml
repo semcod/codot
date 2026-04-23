@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codot"
-version = "0.1.9"
+version = "0.1.10"
 description = "CQRS-URL Platform - Commands and Queries as URL-addressable resources"
 readme = "README.md"
 requires-python = ">=3.8"

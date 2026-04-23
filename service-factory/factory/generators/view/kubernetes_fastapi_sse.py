@@ -1,31 +1,34 @@
-"""kubernetes generator.
-
-Emits Deployment + Service + optional ConfigMap for a bundle. Demonstrates
-that the IR can target multiple infra backends.
-
-No Ingress, no Istio — just Deployment + ClusterIP Service. Teams that
-want ingress wire their own.
-"""
 from __future__ import annotations
 
 from textwrap import dedent
 
-from ...ir import Bundle
+from ...ir import AnyBundle, ViewBundle
+from ._shared import uses_host_local_sources
 
 
-class KubernetesGenerator:
-    target = "kubernetes"
-    category = "infra"
+class KubernetesFastApiSseViewGenerator:
+    target = "view/kubernetes-fastapi-sse"
+    category = "view"
 
-    def generate(self, bundle: Bundle) -> dict[str, str]:
+    def generate(self, bundle: AnyBundle) -> dict[str, str]:
+        if not isinstance(bundle, ViewBundle):
+            raise TypeError(
+                f"{self.target} expects a ViewBundle, got {type(bundle).__name__}"
+            )
         return {
             "k8s/deployment.yaml": self._deployment(bundle),
             "k8s/service.yaml": self._service(bundle),
             "k8s/kustomization.yaml": self._kustomization(bundle),
         }
 
-    def _deployment(self, bundle: Bundle) -> str:
-        return dedent(f"""\
+    def _deployment(self, bundle: ViewBundle) -> str:
+        host_local = uses_host_local_sources(bundle)
+        host_network = "\n                  hostNetwork: true" if host_local else ""
+        dns_policy = (
+            "\n                  dnsPolicy: ClusterFirstWithHostNet" if host_local else ""
+        )
+        return dedent(
+            f"""\
             apiVersion: apps/v1
             kind: Deployment
             metadata:
@@ -44,7 +47,7 @@ class KubernetesGenerator:
                   labels:
                     app: {bundle.name}
                     version: "{bundle.version}"
-                spec:
+                spec:{host_network}{dns_policy}
                   containers:
                     - name: {bundle.name}
                       image: {bundle.name}:{bundle.version}
@@ -57,13 +60,8 @@ class KubernetesGenerator:
                           value: "{bundle.name}"
                         - name: SERVICE_VERSION
                           value: "{bundle.version}"
-                      resources:
-                        limits:
-                          cpu: "{bundle.resources.cpu}"
-                          memory: "{bundle.resources.memory}"
-                        requests:
-                          cpu: "{bundle.resources.cpu}"
-                          memory: "{bundle.resources.memory}"
+                        - name: VIEW_TRANSPORT
+                          value: "sse"
                       livenessProbe:
                         httpGet:
                           path: {bundle.exposure.health_path}
@@ -76,16 +74,19 @@ class KubernetesGenerator:
                           port: http
                         initialDelaySeconds: 2
                         periodSeconds: 10
-        """)
+            """
+        )
 
-    def _service(self, bundle: Bundle) -> str:
-        return dedent(f"""\
+    def _service(self, bundle: ViewBundle) -> str:
+        return dedent(
+            f"""\
             apiVersion: v1
             kind: Service
             metadata:
               name: {bundle.name}
               labels:
                 app: {bundle.name}
+                bundle-hash: "{bundle.contract_hash()}"
             spec:
               type: ClusterIP
               selector:
@@ -94,18 +95,22 @@ class KubernetesGenerator:
                 - name: http
                   port: 80
                   targetPort: http
-        """)
+            """
+        )
 
-    def _kustomization(self, bundle: Bundle) -> str:
-        return dedent(f"""\
+    def _kustomization(self, bundle: ViewBundle) -> str:
+        return dedent(
+            f"""\
             apiVersion: kustomize.config.k8s.io/v1beta1
             kind: Kustomization
             labels:
               - pairs:
                   bundle: {bundle.name}
                   hash: "{bundle.contract_hash()}"
+                  category: view
                 includeSelectors: true
             resources:
               - deployment.yaml
               - service.yaml
-        """)
+            """
+        )

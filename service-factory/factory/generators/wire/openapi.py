@@ -12,21 +12,21 @@ from ...ir import Bundle, Contract
 from ..types import openapi_type
 
 
+def _field_schema(meta: dict) -> dict:
+    t = meta.get("type", "string")
+    fmt = "date-time" if t == "datetime" else None
+    spec = openapi_type(t, fmt)
+    if meta.get("enum"):
+        spec["enum"] = meta["enum"]
+    if meta.get("description"):
+        spec["description"] = meta["description"]
+    return spec
+
+
 def _schema_from_fields(fields: dict[str, dict]) -> dict:
-    props = {}
-    required = []
-    for name, meta in fields.items():
-        t = meta.get("type", "string")
-        fmt = "date-time" if t == "datetime" else None
-        spec = openapi_type(t, fmt)
-        if meta.get("enum"):
-            spec["enum"] = meta["enum"]
-        if meta.get("description"):
-            spec["description"] = meta["description"]
-        props[name] = spec
-        if meta.get("required"):
-            required.append(name)
-    schema = {"type": "object", "properties": props}
+    props = {name: _field_schema(meta) for name, meta in fields.items()}
+    required = [name for name, meta in fields.items() if meta.get("required")]
+    schema: dict = {"type": "object", "properties": props}
     if required:
         schema["required"] = required
     return schema
@@ -61,17 +61,18 @@ def _path_item(c: Contract) -> tuple[str, str, dict]:
             },
         }
     elif c.is_query and c.input_fields:
-        params = []
-        for name, meta in c.input_fields.items():
-            t = meta.get("type", "string")
-            fmt = "date-time" if t == "datetime" else None
-            params.append({
+        op["parameters"] = [
+            {
                 "name": name,
                 "in": "query",
                 "required": bool(meta.get("required")),
-                "schema": openapi_type(t, fmt),
-            })
-        op["parameters"] = params
+                "schema": openapi_type(
+                    meta.get("type", "string"),
+                    "date-time" if meta.get("type", "string") == "datetime" else None,
+                ),
+            }
+            for name, meta in c.input_fields.items()
+        ]
     return endpoint, method, op
 
 

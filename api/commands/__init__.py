@@ -52,9 +52,14 @@ class CommandRegistry:
 
 
 _registry = CommandRegistry()
+_registered = False
 
 
 def get_registry() -> CommandRegistry:
+    global _registered
+    if not _registered:
+        _registered = True
+        register_default_commands()
     return _registry
 
 
@@ -66,8 +71,9 @@ def register_default_commands() -> None:
     from .converttocsv import ConvertToCsvCommand
     from .render import RenderCommand
     from .pipeline import PipelineCommand
+    from .compile_service import CompileServiceCommand
 
-    reg = get_registry()
+    reg = _registry
     reg.register(FetchCommand())
     reg.register(ConvertToJsonCommand())
     reg.register(ConvertToXmlCommand())
@@ -75,6 +81,4 @@ def register_default_commands() -> None:
     reg.register(ConvertToCsvCommand())
     reg.register(RenderCommand())
     reg.register(PipelineCommand())
-
-
-register_default_commands()
+    reg.register(CompileServiceCommand())

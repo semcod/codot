@@ -92,24 +92,55 @@ const mapToEdges = (nodes: WorkflowNode[]): RFEdge[] => {
   const edges: RFEdge[] = [];
   for (const node of nodes) {
     if (node.input) {
-      edges.push({ 
-        id: `e-${node.id}-${node.input}`, 
-        source: node.input, 
-        target: node.id 
+      edges.push({
+        id: `e-${node.id}-${node.input}`,
+        source: node.input,
+        target: node.id,
       });
     }
     if (node.inputs) {
       node.inputs.forEach((src) => {
-        edges.push({ 
-          id: `e-${node.id}-${src}`, 
-          source: src, 
-          target: node.id 
+        edges.push({
+          id: `e-${node.id}-${src}`,
+          source: src,
+          target: node.id,
         });
       });
     }
   }
   return edges;
 };
+
+function rewritePreviewUri(uri: string): string {
+  if (uri.startsWith("http://localhost:18091/")) {
+    return uri.replace("http://localhost:18091/", "/data/");
+  }
+  if (uri.startsWith("http://localhost:18090/")) {
+    return uri.replace("http://localhost:18090/", "/schemas/");
+  }
+  return uri;
+}
+
+async function formatPreviewContent(blob: Blob, response: Response) {
+  const sizeKB = (blob.size / 1024).toFixed(2);
+  const mime = blob.type || response.headers.get("content-type") || "unknown";
+  let content = "";
+  if (blob.size < 10000) {
+    const text = await blob.text();
+    content = text.length > 500 ? text.substring(0, 500) + "..." : text;
+  } else {
+    content = `(Preview skipped - file too large: ${sizeKB} KB)`;
+  }
+  return { content, mime, size: parseFloat(sizeKB) };
+}
+
+function getPreviewErrorMessage(err: unknown): string {
+  const msg = err instanceof Error ? err.message : "Failed to fetch";
+  if (msg === "Failed to fetch") {
+    return "CORS blocked or network error. Preview unavailable for cross-origin URLs, but workflow execution will work via backend.";
+  }
+  return msg;
+}
 
 export default function App() {
   const { screenToFlowPosition, setViewport } = useReactFlow();
@@ -303,39 +334,12 @@ export default function App() {
     setPreviewError(null);
 
     try {
-      // Rewrite local docker-compose URLs to use Vite proxy (avoids CORS)
-      let previewUri = uri;
-      if (uri.startsWith("http://localhost:18091/")) {
-        previewUri = uri.replace("http://localhost:18091/", "/data/");
-      } else if (uri.startsWith("http://localhost:18090/")) {
-        previewUri = uri.replace("http://localhost:18090/", "/schemas/");
-      }
-
-      const response = await fetch(previewUri);
+      const response = await fetch(rewritePreviewUri(uri));
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
       const blob = await response.blob();
-      const sizeKB = (blob.size / 1024).toFixed(2);
-      const mime = blob.type || response.headers.get("content-type") || "unknown";
-
-      let content = "";
-      if (blob.size < 10000) {
-        const text = await blob.text();
-        content = text.length > 500 ? text.substring(0, 500) + "..." : text;
-      } else {
-        content = `(Preview skipped - file too large: ${sizeKB} KB)`;
-      }
-
-      setPreview({ content, mime, size: parseFloat(sizeKB) });
+      setPreview(await formatPreviewContent(blob, response));
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to fetch";
-      if (msg === "Failed to fetch") {
-        setPreviewError(
-          "CORS blocked or network error. Preview unavailable for cross-origin URLs, but workflow execution will work via backend."
-        );
-      } else {
-        setPreviewError(msg);
-      }
+      setPreviewError(getPreviewErrorMessage(err));
     } finally {
       setPreviewLoading(false);
     }

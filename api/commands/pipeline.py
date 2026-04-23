@@ -32,6 +32,45 @@ def _substitute(value: Any, previous: CommandResponse | None) -> Any:
     return value
 
 
+async def _run_agent_step(agent_node_raw: dict, req: CommandRequest) -> CommandResponse:
+    from models import AgentNode
+    from agent import execute_agent
+
+    agent_node = AgentNode(**agent_node_raw)
+    agent_ctx = dict(req.meta)
+    text = _extract_text_from_data_uri(agent_ctx.get("input", ""))
+    if text is not None:
+        agent_ctx["text"] = text
+    agent_req = AgentRequest(agent_node=agent_node, context=agent_ctx)
+    agent_resp = await execute_agent(agent_req)
+    payload_b64 = base64.b64encode(json.dumps(agent_resp.output).encode()).decode()
+    return CommandResponse(
+        payload_b64=payload_b64,
+        mime="application/json",
+        meta={
+            "agent_trace": agent_resp.reasoning_trace,
+            "agent_meta": agent_resp.meta,
+            "agent_ok": agent_resp.ok,
+        },
+    )
+
+
+def _extract_text_from_data_uri(data_uri: str) -> str | None:
+    if not data_uri.startswith("data:"):
+        return None
+    try:
+        from urllib.parse import unquote
+        after_colon = data_uri.split(":", 1)[1]
+        if ";" in after_colon:
+            mime_b64 = after_colon.split(";", 1)
+            b64_part = mime_b64[1].split(",", 1)[1]
+        else:
+            b64_part = after_colon.split(",", 1)[1]
+        return base64.b64decode(b64_part).decode("utf-8", errors="replace")
+    except Exception:
+        return None
+
+
 class PipelineCommand(Command):
     name = "pipeline"
     description = (
@@ -62,35 +101,7 @@ class PipelineCommand(Command):
 
             agent_node_raw = step.get("agent_node")
             if agent_node_raw is not None:
-                from models import AgentNode
-                from agent import execute_agent
-                agent_node = AgentNode(**agent_node_raw)
-                agent_ctx = dict(req.meta)
-                if agent_ctx.get("input", "").startswith("data:"):
-                    try:
-                        import base64
-                        from urllib.parse import unquote
-                        data_uri = agent_ctx["input"]
-                        after_colon = data_uri.split(":", 1)[1]
-                        mime_b64 = after_colon.split(";", 1)
-                        mime = mime_b64[0] if ";" in after_colon else ""
-                        b64_part = mime_b64[1].split(",", 1)[1] if ";" in after_colon else after_colon.split(",", 1)[1]
-                        decoded = base64.b64decode(b64_part).decode("utf-8", errors="replace")
-                        agent_ctx["text"] = decoded
-                    except Exception:
-                        pass
-                agent_req = AgentRequest(agent_node=agent_node, context=agent_ctx)
-                agent_resp = await execute_agent(agent_req)
-                payload_b64 = base64.b64encode(json.dumps(agent_resp.output).encode()).decode()
-                resp = CommandResponse(
-                    payload_b64=payload_b64,
-                    mime="application/json",
-                    meta={
-                        "agent_trace": agent_resp.reasoning_trace,
-                        "agent_meta": agent_resp.meta,
-                        "agent_ok": agent_resp.ok,
-                    },
-                )
+                resp = await _run_agent_step(agent_node_raw, req)
             else:
                 command = reg.get(cmd_name)
                 resp = await command.execute(req)

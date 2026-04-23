@@ -26,20 +26,23 @@ def _snake(name: str) -> str:
     return "".join(out)
 
 
+def _model_field_line(field_name: str, meta: dict) -> str:
+    required = meta.get("required", True)
+    t = py_type(meta.get("type", "string"), required)
+    default = "" if required else " = None"
+    desc = meta.get("description", "").replace('"', '\\"')
+    if desc:
+        return f'    {field_name}: {t}{default}  # {desc}'
+    return f"    {field_name}: {t}{default}"
+
+
 def _pydantic_model(name: str, fields: dict[str, dict]) -> str:
     lines = [f"class {name}(BaseModel):"]
     if not fields:
         lines.append("    pass")
         return "\n".join(lines)
     for field_name, meta in fields.items():
-        required = meta.get("required", True)
-        t = py_type(meta.get("type", "string"), required)
-        default = "" if required else " = None"
-        desc = meta.get("description", "").replace('"', '\\"')
-        if desc:
-            lines.append(f'    {field_name}: {t}{default}  # {desc}')
-        else:
-            lines.append(f"    {field_name}: {t}{default}")
+        lines.append(_model_field_line(field_name, meta))
     return "\n".join(lines)
 
 
@@ -62,21 +65,23 @@ def _command_route(c: Contract) -> str:
     ''').strip()
 
 
+def _query_params(fields: dict[str, dict]) -> str:
+    params = []
+    for name, meta in fields.items():
+        required = meta.get("required", False)
+        t = py_type(meta.get("type", "string"), required)
+        default = "" if required else " = None"
+        params.append(f"{name}: {t}{default}")
+    return ", ".join(params)
+
+
 def _query_route(c: Contract) -> str:
     op = _snake(c.name)
     method = c.http_method.lower() or "get"
     endpoint = c.http_endpoint or f"/api/v1/{op}"
 
     output_model = f"{c.name}Output" if c.output_fields else "dict"
-    # queries use query-string params instead of body
-    params = []
-    for name, meta in c.input_fields.items():
-        required = meta.get("required", False)
-        t = py_type(meta.get("type", "string"), required)
-        default = "" if required else " = None"
-        params.append(f"{name}: {t}{default}")
-
-    sig = ", ".join(params)
+    sig = _query_params(c.input_fields)
 
     return dedent(f'''
         @app.{method}("{endpoint}", response_model={output_model}, tags=["queries"])

@@ -151,6 +151,62 @@ def test_docker_dockerfile_has_healthcheck(bundle: Bundle):
     assert f"EXPOSE {bundle.exposure.port}" in dockerfile
 
 
+def test_view_docker_fastapi_sse_generates_valid_yaml(view_bundle: ViewBundle):
+    import yaml
+
+    gen = get_registry().get("view/docker-fastapi-sse")
+    files = gen.generate(view_bundle)
+    assert set(files.keys()) == {"Dockerfile", "docker-compose.yml", ".dockerignore"}
+
+    parsed = yaml.safe_load(files["docker-compose.yml"])
+    assert "services" in parsed
+    assert view_bundle.name in parsed["services"]
+
+    svc = parsed["services"][view_bundle.name]
+    assert svc["build"]["dockerfile"] == "Dockerfile"
+    assert svc["container_name"].startswith(f"svc-{view_bundle.name}-")
+    assert any(f"SERVICE_NAME={view_bundle.name}" in e for e in svc["environment"])
+    # This sample view points at localhost:18080, so docker needs host networking
+    # to reach the same host service from inside the container.
+    assert svc["network_mode"] == "host"
+
+
+def test_view_docker_fastapi_sse_dockerfile_has_healthcheck(view_bundle: ViewBundle):
+    dockerfile = get_registry().get("view/docker-fastapi-sse").generate(view_bundle)["Dockerfile"]
+    assert "HEALTHCHECK" in dockerfile
+    assert f"EXPOSE {view_bundle.exposure.port}" in dockerfile
+    assert "uvicorn" in dockerfile
+
+
+def test_view_kubernetes_fastapi_sse_generates_valid_yaml(view_bundle: ViewBundle):
+    import yaml
+
+    gen = get_registry().get("view/kubernetes-fastapi-sse")
+    files = gen.generate(view_bundle)
+    assert set(files.keys()) == {
+        "k8s/deployment.yaml",
+        "k8s/service.yaml",
+        "k8s/kustomization.yaml",
+    }
+
+    dep = yaml.safe_load(files["k8s/deployment.yaml"])
+    assert dep["kind"] == "Deployment"
+    assert dep["metadata"]["labels"]["bundle-hash"] == view_bundle.contract_hash()
+    spec = dep["spec"]["template"]["spec"]
+    container = spec["containers"][0]
+    assert container["ports"][0]["containerPort"] == view_bundle.exposure.port
+    assert spec["hostNetwork"] is True
+    assert spec["dnsPolicy"] == "ClusterFirstWithHostNet"
+
+    svc = yaml.safe_load(files["k8s/service.yaml"])
+    assert svc["kind"] == "Service"
+    assert svc["spec"]["ports"][0]["targetPort"] == "http"
+
+    kust = yaml.safe_load(files["k8s/kustomization.yaml"])
+    assert kust["kind"] == "Kustomization"
+    assert kust["labels"][0]["pairs"]["hash"] == view_bundle.contract_hash()
+
+
 def test_kubernetes_generates_valid_yaml(bundle: Bundle):
     import yaml
     gen = get_registry().get("kubernetes")
@@ -163,6 +219,8 @@ def test_kubernetes_generates_valid_yaml(bundle: Bundle):
     dep = yaml.safe_load(files["k8s/deployment.yaml"])
     assert dep["kind"] == "Deployment"
     assert dep["metadata"]["labels"]["bundle-hash"] == bundle.contract_hash()
+    kust = yaml.safe_load(files["k8s/kustomization.yaml"])
+    assert kust["labels"][0]["pairs"]["hash"] == bundle.contract_hash()
     # resources honored
     container = dep["spec"]["template"]["spec"]["containers"][0]
     assert container["resources"]["limits"]["cpu"] == bundle.resources.cpu
@@ -613,15 +671,23 @@ def test_static_html_inline_js_is_valid(view_bundle: ViewBundle, tmp_path: Path)
 
 
 def test_view_bundle_compiles_to_multiple_targets(view_bundle: ViewBundle):
-    """Same IR, two view generators → both produce a valid artefact set."""
+    """Same IR, multiple view generators → consistent artefact families."""
     php_files = get_registry().get("view/php-standalone").generate(view_bundle)
     html_files = get_registry().get("view/static-html").generate(view_bundle)
+    sse_files = get_registry().get("view/fastapi-sse").generate(view_bundle)
+    docker_files = get_registry().get("view/docker-fastapi-sse").generate(view_bundle)
+    k8s_files = get_registry().get("view/kubernetes-fastapi-sse").generate(view_bundle)
     # Each uses its own canonical filename
     assert "index.php" in php_files and "index.html" in html_files
+    assert "main.py" in sse_files
+    assert "docker-compose.yml" in docker_files
+    assert "k8s/deployment.yaml" in k8s_files
     # The bundle hash is identical across generators — it is a property of the IR
-    # not the target.
     assert view_bundle.contract_hash() in php_files["index.php"]
-    assert view_bundle.contract_hash() in html_files["index.html"]
+    assert view_bundle.contract_hash() in html_files["README.md"]
+    assert view_bundle.contract_hash() in sse_files["README.md"]
+    assert view_bundle.contract_hash() in docker_files["docker-compose.yml"]
+    assert view_bundle.contract_hash() in k8s_files["k8s/deployment.yaml"]
 
 
 @pytest.mark.skipif(shutil.which("php") is None, reason="php CLI not installed")

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-04-23
+
+### Docs
+- Update README.md
+- Update TODO/TODO.md
+- Update generated/protocol-dashboard/README.md
+- Update godot/output/README.md
+- Update service-factory/README.md
+
+### Other
+- Update codot_run.py
+- Update cqrs-workflow-editor/src/App.tsx
+- Update examples/view-bundle-protocol-dashboard.json
+- Update frontend/html/js/api.js
+- Update generated/protocol-dashboard/index.php
+- Update godot/output/deploy_workflow.go
+- Update service-factory/factory/__init__.py
+- Update service-factory/factory/cli.py
+- Update service-factory/factory/generators/code/node_fastify.py
+- Update service-factory/factory/generators/code/python_fastapi.py
+- ... and 7 more files
+
 ## [0.1.9] - 2026-04-23
 
 ### Docs

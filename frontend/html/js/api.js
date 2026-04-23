@@ -12,6 +12,21 @@ const API = (() => {
   function getRole() { return sessionStorage.getItem(ROLE_KEY); }
   function setRole(r) { sessionStorage.setItem(ROLE_KEY, r); }
 
+  async function _parseBody(resp) {
+    const ct = resp.headers.get("content-type") || "";
+    if (ct.includes("application/json")) {
+      return resp.json();
+    }
+    return { raw: await resp.text() };
+  }
+
+  function _buildError(resp, data) {
+    const err = new Error(data.detail || data.error || resp.statusText);
+    err.status = resp.status;
+    err.data = data;
+    return err;
+  }
+
   async function request(path, { method = "GET", body = null, auth = true } = {}) {
     const headers = { "Content-Type": "application/json" };
     if (auth && getToken()) headers["Authorization"] = `Bearer ${getToken()}`;
@@ -20,19 +35,8 @@ const API = (() => {
       headers,
       body: body === null ? null : JSON.stringify(body),
     });
-    let data;
-    const ct = resp.headers.get("content-type") || "";
-    if (ct.includes("application/json")) {
-      data = await resp.json();
-    } else {
-      data = { raw: await resp.text() };
-    }
-    if (!resp.ok) {
-      const err = new Error(data.detail || data.error || resp.statusText);
-      err.status = resp.status;
-      err.data = data;
-      throw err;
-    }
+    const data = await _parseBody(resp);
+    if (!resp.ok) throw _buildError(resp, data);
     return data;
   }
 

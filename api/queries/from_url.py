@@ -7,6 +7,19 @@ from protocols import get_registry
 from . import Query
 
 
+def _is_text_mime(mime: str) -> bool:
+    return mime.startswith("text/") or "json" in mime or "xml" in mime or "csv" in mime
+
+
+def _decode_body(content: bytes, mime: str) -> tuple[str, str]:
+    if not _is_text_mime(mime):
+        return base64.b64encode(content).decode("ascii"), "base64"
+    try:
+        return content.decode("utf-8"), "utf-8"
+    except UnicodeDecodeError:
+        return base64.b64encode(content).decode("ascii"), "base64"
+
+
 class FromUrlQuery(Query):
     name = "from-url"
     description = (
@@ -23,17 +36,7 @@ class FromUrlQuery(Query):
         parts = []
         for uri in request.source_uris:
             fetched = await registry.fetch(uri)
-            mime = fetched.mime or ""
-            if mime.startswith("text/") or "json" in mime or "xml" in mime or "csv" in mime:
-                try:
-                    body = fetched.content.decode("utf-8")
-                    encoding = "utf-8"
-                except UnicodeDecodeError:
-                    body = base64.b64encode(fetched.content).decode("ascii")
-                    encoding = "base64"
-            else:
-                body = base64.b64encode(fetched.content).decode("ascii")
-                encoding = "base64"
+            body, encoding = _decode_body(fetched.content, fetched.mime or "")
             parts.append({
                 "uri": uri,
                 "mime": fetched.mime,

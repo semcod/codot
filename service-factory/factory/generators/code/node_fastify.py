@@ -14,6 +14,16 @@ def _camel(name: str) -> str:
     return name[0].lower() + name[1:] if name else name
 
 
+def _schema_property_line(name: str, meta: dict, pad: str) -> str:
+    t = meta.get("type", "string")
+    if t == "datetime":
+        return f'{pad}{name}: {{ type: "string", format: "date-time" }}'
+    if t == "array":
+        return f'{pad}{name}: {{ type: "array", items: {{}} }}'
+    json_t = {"integer": "integer", "number": "number"}.get(t, t)
+    return f'{pad}{name}: {{ type: "{json_t}" }}'
+
+
 def _schema_object(fields: dict[str, dict], indent: int = 4) -> str:
     """Emit a JSON-Schema literal as JS. indent is the column where the opening
     brace sits; nested keys go deeper by 2-space steps."""
@@ -23,19 +33,8 @@ def _schema_object(fields: dict[str, dict], indent: int = 4) -> str:
     inner = " " * (indent + 2)
     props_pad = " " * (indent + 4)
 
-    props_lines = []
-    required = []
-    for name, meta in fields.items():
-        t = meta.get("type", "string")
-        json_t = {"integer": "integer", "number": "number"}.get(t, t)
-        if t == "datetime":
-            props_lines.append(f'{props_pad}{name}: {{ type: "string", format: "date-time" }}')
-        elif t == "array":
-            props_lines.append(f'{props_pad}{name}: {{ type: "array", items: {{}} }}')
-        else:
-            props_lines.append(f'{props_pad}{name}: {{ type: "{json_t}" }}')
-        if meta.get("required"):
-            required.append(name)
+    required = [name for name, meta in fields.items() if meta.get("required")]
+    props_lines = [_schema_property_line(name, meta, props_pad) for name, meta in fields.items()]
 
     lines = [
         "{",
@@ -46,7 +45,6 @@ def _schema_object(fields: dict[str, dict], indent: int = 4) -> str:
     ]
     if required:
         req_items = ", ".join(f'"{r}"' for r in required)
-        # append a trailing comma to properties line instead
         lines[-1] = f"{inner}}},"
         lines.append(f"{inner}required: [{req_items}]")
     lines.append(f"{pad}}}")

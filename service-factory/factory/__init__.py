@@ -68,7 +68,9 @@ def register_default_generators() -> None:
     from .generators.infra.kubernetes import KubernetesGenerator
     from .generators.wire.openapi import OpenApiGenerator
     from .generators.view.php_standalone import PhpStandaloneViewGenerator
+    from .generators.view.docker_fastapi_sse import DockerFastApiSseViewGenerator
     from .generators.view.fastapi_sse import FastApiSseViewGenerator
+    from .generators.view.kubernetes_fastapi_sse import KubernetesFastApiSseViewGenerator
     from .generators.view.static_html import StaticHtmlViewGenerator
 
     reg = get_registry()
@@ -80,5 +82,7 @@ def register_default_generators() -> None:
     reg.register(KubernetesGenerator())
     reg.register(OpenApiGenerator())
     reg.register(PhpStandaloneViewGenerator())
+    reg.register(DockerFastApiSseViewGenerator())
     reg.register(FastApiSseViewGenerator())
+    reg.register(KubernetesFastApiSseViewGenerator())
     reg.register(StaticHtmlViewGenerator())

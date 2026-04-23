@@ -11,6 +11,7 @@ and emits a deployable service across three orthogonal axes:
 | code  | `python-fastapi`, `node-fastify`                     |
 | infra | `docker`, `kubernetes`                               |
 | wire  | `openapi` (AsyncAPI, Proto are 1-file additions)     |
+| view  | `php-standalone`, `static-html`, `fastapi-sse`, `docker-fastapi-sse`, `kubernetes-fastapi-sse` |
 
 The same bundle compiles to **any combination** — swap `--targets` and nothing
 else changes. No DTOs, no per-target IR forks, no Traefik.
@@ -24,7 +25,7 @@ python -m factory.cli list
 # Show the stable hash of a bundle (useful for image caching)
 python -m factory.cli hash bundles/connect-test-service.bundle.json --contracts contracts
 
-# Compile bundle into Python+Docker+OpenAPI
+# Compile SERVICE_BUNDLE into Python+Docker+OpenAPI
 python -m factory.cli compile bundles/connect-test-service.bundle.json \
     --contracts contracts \
     --targets python-fastapi,docker,openapi \
@@ -35,6 +36,11 @@ python -m factory.cli compile bundles/connect-test-service-node.bundle.json \
     --contracts contracts \
     --targets node-fastify,kubernetes \
     --out ./dist-node
+
+# Compile VIEW_BUNDLE (read-only aggregation view) into a PHP standalone
+python -m factory.cli compile bundles/protocol-dashboard.bundle.json \
+    --targets view/php-standalone \
+    --out ./dist-dashboard
 
 # Tests
 pytest tests/
@@ -167,11 +173,18 @@ service-factory/
 │       ├── infra/
 │       │   ├── docker.py
 │       │   └── kubernetes.py
-│       └── wire/
-│           └── openapi.py
+│       ├── wire/
+│       │   └── openapi.py
+│       └── view/
+│           ├── php_standalone.py
+│           ├── static_html.py
+│           ├── fastapi_sse.py
+│           ├── docker_fastapi_sse.py
+│           └── kubernetes_fastapi_sse.py
 ├── bundles/
 │   ├── connect-test-service.bundle.json        (Python + Docker + Postgres + LiteLLM)
-│   └── connect-test-service-node.bundle.json   (Node + k8s, no storage)
+│   ├── connect-test-service-node.bundle.json   (Node + k8s, no storage)
+│   └── protocol-dashboard.bundle.json          (VIEW_BUNDLE → PHP standalone)
 ├── contracts/                   Sample CQRS contracts (from the existing ecosystem)
 ├── tests/
 │   └── test_factory.py          15 tests, all green

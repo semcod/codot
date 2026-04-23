@@ -93,6 +93,31 @@ def run_agent(base: str, token: str, agent_path: str) -> dict:
     return r.json()
 
 
+def _print_agent_result(result: dict) -> None:
+    print("=== AGENT OUTPUT ===")
+    print(json.dumps(result.get("output", {}), indent=2, ensure_ascii=False))
+    trace = result.get("reasoning_trace", [])
+    if trace:
+        print("\n=== TRACE ===")
+        for line in trace:
+            print(f"  {line}")
+
+
+def _print_pipeline_result(result: dict) -> None:
+    meta = result.get("meta", {})
+    trace = meta.get("pipeline_trace", [])
+    for t in trace:
+        print(f"  step {t['step']}: {t['command']} → mime={t.get('mime')}")
+    if "payload_b64" in result:
+        try:
+            decoded = base64.b64decode(result["payload_b64"]).decode("utf-8")
+            print("\n=== OUTPUT ===")
+            print(decoded)
+        except Exception:
+            print("\n=== OUTPUT (base64) ===")
+            print(result["payload_b64"])
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run CQRS workflows / agents from CLI")
     parser.add_argument("file", help="JSON workflow or agent definition")
@@ -119,26 +144,9 @@ def main() -> int:
         return 1
 
     if args.agent:
-        print("=== AGENT OUTPUT ===")
-        print(json.dumps(result.get("output", {}), indent=2, ensure_ascii=False))
-        trace = result.get("reasoning_trace", [])
-        if trace:
-            print("\n=== TRACE ===")
-            for line in trace:
-                print(f"  {line}")
+        _print_agent_result(result)
     else:
-        meta = result.get("meta", {})
-        trace = meta.get("pipeline_trace", [])
-        for t in trace:
-            print(f"  step {t['step']}: {t['command']} → mime={t.get('mime')}")
-        if "payload_b64" in result:
-            try:
-                decoded = base64.b64decode(result["payload_b64"]).decode("utf-8")
-                print("\n=== OUTPUT ===")
-                print(decoded)
-            except Exception:
-                print("\n=== OUTPUT (base64) ===")
-                print(result["payload_b64"])
+        _print_pipeline_result(result)
 
     return 0
 

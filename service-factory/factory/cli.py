@@ -17,13 +17,28 @@ from . import get_registry, register_default_generators
 from .ir import BundleLoader
 
 
+def _load_bundle(args: argparse.Namespace):
+    contracts_dir = Path(args.contracts) if args.contracts else Path(args.bundle).parent
+    loader = BundleLoader(contracts_dir)
+    return loader.load(Path(args.bundle))
+
+
+def _write_target_files(files: dict[str, str], out_root: Path, target: str, verbose: bool) -> int:
+    count = 0
+    for rel_path, content in files.items():
+        dest = out_root / rel_path
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(content)
+        count += 1
+        if verbose:
+            print(f"  [{target}] wrote {rel_path} ({len(content)} bytes)")
+    return count
+
+
 def cmd_compile(args: argparse.Namespace) -> int:
     register_default_generators()
     reg = get_registry()
-
-    contracts_dir = Path(args.contracts) if args.contracts else Path(args.bundle).parent
-    loader = BundleLoader(contracts_dir)
-    bundle = loader.load(Path(args.bundle))
+    bundle = _load_bundle(args)
 
     targets = [t.strip() for t in args.targets.split(",") if t.strip()]
     if not targets:
@@ -42,13 +57,7 @@ def cmd_compile(args: argparse.Namespace) -> int:
             return 2
 
         files = gen.generate(bundle)
-        for rel_path, content in files.items():
-            dest = out_root / rel_path
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            dest.write_text(content)
-            total_files += 1
-            if args.verbose:
-                print(f"  [{target}] wrote {rel_path} ({len(content)} bytes)")
+        total_files += _write_target_files(files, out_root, target, args.verbose)
 
     print(
         f"compiled bundle {bundle.name!r} (hash={bundle.contract_hash()}) "
@@ -66,9 +75,7 @@ def cmd_list(args: argparse.Namespace) -> int:
 
 
 def cmd_hash(args: argparse.Namespace) -> int:
-    contracts_dir = Path(args.contracts) if args.contracts else Path(args.bundle).parent
-    loader = BundleLoader(contracts_dir)
-    bundle = loader.load(Path(args.bundle))
+    bundle = _load_bundle(args)
     print(bundle.contract_hash())
     return 0
 

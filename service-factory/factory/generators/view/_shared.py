@@ -7,6 +7,7 @@ pulls nothing beyond an empty namespace.
 from __future__ import annotations
 
 import re
+from urllib.parse import urlparse
 
 _REFRESH_RE = re.compile(r"^\s*(\d+)\s*(ms|s|m|h)?\s*$", re.IGNORECASE)
 
@@ -31,3 +32,11 @@ def refresh_to_ms(value: str) -> int:
 def is_never(value: str) -> bool:
     """Return True when the refresh value means 'fetch once, do not poll'."""
     return bool(value) and value.strip().lower() == "never"
+
+
+def uses_host_local_sources(bundle) -> bool:
+    for source in bundle.sources:
+        host = urlparse(source.uri).hostname or ""
+        if host in {"localhost", "127.0.0.1"}:
+            return True
+    return False

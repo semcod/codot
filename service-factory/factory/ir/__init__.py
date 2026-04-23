@@ -285,6 +285,16 @@ class BundleLoader:
             exposure=Exposure(**raw.get("exposure", {})),
         )
 
+    def load_from_dict(self, raw: dict, bundle_path: Path | None = None) -> AnyBundle:
+        """Load bundle from an already-parsed dict (no disk read)."""
+        path = bundle_path or Path("bundle.json")
+        kind = raw.get("kind", "SERVICE_BUNDLE")
+        if kind == "VIEW_BUNDLE":
+            return self._load_view(raw, path)
+        if kind == "SERVICE_BUNDLE":
+            return self._load_service(raw, path)
+        raise ValueError(f"unknown kind {kind!r} (expected SERVICE_BUNDLE or VIEW_BUNDLE)")
+
     def _load_view(self, raw: dict, bundle_path: Path) -> ViewBundle:
         self._validate_view(raw, bundle_path)
         sources = [Source(**s) for s in raw.get("sources", [])]
