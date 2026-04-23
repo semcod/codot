@@ -1,0 +1,28 @@
+{
+  "bundle": "news-aggregator-view",
+  "kind": "VIEW_BUNDLE",
+  "version": "1.0.0",
+  "description": "Dashboard rendering aggregated news from news-aggregator-service",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "go_temporal",
+  "sources": [
+    {
+      "name": "news-api",
+      "uri": "http://localhost:8090/GetNews?source=all&limit=50",
+      "refresh_sec": 60,
+      "type": "http_get",
+      "depends_on": ["news-aggregator-service"]
+    }
+  ],
+  "template": {
+    "engine": "jinja2",
+    "source_uri": "file:///templates/news-dashboard.html"
+  },
+  "output": {
+    "format": "html",
+    "runtime": {
+      "port": 8083,
+      "lang": "php"
+    }
+  }
+}

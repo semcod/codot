@@ -9,6 +9,7 @@ COPY llm/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY llm/app.py /app/app.py
+COPY llm/audit.py /app/audit.py
 COPY llm/acl.yaml /app/acl.yaml
 COPY bundle.schema.json /app/bundle.schema.json
 

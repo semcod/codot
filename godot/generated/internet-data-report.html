@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Combined weather + currency report fetched from public internet APIs</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 40px auto; padding: 20px; }
+    h1 { color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { text-align: left; padding: 8px; border-bottom: 2px solid #333; }
+    tr:hover { background: #f5f5f5; }
+    .meta { color: #666; font-size: 0.9em; margin-bottom: 20px; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:4px; background:#007acc; color:#fff; font-size:0.8em; }
+  </style>
+</head>
+<body>
+  <h1>Combined weather + currency report fetched from public internet APIs</h1>
+  <div class="meta">
+    <span class="badge">VIEW_BUNDLE</span>
+    <span>Bundle: <code>internet-data-report</code></span>
+    <span> | Generated: 2026-04-23T20:05:11.923011Z</span>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Source</th><th>Data</th></tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid #ddd;font-weight:bold">weather-berlin</td>
+          <td style="padding:8px;border-bottom:1px solid #ddd">
+            <pre style="margin:0;white-space:pre-wrap;word-break:break-word">{
+  "latitude": 52.52,
+  "longitude": 13.419998,
+  "generationtime_ms": 0.08785724639892578,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 38.0,
+  "current_weather_units": {
+    "time": "iso8601",
+    "interval": "seconds",
+    "temperature": "°C",
+    "windspeed": "km/h",
+    "winddirection": "°",
+    "is_day": "",
+    "weathercode": "wmo code"
+  },
+  "current_weather": {
+    "time": "2026-04-23T20:00",
+    "interval": 900,
+    "temperature": 13.5,
+    "windspeed": 13.0,
+    "winddirection": 294,
+    "is_day": 0,
+    "weathercode": 1
+  }
+}</pre>
+          </td>
+        </tr>
+        
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid #ddd;font-weight:bold">nbp-rates</td>
+          <td style="padding:8px;border-bottom:1px solid #ddd">
+            <pre style="margin:0;white-space:pre-wrap;word-break:break-word">[
+  {
+    "table": "A",
+    "no": "078/A/NBP/2026",
+    "effectiveDate": "2026-04-23",
+    "rates": [
+      {
+        "currency": "bat (Tajlandia)",
+        "code": "THB",
+        "mid": 0.112
+      },
+      {
+        "currency": "dolar amerykański",
+        "code": "USD",
+        "mid": 3.6321
+      },
+      {
+        "currency": "dolar australijski",
+        "code": "AUD",
+        "mid": 2.5981
+      },
+      {
+        "currency": "dolar Hongkongu",
+        "code": "HKD",
+        "mid": 0.4637
+      },
+      {
+        "currency": "dolar kanadyjski",
+        "code": "CAD",
+        "mid": 2.6585
+      },
+      {
+        "currency": "dolar nowozelandzki",
+        "code": "NZD",
+        "mid": 2.1379
+      },
+      {
+        "currency": "dolar singapurski",
+        "code": "SGD",
+        "mid": 2.8461
+      },
+      {
+        "currency": "euro",
+        "code": "EUR",
+        "mid": 4.2501
+      },
+      {
+        "currency": "forint (Węgry)",
+        "code": "HUF",
+        "mid": 0.011617
+      },
+      {
+        "currency": "frank szwajcarski",
+        "code": "CHF",
+        "mid": 4.6318
+      },
+      {
+        "currency": "funt szterling",
+        "code": "GBP",
+        "mid": 4.9046
+      },
+      {
+        "currency": "hrywna (Ukraina)",
+        "code": "UAH",
+        "mid": 0.0827
+      },
+      {
+        "currency": "jen (Japonia)",
+        "code": "JPY",
+        "mid": 0.022744
+      },
+      {
+        "currency": "korona czeska",
+        "code": "CZK",
+        "mid": 0.1744
+      },
+      {
+        "currency": "korona duńska",
+        "code": "DKK",
+        "mid": 0.5687
+      },
+      {
+        "currency": "korona islandzka",
+        "code": "ISK",
+        "mid": 0.029556
+      },
+      {
+        "currency": "korona norweska",
+        "code": "NOK",
+        "mid": 0.3902
+      },
+      {
+        "currency": "korona szwedzka",
+        "code": "SEK",
+        "mid": 0.3939
+      },
+      {
+        "currency": "lej rumuński",
+        "code": "RON",
+        "mi</pre>
+          </td>
+        </tr>
+        
+    </tbody>
+  </table>
+</body>
+</html>

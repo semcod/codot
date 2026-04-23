@@ -1,0 +1,78 @@
+{
+  "bundle": "news-aggregator-service",
+  "kind": "SERVICE_BUNDLE",
+  "version": "1.0.0",
+  "description": "Fetch and parse RSS feeds from multiple sources (Hacker News, Reddit programming, Lobsters)",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "python_fastapi",
+  "contracts": [
+    {
+      "name": "GetNews",
+      "kind": "CQRS_QUERY",
+      "input": {
+        "source": {
+          "type": "string",
+          "enum": ["hackernews", "reddit_programming", "lobsters", "all"]
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 30
+        }
+      },
+      "output": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "link": { "type": "string" },
+              "published": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+        "count": { "type": "integer" }
+      }
+    },
+    {
+      "name": "RefreshFeeds",
+      "kind": "CQRS_COMMAND",
+      "input": {},
+      "output": {
+        "refreshed": { "type": "integer" },
+        "errors": { "type": "array" }
+      }
+    }
+  ],
+  "sources": [
+    {
+      "name": "hackernews-rss",
+      "uri": "https://news.ycombinator.com/rss",
+      "refresh_sec": 300,
+      "type": "rss"
+    },
+    {
+      "name": "reddit-programming-rss",
+      "uri": "https://www.reddit.com/r/programming/.rss",
+      "refresh_sec": 600,
+      "type": "rss"
+    },
+    {
+      "name": "lobsters-rss",
+      "uri": "https://lobste.rs/rss",
+      "refresh_sec": 300,
+      "type": "rss"
+    }
+  ],
+  "output": {
+    "format": "python_fastapi",
+    "runtime": {
+      "port": 8090,
+      "lang": "python"
+    }
+  },
+  "storage": "postgres"
+}

@@ -1,0 +1,26 @@
+{
+  "bundle": "llm-device-dashboard",
+  "kind": "VIEW_BUNDLE",
+  "version": "1.0.0",
+  "description": "Zbuduj live dashboard view bundle dla mock API z web pwa targets.",
+  "schema_uri": "file:///app/bundle.schema.json",
+  "runner": "go_temporal",
+  "targets": [
+    "web",
+    "pwa"
+  ],
+  "sources": [
+    {
+      "name": "mock-api",
+      "uri": "http://mock-api:8001/api/v1/protocols/123",
+      "refresh_sec": 15
+    }
+  ],
+  "output": {
+    "format": "fastapi_sse",
+    "runtime": {
+      "port": 8082,
+      "lang": "php"
+    }
+  }
+}

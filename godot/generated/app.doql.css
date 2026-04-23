@@ -1,0 +1,39 @@
+// Auto-generated from Godot Bundle: weather-europe-view
+// Source: /home/tom/github/semcod/codot/godot/bundles/weather-europe-view.json
+
+app {
+  name: weather-europe-view;
+  version: 1.0.0;
+  description: "Live weather dashboard for Europe (Berlin, Paris, Rome, Warsaw) from Open-Meteo";
+}
+
+interface[type="web"] {
+  type: spa;
+  framework: react;
+}
+
+workflow[name="fetch-weather-berlin"] {
+  trigger: interval 300s;
+  step-1: run cmd=curl -fsS "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true" | tee /tmp/weather-berlin.json;
+}
+
+workflow[name="fetch-weather-paris"] {
+  trigger: interval 300s;
+  step-1: run cmd=curl -fsS "https://api.open-meteo.com/v1/forecast?latitude=48.85&longitude=2.35&current_weather=true" | tee /tmp/weather-paris.json;
+}
+
+workflow[name="fetch-weather-rome"] {
+  trigger: interval 300s;
+  step-1: run cmd=curl -fsS "https://api.open-meteo.com/v1/forecast?latitude=41.90&longitude=12.50&current_weather=true" | tee /tmp/weather-rome.json;
+}
+
+workflow[name="fetch-weather-warsaw"] {
+  trigger: interval 300s;
+  step-1: run cmd=curl -fsS "https://api.open-meteo.com/v1/forecast?latitude=52.23&longitude=21.01&current_weather=true" | tee /tmp/weather-warsaw.json;
+}
+
+runtime {
+  port: 8082;
+  language: php;
+}
+

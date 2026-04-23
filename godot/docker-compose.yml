@@ -32,9 +32,8 @@ services:
     container_name: temporal-server
     ports:
       - "${TEMPORAL_PORT:-7233}:7233"
-      - "8233:8233"
     environment:
-      - DB=postgresql
+      - DB=postgres12
       - DB_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER:-temporal}
       - POSTGRES_PWD=${POSTGRES_PASSWORD:-temporal}
@@ -43,6 +42,19 @@ services:
       - bundle-network
     depends_on:
       - postgres
+
+  # Temporal Web UI
+  temporal-ui:
+    image: temporalio/ui:latest
+    container_name: temporal-ui
+    ports:
+      - "8233:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    networks:
+      - bundle-network
+    depends_on:
+      - temporal
 
   # PostgreSQL for Temporal
   postgres:
@@ -58,6 +70,7 @@ services:
       - bundle-network
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-audit.sql:/docker-entrypoint-initdb.d/99-init-audit.sql:ro
 
   # Schema server (Caddy for serving bundle schema)
   schema-server:
@@ -84,6 +97,11 @@ services:
       - LLM_OFFLINE=true
       - BUNDLE_OUTPUT_DIR=/app/bundles/generated
       - BUNDLE_SCHEMA_FILE=/app/bundle.schema.json
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-temporal}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-temporal}
+      - POSTGRES_DB=${POSTGRES_DB:-temporal}
     volumes:
       - ./llm:/app
       - ./bundles:/app/bundles

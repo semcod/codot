@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"time"
 
 	"go.temporal.io/sdk/client"
@@ -76,6 +79,22 @@ func DeployApplicationBundle(ctx workflow.Context, bundleJSON []byte) (string, e
 	return DeployViewBundle(ctx, bundleJSON)
 }
 
+// BuildAppWorkflow generates and builds a DOQL application from an APPLICATION_BUNDLE.
+func BuildAppWorkflow(ctx workflow.Context, bundleJSON []byte) (string, error) {
+	var b Bundle
+	if err := json.Unmarshal(bundleJSON, &b); err != nil {
+		return "", err
+	}
+	opts := workflow.ActivityOptions{StartToCloseTimeout: 10 * time.Minute}
+	ctx = workflow.WithActivityOptions(ctx, opts)
+
+	var buildDir string
+	if err := workflow.ExecuteActivity(ctx, BuildDOQLActivity, bundleJSON, b.Bundle).Get(ctx, &buildDir); err != nil {
+		return "", fmt.Errorf("doql build: %w", err)
+	}
+	return buildDir, nil
+}
+
 func GenerateCodeActivity(ctx context.Context, bundleJSON []byte) (string, error) {
 	var b Bundle
 	if err := json.Unmarshal(bundleJSON, &b); err != nil {
@@ -99,6 +118,56 @@ func GenerateCodeActivity(ctx context.Context, bundleJSON []byte) (string, error
 }
 func DeployServiceActivity(ctx context.Context, codePath string, port int) (string, error) {
 	return fmt.Sprintf("http://localhost:%d", port), nil
+}
+
+// BuildDOQLActivity writes the bundle to a temp file, generates app.doql.css,
+// and invokes the DOQL CLI to produce build artifacts.
+func BuildDOQLActivity(ctx context.Context, bundleJSON []byte, bundleName string) (string, error) {
+	// 1. Write bundle JSON to a temp file
+	tmpFile := fmt.Sprintf("/tmp/buildapp-%s.json", bundleName)
+	if err := os.WriteFile(tmpFile, bundleJSON, 0644); err != nil {
+		return "", fmt.Errorf("write temp bundle: %w", err)
+	}
+
+	// 2. Determine project root (assumes this binary runs from src/)
+	root, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("get wd: %w", err)
+	}
+	root = filepath.Dir(root) // go up from src/ to godot/
+
+	// 3. Generate app.doql.css
+	genCmd := exec.CommandContext(ctx, "python3", "scripts/bundle-to-doql.py", tmpFile)
+	genCmd.Dir = root
+	genCmd.Env = os.Environ()
+	cssPath := filepath.Join(root, "generated", "app.doql.css")
+	outFile, err := os.Create(cssPath)
+	if err != nil {
+		return "", fmt.Errorf("create css file: %w", err)
+	}
+	defer outFile.Close()
+	genCmd.Stdout = outFile
+	genCmd.Stderr = os.Stderr
+	if err := genCmd.Run(); err != nil {
+		return "", fmt.Errorf("generate doql: %w", err)
+	}
+
+	// 4. Build DOQL artifacts
+	buildCmd := exec.CommandContext(ctx,
+		"python3", "-m", "doql.cli",
+		"-f", "generated/app.doql.css",
+		"build",
+	)
+	buildCmd.Dir = root
+	buildCmd.Env = os.Environ()
+	buildCmd.Stdout = os.Stdout
+	buildCmd.Stderr = os.Stderr
+	if err := buildCmd.Run(); err != nil {
+		return "", fmt.Errorf("doql build: %w", err)
+	}
+
+	buildDir := filepath.Join(root, "generated", "build")
+	return buildDir, nil
 }
 func HealthcheckActivity(ctx context.Context, svcURL string, sources []Source) error {
 	c := &http.Client{Timeout: 10 * time.Second}
@@ -125,10 +194,12 @@ func main() {
 	w.RegisterWorkflow(DeployServiceBundle)
 	w.RegisterWorkflow(DeployWorkflowBundle)
 	w.RegisterWorkflow(DeployApplicationBundle)
+	w.RegisterWorkflow(BuildAppWorkflow)
 	w.RegisterActivity(GenerateCodeActivity)
 	w.RegisterActivity(DeployServiceActivity)
 	w.RegisterActivity(HealthcheckActivity)
 	w.RegisterActivity(CleanupActivity)
+	w.RegisterActivity(BuildDOQLActivity)
 	if err := w.Run(worker.InterruptCh()); err != nil {
 		log.Fatalln(err)
 	}

@@ -167,6 +167,7 @@ import sys
 payload = json.loads(sys.argv[1])
 bundle = payload["bundle"]
 assert bundle["kind"] == "APPLICATION_BUNDLE", bundle
+assert bundle["runner"] == "go_temporal", bundle
 assert set(["desktop", "mobile", "web", "pwa"]).issubset(set(bundle.get("targets", []))), bundle
 print("bundle file:", payload["file_path"])
 PY

@@ -1,0 +1,59 @@
+{
+  "bundle": "nbp-currency-service",
+  "kind": "SERVICE_BUNDLE",
+  "version": "1.0.0",
+  "description": "Currency exchange rates service from Polish National Bank (NBP) API",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "python_fastapi",
+  "contracts": [
+    {
+      "name": "GetTableA",
+      "kind": "CQRS_QUERY",
+      "input": {},
+      "output": {
+        "table": {
+          "type": "string"
+        },
+        "rates": {
+          "type": "array"
+        }
+      }
+    },
+    {
+      "name": "GetRate",
+      "kind": "CQRS_QUERY",
+      "input": {
+        "currency_code": {
+          "type": "string"
+        }
+      },
+      "output": {
+        "currency": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "mid": {
+          "type": "number"
+        }
+      }
+    }
+  ],
+  "sources": [
+    {
+      "name": "nbp-table-a",
+      "uri": "https://api.nbp.pl/api/exchangerates/tables/A/?format=json",
+      "refresh_sec": 3600,
+      "type": "http_get"
+    }
+  ],
+  "output": {
+    "format": "python_fastapi",
+    "runtime": {
+      "port": 8080,
+      "lang": "python"
+    }
+  },
+  "storage": "postgres"
+}

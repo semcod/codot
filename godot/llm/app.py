@@ -22,6 +22,12 @@ try:
 except Exception:  # pragma: no cover - optional dependency at runtime
     litellm_completion = None
 
+try:
+    import audit
+    audit.ensure_table()
+except Exception:  # pragma: no cover - optional at runtime (no postgres)
+    audit = None  # type: ignore[assignment]
+
 APP_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = APP_ROOT
 DEFAULT_SCHEMA_FILE = REPO_ROOT / "bundle.schema.json"
@@ -242,12 +248,12 @@ def infer_kind(prompt: str, explicit: str | None = None) -> str:
     if explicit:
         return explicit
     lower = prompt.lower()
-    if any(token in lower for token in ["desktop", "mobile", "web", "pwa", "application", "app ", "app\n"]):
-        return "APPLICATION_BUNDLE"
     if any(token in lower for token in ["workflow", "pipeline", "orchestrate", "dag"]):
         return "WORKFLOW_BUNDLE"
     if any(token in lower for token in ["dashboard", "view", "ui", "frontend", "panel", "stream", "live"]):
         return "VIEW_BUNDLE"
+    if any(token in lower for token in ["desktop", "mobile", "web", "pwa", "application", "app ", "app\n"]):
+        return "APPLICATION_BUNDLE"
     return "SERVICE_BUNDLE"
 
 
@@ -268,7 +274,7 @@ def infer_runner(kind: str, targets: list[str], explicit: str | None = None) -> 
     if explicit:
         return explicit
     if kind == "APPLICATION_BUNDLE":
-        return "python_fastapi"
+        return STATE.settings.default_runner
     if kind == "VIEW_BUNDLE" and any(target in targets for target in ["web", "pwa"]):
         return "go_temporal"
     return STATE.settings.default_runner
@@ -522,19 +528,44 @@ async def fetch_context(request: FetchManyRequest) -> dict[str, Any]:
 
 @main_app.post("/generate/bundle")
 async def generate_bundle(request: GenerateBundleRequest) -> dict[str, Any]:
-    bundle, llm_used, context_items = await build_bundle_from_prompt(request)
-    file_path = None
-    if request.write_file:
-        file_path = str(await write_bundle(bundle))
-    return {
-        "bundle": bundle,
-        "bundle_name": bundle["bundle"],
-        "kind": bundle["kind"],
-        "targets": bundle.get("targets", []),
-        "file_path": file_path,
-        "llm_used": llm_used,
-        "context": context_items,
-    }
+    import time as _time
+    t0 = _time.time()
+    error_text: str | None = None
+    bundle: dict[str, Any] = {}
+    try:
+        bundle, llm_used, context_items = await build_bundle_from_prompt(request)
+        file_path = None
+        if request.write_file:
+            file_path = str(await write_bundle(bundle))
+        return {
+            "bundle": bundle,
+            "bundle_name": bundle.get("bundle", "unknown"),
+            "kind": bundle.get("kind", "SERVICE_BUNDLE"),
+            "targets": bundle.get("targets", []),
+            "file_path": file_path,
+            "llm_used": llm_used,
+            "context": context_items,
+        }
+    except Exception as exc:
+        error_text = str(exc)
+        raise
+    finally:
+        if audit is not None:
+            try:
+                audit.log_generation(
+                    endpoint="/generate/bundle",
+                    prompt=request.prompt or "",
+                    kind=bundle.get("kind", "SERVICE_BUNDLE") if bundle else "",
+                    runner=bundle.get("runner", "") if bundle else "",
+                    targets=bundle.get("targets", []) if bundle else [],
+                    generated_bundle=bundle if bundle else None,
+                    acl_allowed=True,
+                    error=error_text,
+                    client_ip=None,
+                    duration_ms=(_time.time() - t0) * 1000,
+                )
+            except Exception:
+                pass
 
 
 @main_app.post("/generate/bundles")

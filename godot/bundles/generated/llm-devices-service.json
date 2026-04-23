@@ -1,0 +1,22 @@
+{
+  "bundle": "llm-devices-service",
+  "kind": "SERVICE_BUNDLE",
+  "version": "1.0.0",
+  "description": "Stwórz bundle usługi dla urządzeń z endpointem mock-api i wyjściem python fastapi.",
+  "schema_uri": "file:///app/bundle.schema.json",
+  "runner": "go_temporal",
+  "sources": [
+    {
+      "name": "mock-api",
+      "uri": "http://mock-api:8001/api/v1/devices",
+      "refresh_sec": 15
+    }
+  ],
+  "output": {
+    "format": "python_fastapi",
+    "runtime": {
+      "port": 8080,
+      "lang": "go"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "bundle": "llm-multi-platform-app",
+  "kind": "APPLICATION_BUNDLE",
+  "version": "1.0.0",
+  "description": "Wygeneruj application bundle dla desktop, mobile, web i pwa klienta danych.",
+  "schema_uri": "file:///app/bundle.schema.json",
+  "runner": "go_temporal",
+  "targets": [
+    "desktop",
+    "mobile",
+    "web",
+    "pwa"
+  ],
+  "output": {
+    "format": "desktop_mobile_app",
+    "runtime": {
+      "port": 8086,
+      "lang": "python"
+    }
+  }
+}

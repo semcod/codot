@@ -1,0 +1,9 @@
+{
+  "version": "2",
+  "generated_at": "2026-04-23T20:26:00.467567Z",
+  "doql_version": "1.0.26",
+  "sections": {
+    "spec_file": "0a30b19b5aaee2d1338d021324373221ad9ff3a659f9530d8f8c6dca3a602902",
+    "interface:web": "5f2d4bc0ed5e710e"
+  }
+}

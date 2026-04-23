@@ -186,6 +186,20 @@ func TestOutputValidation(t *testing.T) {
 	}
 }
 
+func TestResolvedSchemaURIFallback(t *testing.T) {
+	t.Setenv("BUNDLE_SCHEMA_URI", "file:///tmp/test-bundle.schema.json")
+
+	bundleWithPlaceholder := Bundle{SchemaURI: placeholderSchemaURI}
+	if got := bundleWithPlaceholder.resolvedSchemaURI(); got != "file:///tmp/test-bundle.schema.json" {
+		t.Fatalf("placeholder schema URI fallback mismatch: got %s", got)
+	}
+
+	bundleWithEmptySchema := Bundle{}
+	if got := bundleWithEmptySchema.resolvedSchemaURI(); got != "file:///tmp/test-bundle.schema.json" {
+		t.Fatalf("empty schema URI fallback mismatch: got %s", got)
+	}
+}
+
 func TestBundleUnmarshal(t *testing.T) {
 	bundleJSON := `{
 		"bundle": "test-bundle",

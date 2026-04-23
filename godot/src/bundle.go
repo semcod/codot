@@ -44,8 +44,31 @@ type Output struct {
 	} `json:"runtime,omitempty"`
 }
 
+const placeholderSchemaURI = "https://example.com/bundle.schema.json"
+
+func (b *Bundle) resolvedSchemaURI() string {
+	if b.SchemaURI != "" && b.SchemaURI != placeholderSchemaURI {
+		return b.SchemaURI
+	}
+	if schemaURI := os.Getenv("BUNDLE_SCHEMA_URI"); schemaURI != "" {
+		return schemaURI
+	}
+	if _, err := os.Stat("../bundle.schema.json"); err == nil {
+		return "file://../bundle.schema.json"
+	}
+	if _, err := os.Stat("bundle.schema.json"); err == nil {
+		return "file://bundle.schema.json"
+	}
+	return b.SchemaURI
+}
+
 // LoadSchema fetches the schema from schema_uri and validates the bundle
 func (b *Bundle) LoadSchema() error {
+	schemaURI := b.resolvedSchemaURI()
+	if schemaURI == "" {
+		return fmt.Errorf("schema_uri is empty and no fallback schema is configured")
+	}
+	b.SchemaURI = schemaURI
 	log.Printf("Validating bundle %s against schema %s", b.Bundle, b.SchemaURI)
 
 	// Fetch schema from URI

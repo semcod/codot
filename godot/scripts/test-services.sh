@@ -75,9 +75,15 @@ echo ""
 # Test 2: Check Temporal server
 echo "Test 2: Checking Temporal server..."
 if wait_for_port localhost "${TEMPORAL_PORT:-7233}" 30 2; then
-    echo "✓ Temporal server is accessible on port ${TEMPORAL_PORT:-7233}"
+    echo "✓ Temporal gRPC frontend on port ${TEMPORAL_PORT:-7233}"
 else
-    echo "❌ Temporal server is not accessible on port ${TEMPORAL_PORT:-7233}"
+    echo "❌ Temporal gRPC frontend not accessible on port ${TEMPORAL_PORT:-7233}"
+    exit 1
+fi
+if wait_for_http "http://localhost:8233" 30 2; then
+    echo "✓ Temporal Web UI accessible at http://localhost:8233"
+else
+    echo "❌ Temporal Web UI not accessible at http://localhost:8233"
     exit 1
 fi
 echo ""
@@ -112,8 +118,8 @@ else
 fi
 echo ""
 
-# Test 6: Test schema loading with default schema
-echo "Test 6: Testing schema loading with default schema..."
+# Test 6: Check schema URI configuration
+echo "Test 6: Checking schema URI configuration..."
 echo "✓ Schema URI from env: $(docker exec godot-bundle-service sh -c 'echo $BUNDLE_SCHEMA_URI')"
 echo ""
 
@@ -127,7 +133,7 @@ echo "=== Service Testing Complete ==="
 echo ""
 echo "Service URLs:"
 echo "  Schema Server:  http://localhost:${SCHEMA_SERVER_PORT:-8084}/bundle.schema.json"
-echo "  Temporal Web:   http://localhost:${TEMPORAL_PORT:-7233}"
+echo "  Temporal Web:   http://localhost:8233"
 echo "  PostgreSQL:     localhost:${POSTGRES_PORT:-5433}"
 echo ""
 echo "Next steps:"

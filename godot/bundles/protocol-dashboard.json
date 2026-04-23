@@ -27,7 +27,9 @@
   },
   "output": {
     "format": "php",
-    "runtime": "standalone",
-    "port": 8082
+    "runtime": {
+      "port": 8082,
+      "lang": "php"
+    }
   }
 }

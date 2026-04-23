@@ -1,0 +1,34 @@
+{
+  "bundle": "combined-weather-news-report",
+  "kind": "VIEW_BUNDLE",
+  "version": "1.0.0",
+  "description": "Bundle-to-bundle composition: merges weather data and news feed into a single report",
+  "schema_uri": "https://example.com/bundle.schema.json",
+  "runner": "go_temporal",
+  "sources": [
+    {
+      "name": "weather-berlin",
+      "uri": "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true",
+      "refresh_sec": 300,
+      "type": "http_get"
+    },
+    {
+      "name": "news-headlines",
+      "uri": "http://localhost:8090/GetNews?source=all&limit=10",
+      "refresh_sec": 60,
+      "type": "http_get",
+      "depends_on": ["news-aggregator-service"]
+    }
+  ],
+  "template": {
+    "engine": "jinja2",
+    "source_uri": "file:///templates/combined-report.html"
+  },
+  "output": {
+    "format": "report",
+    "runtime": {
+      "port": 8084,
+      "lang": "php"
+    }
+  }
+}
