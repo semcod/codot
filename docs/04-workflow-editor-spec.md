@@ -458,6 +458,82 @@ Opiszę kroki na wysokim poziomie:
         - robić Command/Query nad:
             - URL‑zasobami,
             - API‑MCP,
+            - agentami z różnymi backendami (mcp, litellm, bash_cli).
+
+***
+
+## 6. Przykład workflow z Agentem MCP
+
+Twój DAG może teraz zawierać węzeł `type: "agent"` z backendem MCP:
+
+```json
+{
+  "version": "1.0",
+  "nodes": [
+    {
+      "id": "fetch1",
+      "label": "Fetch CSV",
+      "type": "fetch",
+      "uri": "https://example.com/table.csv",
+      "mime_type": "text/csv"
+    },
+    {
+      "id": "agent_mcp",
+      "label": "Analyze via MCP",
+      "type": "agent",
+      "role": "data-analyst",
+      "goal": "summarize CSV content",
+      "tools": ["read_csv", "summarize"],
+      "backend": "mcp",
+      "backend_config": {
+        "server_url": "http://mcp-server:8080/sse"
+      },
+      "input": "fetch1"
+    },
+    {
+      "id": "render1",
+      "label": "Render HTML",
+      "type": "command",
+      "command_type": "render-table-html",
+      "input": "agent_mcp",
+      "mime_type": "text/html"
+    }
+  ],
+  "outputs": [
+    { "id": "report", "label": "Report", "source": "render1" }
+  ],
+  "ui": { "layout": "LR" }
+}
+```
+
+Wykonanie przez pipeline CQRS:
+
+```bash
+curl -X PUT http://localhost:18080/commands/pipeline \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "meta": {
+      "steps": [
+        { "command": "fetch", "request": { "input_uri": "https://example.com/table.csv" } },
+        {
+          "command": "agent",
+          "request": { "meta": { "input": "$previous.output" } },
+          "agent_node": {
+            "id": "agent_mcp",
+            "role": "data-analyst",
+            "goal": "summarize CSV content",
+            "tools": ["read_csv", "summarize"],
+            "backend": "mcp",
+            "backend_config": { "stdio_command": ["python", "-m", "mcp_server_csv"] }
+          }
+        },
+        { "command": "render", "request": { "meta": { "input": "$previous.output" } } }
+      ]
+    }
+  }'
+```
+            - API‑MCP,
             - internal‑DB,
             - lakehouse‑plikami.
 

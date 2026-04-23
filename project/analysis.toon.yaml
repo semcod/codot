@@ -1,4 +1,4 @@
-# code2llm | 101f 12160L | python:24,md:20,json:16,yaml:13,shell:7,txt:4,typescript:3,yml:2,conf:2,javascript:2,toml:1,cfg:1 | 2026-04-23
+# code2llm | 101f 12326L | python:24,md:20,json:16,yaml:13,shell:7,txt:4,typescript:3,yml:2,conf:2,javascript:2,toml:1,cfg:1 | 2026-04-23
 # CC̄=1.2 | critical:0/436 | dups:0 | cycles:1
 
 HEALTH[0]: ok
@@ -6,7 +6,7 @@ HEALTH[0]: ok
 REFACTOR[1]:
   1. break 1 circular dependencies
 
-PIPELINES[139]:
+PIPELINES[135]:
   [1] Src [API]: API → getToken
       PURITY: 100% pure
   [2] Src [clearToken]: clearToken
@@ -41,27 +41,27 @@ LAYERS:
   │ map.toon.yaml               11L  0C    0m  CC=0.0    ←0
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
-  api/                            CC̄=1.6    ←in:14  →out:0
-  │ agent                      362L  0C    7m  CC=10     ←0
-  │ SUMD.md                    315L  0C   37m  CC=0.0    ←10
+  api/                            CC̄=1.7    ←in:14  →out:0
+  │ agent                      362L  0C    7m  CC=10     ←2
+  │ SUMD.md                    322L  0C   37m  CC=0.0    ←0
   │ main                       234L  0C   15m  CC=3      ←0
   │ mcp_client                 164L  4C   15m  CC=6      ←0
-  │ map.toon.yaml              155L  0C   37m  CC=0.0    ←0
-  │ __init__                   149L  3C   11m  CC=8      ←0
+  │ map.toon.yaml              162L  0C   37m  CC=0.0    ←0
+  │ __init__                   149L  3C   11m  CC=8      ←1
   │ models                     125L  13C    0m  CC=0.0    ←0
-  │ __init__                   102L  1C    6m  CC=3      ←0
+  │ __init__                   102L  1C    6m  CC=3      ←1
   │ render                      97L  1C    1m  CC=6      ←0
+  │ pipeline                    97L  1C    3m  CC=9      ←0
   │ sumd.json                   90L  0C    0m  CC=0.0    ←0
-  │ __init__                    80L  2C    7m  CC=2      ←5
+  │ __init__                    80L  2C    7m  CC=2      ←9
   │ converttojson               80L  1C    3m  CC=8      ←0
-  │ pipeline                    78L  1C    3m  CC=8      ←0
   │ __init__                    69L  3C    7m  CC=3      ←0
   │ rules.yaml                  66L  0C    0m  CC=0.0    ←0
   │ converttocsv                60L  1C    1m  CC=13     ←0
   │ __init__                    56L  2C    7m  CC=2      ←0
   │ converttoxml                51L  1C    1m  CC=9      ←0
   │ file_protocol               51L  1C    2m  CC=10     ←0
-  │ __init__                    48L  1C    2m  CC=7      ←0
+  │ __init__                    48L  1C    2m  CC=7      ←1
   │ from_url                    45L  1C    1m  CC=9      ←0
   │ data_protocol               40L  1C    1m  CC=9      ←0
   │ config                      34L  1C    1m  CC=3      ←0
@@ -89,7 +89,7 @@ LAYERS:
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
   docs/                           CC̄=0.0    ←in:0  →out:0
-  │ 04-workflow-editor-spec.md   497L  3C    1m  CC=0.0    ←0
+  │ !! 04-workflow-editor-spec.md   573L  3C    1m  CC=0.0    ←0
   │ 03-multi-agent-architecture.md   295L  0C    0m  CC=0.0    ←0
   │ 02-market-comparison.md    276L  0C    0m  CC=0.0    ←0
   │ 01-cqrs-url-platform-status.md    66L  0C    0m  CC=0.0    ←0
@@ -99,24 +99,24 @@ LAYERS:
   │ 04-frontend-playground-status.md    45L  0C    0m  CC=0.0    ←0
   │
   ./                              CC̄=0.0    ←in:0  →out:0
-  │ !! SUMD.md                    650L  0C   66m  CC=0.0    ←0
+  │ !! SUMD.md                    664L  0C   66m  CC=0.0    ←0
   │ !! goal.yaml                  512L  0C    0m  CC=0.0    ←0
   │ README.md                  161L  1C    0m  CC=0.0    ←0
   │ sumd.json                  120L  0C    0m  CC=0.0    ←0
+  │ CHANGELOG.md               117L  0C    0m  CC=0.0    ←0
   │ pyproject.toml              94L  0C    0m  CC=0.0    ←0
-  │ CHANGELOG.md                92L  0C    0m  CC=0.0    ←0
   │ docker-compose.yml          89L  0C    0m  CC=0.0    ←0
   │ project.sh                  40L  0C    0m  CC=0.0    ←0
   │ Makefile                     0L  0C    0m  CC=0.0    ←0
   │
   project/                        CC̄=0.0    ←in:0  →out:0
-  │ !! calls.yaml                1110L  0C    0m  CC=0.0    ←0
-  │ !! context.md                 526L  0C    0m  CC=0.0    ←0
+  │ !! calls.yaml                1121L  0C    0m  CC=0.0    ←0
+  │ !! context.md                 522L  0C    0m  CC=0.0    ←0
   │ README.md                  339L  0C    0m  CC=0.0    ←0
-  │ map.toon.yaml              218L  0C   66m  CC=0.0    ←0
-  │ calls.toon.yaml            169L  0C    0m  CC=0.0    ←0
-  │ analysis.toon.yaml         165L  0C    0m  CC=0.0    ←0
-  │ project.toon.yaml           54L  0C    0m  CC=0.0    ←0
+  │ map.toon.yaml              229L  0C   66m  CC=0.0    ←0
+  │ calls.toon.yaml            171L  0C    0m  CC=0.0    ←0
+  │ analysis.toon.yaml         166L  0C    0m  CC=0.0    ←0
+  │ project.toon.yaml           51L  0C    0m  CC=0.0    ←0
   │ prompt.txt                  47L  0C    0m  CC=0.0    ←0
   │ evolution.toon.yaml         39L  0C    0m  CC=0.0    ←0
   │ duplication.toon.yaml        9L  0C    0m  CC=0.0    ←0

@@ -1,4 +1,4 @@
-# codot | 47f 3804L | python:28,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
+# codot | 47f 3823L | python:28,shell:8,less:5,javascript:4,typescript:1,css:1 | 2026-04-23
 # stats: 71 func | 47 cls | 47 mod | CC̄=2.4 | critical:1 | cycles:0
 # alerts[5]: CC _mcp_execute=10; CC _substitute=8; CC run_workflow=8; CC validate_against_schema_uri=7; CC _websocket_execute=6
 # hotspots[5]: _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _mcp_execute fan=10; _litellm_execute fan=10
@@ -14,7 +14,7 @@ M[47]:
   api/commands/converttojson.py,81
   api/commands/converttoxml.py,52
   api/commands/fetch.py,28
-  api/commands/pipeline.py,79
+  api/commands/pipeline.py,98
   api/commands/render.py,98
   api/config.py,35
   api/main.py,235

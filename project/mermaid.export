@@ -132,10 +132,10 @@ flowchart TD
         api__commands__converttojson__ConvertToJsonCommand___convert("_convert CC=8")
         api__commands__converttojson__ConvertToJsonCommand__execute["execute"]
         api__commands__converttobase64__ConvertToBase64Command__execute["execute"]
-        api__commands__converttoxml__ConvertToXmlCommand__execute("execute CC=9")
         api__commands__pipeline___to_data_uri["_to_data_uri"]
         api__commands__pipeline___substitute("_substitute CC=8")
-        api__commands__pipeline__PipelineCommand__execute("execute CC=8")
+        api__commands__pipeline__PipelineCommand__execute("execute CC=9")
+        api__commands__converttoxml__ConvertToXmlCommand__execute("execute CC=9")
     end
     subgraph api__config
         api__config__load_settings["load_settings"]
@@ -476,31 +476,6 @@ flowchart TD
     frontend__html__js__api__runCommand --> frontend__html__js__api__request
     frontend__html__js__api__runQuery --> frontend__html__js__api__request
     frontend__html__js__app__renderDecoded --> frontend__html__js__app__decodeB64
-    cqrs_backend_workflows__server___handle_command --> cqrs_backend_workflows__server___result_to_data_uri
-    cqrs_backend_workflows__server___handle_render --> cqrs_backend_workflows__server___result_to_data_uri
-    cqrs_backend_workflows__server__list_workflows --> api__commands__CommandRegistry__list
-    cqrs_backend_workflows__server__create_workflow --> cqrs_backend_workflows__server__validate_workflow
-    cqrs_backend_workflows__server__update_workflow --> cqrs_backend_workflows__server__validate_workflow
-    cqrs_backend_workflows__server__run_workflow --> cqrs_backend_workflows__server__execute_node
-    api__main__issue_token --> api__SUMD__authenticate
-    api__main__issue_token --> api__SUMD__get_jwt_manager
-    api__main__execute_command --> api__SUMD__get_engine
-    api__main__execute_query --> api__SUMD__get_engine
-    api__main__execute_query_get --> api__main__execute_query
-    api__main__run_agent --> api__SUMD__execute_agent
-    api__main__run_agent --> api__SUMD__get_engine
-    api__commands__fetch__FetchCommand__execute --> api__SUMD__get_registry
-    api__commands__converttocsv__ConvertToCsvCommand__execute --> api__commands__CommandRegistry__list
-    api__commands__register_default_commands --> api__commands__get_registry
-    api__commands__converttojson__ConvertToJsonCommand___convert --> api__commands__CommandRegistry__list
-    api__commands__converttojson__ConvertToJsonCommand__execute --> api__SUMD__get_registry
-    api__commands__converttojson__ConvertToJsonCommand__execute --> api__SUMD__validate_against_schema_uri
-    api__commands__converttobase64__ConvertToBase64Command__execute --> api__SUMD__get_registry
-    api__validators__validate_against_schema_uri --> api__commands__CommandRegistry__list
-    api__validators__validate_against_schema_uri --> api__SUMD__get_registry
-    api__protocols__register_default_protocols --> api__protocols__get_registry
-    api__queries__from_url__FromUrlQuery__execute --> api__SUMD__get_registry
-    api__queries__register_default_queries --> api__queries__get_registry
     cqrs_workflow_editor__src__App__fetchBackendWorkflows --> cqrs_workflow_editor__src__App__json
     cqrs_workflow_editor__src__App__loadBackendWorkflow --> cqrs_workflow_editor__src__App__json
     cqrs_workflow_editor__src__App__loadBackendWorkflow --> cqrs_workflow_editor__src__App__mapToNodes
@@ -525,9 +500,34 @@ flowchart TD
     cqrs_workflow_editor__src__App__file --> cqrs_workflow_editor__src__App__mapToEdges
     cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToNodes
     cqrs_workflow_editor__src__App__reader --> cqrs_workflow_editor__src__App__mapToEdges
+    cqrs_backend_workflows__server___handle_command --> cqrs_backend_workflows__server___result_to_data_uri
+    cqrs_backend_workflows__server___handle_render --> cqrs_backend_workflows__server___result_to_data_uri
+    cqrs_backend_workflows__server__list_workflows --> api__commands__CommandRegistry__list
+    cqrs_backend_workflows__server__create_workflow --> cqrs_backend_workflows__server__validate_workflow
+    cqrs_backend_workflows__server__update_workflow --> cqrs_backend_workflows__server__validate_workflow
+    cqrs_backend_workflows__server__run_workflow --> cqrs_backend_workflows__server__execute_node
+    api__main__issue_token --> api__auth__authenticate
+    api__main__issue_token --> api__auth__get_jwt_manager
+    api__main__execute_command --> api__policy__get_engine
+    api__main__execute_query --> api__policy__get_engine
+    api__main__execute_query_get --> api__main__execute_query
+    api__main__run_agent --> api__agent__execute_agent
+    api__main__run_agent --> api__policy__get_engine
+    api__commands__fetch__FetchCommand__execute --> api__commands__get_registry
+    api__commands__converttocsv__ConvertToCsvCommand__execute --> api__commands__CommandRegistry__list
+    api__commands__register_default_commands --> api__commands__get_registry
+    api__commands__converttojson__ConvertToJsonCommand___convert --> api__commands__CommandRegistry__list
+    api__commands__converttojson__ConvertToJsonCommand__execute --> api__commands__get_registry
+    api__commands__converttojson__ConvertToJsonCommand__execute --> api__validators__validate_against_schema_uri
+    api__commands__converttobase64__ConvertToBase64Command__execute --> api__commands__get_registry
     api__commands__pipeline___substitute --> api__commands__pipeline___to_data_uri
-    api__commands__pipeline__PipelineCommand__execute --> api__SUMD___substitute
+    api__commands__pipeline__PipelineCommand__execute --> api__commands__pipeline___substitute
+    api__validators__validate_against_schema_uri --> api__commands__CommandRegistry__list
+    api__validators__validate_against_schema_uri --> api__commands__get_registry
+    api__protocols__register_default_protocols --> api__protocols__get_registry
+    api__queries__from_url__FromUrlQuery__execute --> api__commands__get_registry
+    api__queries__register_default_queries --> api__queries__get_registry
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class frontend__html__js__api__API,frontend__html__js__api__request,frontend__html__js__app__renderDecoded,cqrs_backend_workflows__server__run_workflow,api__commands__converttocsv__ConvertToCsvCommand__execute,api__commands__converttojson__ConvertToJsonCommand___detect_mode,api__commands__converttojson__ConvertToJsonCommand___convert,api__commands__converttoxml__ConvertToXmlCommand__execute,api__policy__PolicyEngine__can_execute_command,api__policy__PolicyEngine__can_execute_query,api__protocols__data_protocol__DataProtocol__fetch,api__protocols__file_protocol__FileProtocol___resolve,api__queries__from_url__FromUrlQuery__execute,cqrs_workflow_editor__src__App__fetchPreview,api__commands__pipeline___substitute,api__commands__pipeline__PipelineCommand__execute,api__agent___mcp_execute medCC
+    class frontend__html__js__api__API,frontend__html__js__api__request,frontend__html__js__app__renderDecoded,cqrs_workflow_editor__src__App__fetchPreview,cqrs_backend_workflows__server__run_workflow,api__agent___mcp_execute,api__commands__converttocsv__ConvertToCsvCommand__execute,api__commands__converttojson__ConvertToJsonCommand___detect_mode,api__commands__converttojson__ConvertToJsonCommand___convert,api__commands__pipeline___substitute,api__commands__pipeline__PipelineCommand__execute,api__commands__converttoxml__ConvertToXmlCommand__execute,api__policy__PolicyEngine__can_execute_command,api__policy__PolicyEngine__can_execute_query,api__protocols__data_protocol__DataProtocol__fetch,api__protocols__file_protocol__FileProtocol___resolve,api__queries__from_url__FromUrlQuery__execute medCC

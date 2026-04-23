@@ -1,4 +1,4 @@
-# api | 25f 2136L | python:24,less:1 | 2026-04-23
+# api | 25f 2155L | python:24,less:1 | 2026-04-23
 # stats: 39 func | 42 cls | 25 mod | CC̄=2.4 | critical:1 | cycles:0
 # alerts[5]: CC _mcp_execute=10; CC _substitute=8; CC validate_against_schema_uri=7; CC _websocket_execute=6; CC _bash_cli_execute=5
 # hotspots[5]: _bash_cli_execute fan=12; _websocket_execute fan=11; validate_against_schema_uri fan=11; _mcp_execute fan=10; _litellm_execute fan=10
@@ -14,7 +14,7 @@ M[25]:
   commands/converttojson.py,81
   commands/converttoxml.py,52
   commands/fetch.py,28
-  commands/pipeline.py,79
+  commands/pipeline.py,98
   commands/render.py,98
   config.py,35
   main.py,235

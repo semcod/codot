@@ -1,9 +1,9 @@
-# redup/duplication | 0 groups | 24f 2441L | 2026-04-23
+# redup/duplication | 0 groups | 24f 2460L | 2026-04-23
 
 SUMMARY:
   files_scanned: 24
-  total_lines:   2441
+  total_lines:   2460
   dup_groups:    0
   dup_fragments: 0
   saved_lines:   0
-  scan_ms:       11143
+  scan_ms:       8744
