@@ -574,6 +574,33 @@ async def describe_acl() -> dict[str, Any]:
     return STATE.acl.describe()
 
 
+@main_app.get("/auth")
+async def auth_validate(
+    request: fastapi.Request,
+    x_original_uri: str = fastapi.Header(default=""),
+    x_original_method: str = fastapi.Header(default=""),
+) -> Response:
+    """Caddy forward_auth endpoint: validate Bearer token and return scopes."""
+    auth_header = request.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing Bearer token")
+    token = auth_header[7:]
+    # Simple hard-coded demo tokens (replace with real JWT/OAuth in prod)
+    demo_tokens = {
+        "admin-token": ["admin", "bundle:write", "bundle:deploy"],
+        "user-token": ["bundle:read"],
+        "deploy-token": ["bundle:deploy"],
+    }
+    scopes = demo_tokens.get(token)
+    if scopes is None:
+        raise HTTPException(status_code=403, detail="Invalid token")
+    # Return scopes as header for Caddy downstream
+    return Response(
+        status_code=200,
+        headers={"X-Auth-Scopes": ",".join(scopes)},
+    )
+
+
 @main_app.get("/metrics")
 async def metrics() -> Response:
     if generate_latest is None:

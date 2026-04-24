@@ -12,6 +12,12 @@ import (
 
 	"github.com/xeipuuv/gojsonschema"
 	"go.temporal.io/sdk/client"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Bundle matches bundle.schema.json 1:1
@@ -95,16 +101,48 @@ func (b *Bundle) LoadSchema() error {
 	return nil
 }
 
+// tracer is the module-level OpenTelemetry tracer.
+var tracer = otel.Tracer("godot-bundle")
+
+// initTracer initialises a stdout OTel tracer if OTEL_EXPORTER is set.
+func initTracer() func() {
+	if os.Getenv("OTEL_EXPORTER") == "" {
+		return func() {}
+	}
+	exp, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
+	if err != nil {
+		log.Printf("OTel stdout exporter error: %v", err)
+		return func() {}
+	}
+	tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(exp))
+	otel.SetTracerProvider(tp)
+	return func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = tp.Shutdown(ctx)
+	}
+}
+
 // Run executes the bundle using the specified runner
 func (b *Bundle) Run(ctx context.Context) error {
+	ctx, span := tracer.Start(ctx, "bundle.Run",
+		trace.WithAttributes(
+			attribute.String("bundle.id", b.Bundle),
+			attribute.String("bundle.kind", b.Kind),
+			attribute.String("bundle.runner", b.Runner),
+		),
+	)
+	defer span.End()
+
 	// Check if we should validate (skip in debug mode if schema_uri is empty)
 	debugMode := os.Getenv("DEBUG") == "true" || os.Getenv("BUNDLE_SKIP_VALIDATION") == "true"
-	
+
 	if b.SchemaURI != "" || !debugMode {
 		if err := b.LoadSchema(); err != nil {
 			if debugMode {
 				log.Printf("WARNING: bundle %s validation failed (DEBUG mode, continuing): %v", b.Bundle, err)
 			} else {
+				span.RecordError(err)
 				return fmt.Errorf("validation failed: %w", err)
 			}
 		}
@@ -118,7 +156,9 @@ func (b *Bundle) Run(ctx context.Context) error {
 	case "python_fastapi":
 		return b.runPythonFastAPI(ctx)
 	default:
-		return fmt.Errorf("unknown runner: %s", b.Runner)
+		err := fmt.Errorf("unknown runner: %s", b.Runner)
+		span.RecordError(err)
+		return err
 	}
 }
 

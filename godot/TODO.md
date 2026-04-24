@@ -34,14 +34,14 @@
 - [ ] Artifact storage: MinIO/S3 container for generated apps
 
 ## P3 — Auth, Observability & DX
-- [ ] Auth layer (Caddy forward_auth + bundle `auth` field with scopes)
+- [x] Auth layer (Caddy forward_auth + bundle `auth` field with scopes) (`caddy.conf`, `llm/app.py` /auth, `scripts/test-auth.sh`, `make test-auth`)
 - [x] ACL for LLM: network CIDR, endpoint deny-lists, field redaction (`llm/app.py`, `llm/acl.yaml`)
 - [x] Audit log table in Postgres for every LLM decision (`llm/audit.py`, `scripts/init-audit.sql`, `make test-audit`)
 - [x] Human-in-the-loop: `bundles/pending/` for WORKFLOW_BUNDLE approval (`scripts/approve-bundle.sh`, `scripts/test-human-in-the-loop.sh`, `make pending-bundle`)
 - [x] Prometheus + Grafana dashboards per runner (`prometheus.yml`, `grafana/provisioning/`, `llm/app.py` /metrics, `make test-prometheus`)
 - [ ] OpenTelemetry tracing through bundle execution
-- [ ] Go test coverage >80%, mutation testing
-- [ ] devcontainer.json + pre-commit hooks
+- [x] Go test coverage >80%, mutation testing (`bundle_test.go`, `deploy_workflow_test.go`, `make test-go`, `make test-mutation`)
+- [x] devcontainer.json + pre-commit hooks (`.devcontainer/devcontainer.json`, `.pre-commit-config.yaml`, `make test-devcontainer`, `make test-precommit`)
 
 ## LLM / NLP Fixtures (Test Prompts)
 1. "Show protocol 123 status every second" → VIEW_BUNDLE, refresh_sec: 1

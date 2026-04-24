@@ -72,13 +72,14 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./scripts/init-audit.sql:/docker-entrypoint-initdb.d/99-init-audit.sql:ro
 
-  # Schema server (Caddy for serving bundle schema)
+  # Schema server + Auth proxy (Caddy)
   schema-server:
     image: caddy:latest
     container_name: schema-server
     volumes:
       - ./bundle.schema.json:/srv/bundle.schema.json
       - ./caddy.conf:/etc/caddy/Caddyfile
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
     ports:
       - "${SCHEMA_SERVER_PORT:-8084}:80"
     networks:

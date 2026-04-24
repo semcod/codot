@@ -45,7 +45,7 @@ The Godot Bundle System provides:
 ## Architecture
 
 ```
-bundles/*.json 
+bundles/*.json
   → JSON Schema Validation (bundle.schema.json)
   → Go Structs (Bundle, Source, Output)
   → Runner Selection (go_temporal, python_fastapi)

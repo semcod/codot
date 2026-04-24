@@ -242,3 +242,85 @@ func TestBundleUnmarshal(t *testing.T) {
 		t.Errorf("Targets mismatch: got %#v, want [web]", bundle.Targets)
 	}
 }
+
+func TestWorkflowNameForKindInBundle(t *testing.T) {
+	cases := []struct {
+		kind     string
+		expected string
+	}{
+		{"SERVICE_BUNDLE", "DeployServiceBundle"},
+		{"VIEW_BUNDLE", "DeployServiceBundle"},
+		{"WORKFLOW_BUNDLE", "DeployWorkflowBundle"},
+		{"APPLICATION_BUNDLE", "BuildAppWorkflow"},
+		{"UNKNOWN_BUNDLE", "DeployServiceBundle"},
+	}
+	for _, tc := range cases {
+		got := workflowNameForKindInBundle(tc.kind)
+		if got != tc.expected {
+			t.Errorf("workflowNameForKindInBundle(%q) = %q, want %q", tc.kind, got, tc.expected)
+		}
+	}
+}
+
+func TestFetchSchemaFileURI(t *testing.T) {
+	tmp := t.TempDir()
+	path := filepath.Join(tmp, "test.json")
+	content := []byte(`{"type":"object"}`)
+	if err := os.WriteFile(path, content, 0644); err != nil {
+		t.Fatal(err)
+	}
+	uri := "file://" + path
+	got, err := fetchSchema(uri)
+	if err != nil {
+		t.Fatalf("fetchSchema(file://): %v", err)
+	}
+	if !bytes.Equal(got, content) {
+		t.Errorf("fetchSchema(file://) = %q, want %q", got, content)
+	}
+}
+
+func TestFetchSchemaHTTPNotFound(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer server.Close()
+	_, err := fetchSchema(server.URL + "/404")
+	if err == nil {
+		t.Fatal("expected error for HTTP 404")
+	}
+	if !strings.Contains(err.Error(), "HTTP 404") {
+		t.Errorf("expected HTTP 404 error, got %v", err)
+	}
+}
+
+func TestLoadSchemaFileURI(t *testing.T) {
+	tmp := t.TempDir()
+	schemaPath := filepath.Join(tmp, "schema.json")
+	schemaContent := []byte(`{"$schema": "http://json-schema.org/draft-07/schema#", "type": "object"}`)
+	if err := os.WriteFile(schemaPath, schemaContent, 0644); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("BUNDLE_SCHEMA_URI", "file://"+schemaPath)
+	schema, err := LoadSchema()
+	if err != nil {
+		t.Fatalf("LoadSchema(file://): %v", err)
+	}
+	if schema.Schema != "http://json-schema.org/draft-07/schema#" {
+		t.Errorf("LoadSchema.Schema = %q, want draft-07", schema.Schema)
+	}
+}
+
+func TestResolvedSchemaURIEnv(t *testing.T) {
+	envURI := "file:///custom/schema.json"
+	t.Setenv("BUNDLE_SCHEMA_URI", envURI)
+	got := resolvedSchemaURI()
+	if got != envURI {
+		t.Errorf("resolvedSchemaURI() = %q, want %q", got, envURI)
+	}
+}
+
+func TestRunPythonFastAPIPlaceholder(t *testing.T) {
+	if err := runPythonFastAPI("dummy.bundle"); err != nil {
+		t.Fatalf("runPythonFastAPI placeholder: %v", err)
+	}
+}
