@@ -1,5 +1,8 @@
 .PHONY: all build run deploy validate validate-all test clean docker-build docker-test docker-up docker-down start stop restart quickstart llm-test help
 
+-include .env
+export
+
 BUNDLE := bundles/protocol-dashboard.json
 PORT   := $(shell python3 -c "import json; data=json.load(open('$(BUNDLE)')); output=data.get('output', {}); runtime=output.get('runtime'); print((runtime or {}).get('port', output.get('port', 8082)) if isinstance(runtime, dict) else output.get('port', 8082))")
 
@@ -30,6 +33,10 @@ help:
 	@echo "  test-practical - test LLM inference for all practical bundles"
 	@echo "  test-buildapp - test BuildAppWorkflow (bundle → DOQL → build)"
 	@echo "  test-audit     - verify Postgres audit_log after LLM generation"
+	@echo "  pending-bundle - list/approve/reject bundles pending approval"
+	@echo "  test-human-in-the-loop - test WORKFLOW_BUNDLE approval workflow"
+	@echo "  test-prometheus - verify Prometheus/Grafana scrape of LLM metrics"
+	@echo "  test-temporal-ui - verify Temporal Web UI, gRPC, and namespace API"
 
 all: build run
 
@@ -62,7 +69,7 @@ stop:
 	-docker-compose down 2>/dev/null
 	-docker rm -f godot-bundle-service godot-llm godot-mock-api temporal-server temporal-ui temporal-postgres schema-server 2>/dev/null
 	@echo "Killing processes on ports..."
-	-for port in 9000 9001 9002 9003 18094 18095 5433 7233 8233 8084; do \
+	-for port in $(GODOT_PORT_8080) $(GODOT_PORT_8081) $(GODOT_PORT_8082) $(GODOT_PORT_8083) $(LLM_PORT) $(MOCK_API_PORT) $(POSTGRES_PORT) $(TEMPORAL_PORT) $(TEMPORAL_UI_PORT) $(SCHEMA_SERVER_PORT); do \
 		pid=$$(lsof -t -i:$$port 2>/dev/null) && kill -9 $$pid 2>/dev/null || true; \
 	done
 	@echo "✓ Stopped"
@@ -75,7 +82,7 @@ status:
 	@docker ps --filter name=godot --filter name=temporal --filter name=schema --filter name=mock-api --filter name=godot-llm --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || echo "No containers running"
 	@echo ""
 	@echo "Port status:"
-	@for port in 9000 9001 9002 9003 18094 18095 5433 7233 8233 8084; do \
+	@for port in $(GODOT_PORT_8080) $(GODOT_PORT_8081) $(GODOT_PORT_8082) $(GODOT_PORT_8083) $(LLM_PORT) $(MOCK_API_PORT) $(POSTGRES_PORT) $(TEMPORAL_PORT) $(TEMPORAL_UI_PORT) $(SCHEMA_SERVER_PORT); do \
 		if lsof -i:$$port >/dev/null 2>&1; then \
 			echo "  Port $$port: ✓ in use"; \
 		else \
@@ -107,7 +114,7 @@ start:
 	@bash -c 'source .env && echo "Service URLs:" && \
 		echo "  Schema Server:  http://localhost:$${SCHEMA_SERVER_PORT:-8084}/bundle.schema.json" && \
 		echo "  Temporal gRPC:  localhost:$${TEMPORAL_PORT:-7233}" && \
-		echo "  Temporal Web:   http://localhost:8233" && \
+		echo "  Temporal Web:   http://localhost:$${TEMPORAL_UI_PORT:-8233}" && \
 		echo "  PostgreSQL:     localhost:$${POSTGRES_PORT:-5433}" && \
 		echo "  LLM API:        http://localhost:$${LLM_PORT:-18094}/health" && \
 		echo "  Mock API:       http://localhost:$${MOCK_API_PORT:-18095}/health"'
@@ -167,6 +174,28 @@ test-practical:
 test-buildapp:
 	@echo "=== Testing BuildAppWorkflow (bundle → DOQL → build) ==="
 	@bash scripts/test-buildapp-workflow.sh $(BUNDLE)
+
+test-audit:
+	@echo "=== Testing Postgres audit_log after LLM generation ==="
+	@bash scripts/test-audit.sh
+
+pending-bundle:
+	@echo "=== Pending WORKFLOW_BUNDLE approvals ==="
+	@bash scripts/approve-bundle.sh $(ACTION) $(BUNDLE)
+
+test-human-in-the-loop:
+	@echo "=== Testing WORKFLOW_BUNDLE human-in-the-loop approval ==="
+	@bash scripts/test-human-in-the-loop.sh
+
+test-prometheus:
+	@echo "=== Verifying Prometheus/Grafana LLM metrics ==="
+	@echo "Grafana: http://localhost:$${GRAFANA_PORT:-3000}  (admin/$${GRAFANA_PASSWORD:-admin})"
+	@echo "Prometheus: http://localhost:$${PROMETHEUS_PORT:-9090}"
+	@bash scripts/test-prometheus.sh
+
+test-temporal-ui:
+	@echo "=== Verifying Temporal Web UI, gRPC, and namespace API ==="
+	@bash scripts/test-temporal-ui.sh
 
 clean:
 	-pkill -f "php -S 0.0.0.0"

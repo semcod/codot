@@ -29,3 +29,25 @@ allow_file_roots:
   - /app/schemas
 
 deny_private_networks: true
+
+# Network CIDR blocks to deny/allow (LLM fetches)
+deny_cidrs:
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"
+
+allow_cidrs: []
+
+# Endpoint path patterns to deny (e.g. admin/internal APIs)
+endpoint_deny_patterns:
+  - "*/admin/*"
+  - "*/internal/*"
+  - "*/debug/*"
+
+# Fields to redact from generated bundles before returning to client
+redact_fields:
+  - "password"
+  - "secret_key"
+  - "api_key"
+  - "token"
+  - "private_key"

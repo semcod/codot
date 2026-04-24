@@ -13,9 +13,24 @@ from urllib.parse import unquote_to_bytes, urlparse
 
 import httpx
 import yaml
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from jsonschema import Draft202012Validator
 from pydantic import BaseModel, Field
+
+try:
+    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Histogram
+except Exception:  # pragma: no cover
+    generate_latest = None  # type: ignore[assignment]
+    CONTENT_TYPE_LATEST = "text/plain"  # type: ignore[assignment]
+    Counter = None  # type: ignore[assignment,misc]
+    Histogram = None  # type: ignore[assignment,misc]
+
+if Counter:
+    BUNDLE_GENERATIONS = Counter("llm_bundle_generations_total", "Total bundle generations", ["kind", "status"])
+    BUNDLE_GENERATION_DURATION = Histogram("llm_bundle_generation_duration_seconds", "Bundle generation latency")
+else:
+    BUNDLE_GENERATIONS = None  # type: ignore[assignment]
+    BUNDLE_GENERATION_DURATION = None  # type: ignore[assignment]
 
 try:
     from litellm import completion as litellm_completion
@@ -139,6 +154,10 @@ class ACLPolicy:
     allow_file_roots: list[Path] = field(default_factory=list)
     allowed_schemes: list[str] = field(default_factory=lambda: ["http", "https", "file", "data"])
     deny_private_networks: bool = True
+    deny_cidrs: list[str] = field(default_factory=list)
+    allow_cidrs: list[str] = field(default_factory=list)
+    endpoint_deny_patterns: list[str] = field(default_factory=list)
+    redact_fields: list[str] = field(default_factory=lambda: ["password", "secret_key", "api_key", "token"])
 
     @classmethod
     def from_file(cls, path: Path) -> "ACLPolicy":
@@ -151,6 +170,10 @@ class ACLPolicy:
             allow_file_roots=[Path(p) for p in raw.get("allow_file_roots", []) or []],
             allowed_schemes=list(raw.get("allowed_schemes", ["http", "https", "file", "data"]) or []),
             deny_private_networks=bool(raw.get("deny_private_networks", True)),
+            deny_cidrs=list(raw.get("deny_cidrs", []) or []),
+            allow_cidrs=list(raw.get("allow_cidrs", []) or []),
+            endpoint_deny_patterns=list(raw.get("endpoint_deny_patterns", []) or []),
+            redact_fields=list(raw.get("redact_fields", ["password", "secret_key", "api_key", "token"]) or []),
         )
 
     def _matches_any(self, patterns: list[str], values: list[str]) -> bool:
@@ -160,12 +183,23 @@ class ACLPolicy:
                     return True
         return False
 
+    def _ip_in_cidrs(self, host: str, cidrs: list[str]) -> bool:
+        try:
+            addr = ipaddress.ip_address(host)
+            for cidr in cidrs:
+                if addr in ipaddress.ip_network(cidr, strict=False):
+                    return True
+        except ValueError:
+            pass
+        return False
+
     def allows(self, uri: str) -> tuple[bool, str]:
         parsed = urlparse(uri)
         scheme = parsed.scheme.lower()
         host = parsed.hostname or ""
         netloc = parsed.netloc or ""
-        values = [uri, host, netloc, f"{scheme}://{host}{parsed.path or '/'}"]
+        path = parsed.path or "/"
+        values = [uri, host, netloc, f"{scheme}://{host}{path}"]
 
         if scheme not in self.allowed_schemes:
             return False, f"scheme '{scheme}' is not allowed"
@@ -173,17 +207,20 @@ class ACLPolicy:
         if self._matches_any(self.deny_patterns, values):
             return False, f"uri '{uri}' matches deny policy"
 
+        if self._matches_any(self.endpoint_deny_patterns, [path, f"{host}{path}"]):
+            return False, f"uri '{uri}' matches endpoint deny policy"
+
         if scheme == "file":
-            path = Path(unquote_to_bytes(parsed.path).decode("utf-8", errors="ignore")).resolve()
+            fpath = Path(unquote_to_bytes(path).decode("utf-8", errors="ignore")).resolve()
             for root in self.allow_file_roots:
                 try:
-                    path.relative_to(root.resolve())
+                    fpath.relative_to(root.resolve())
                     return True, "file path allowed"
                 except ValueError:
                     continue
             if self._matches_any(self.allow_patterns, values):
                 return True, "allowed by explicit pattern"
-            return False, f"file path '{path}' is not inside an allowed root"
+            return False, f"file path '{fpath}' is not inside an allowed root"
 
         if self._matches_any(self.allow_patterns, values):
             return True, "allowed by explicit pattern"
@@ -191,7 +228,24 @@ class ACLPolicy:
         if self.deny_private_networks and is_private_host(host):
             return False, f"host '{host}' is private or loopback"
 
+        if self._ip_in_cidrs(host, self.deny_cidrs):
+            return False, f"host '{host}' matches deny CIDR"
+
+        if self.allow_cidrs and not self._ip_in_cidrs(host, self.allow_cidrs):
+            return False, f"host '{host}' is not in any allowed CIDR"
+
         return False, f"uri '{uri}' does not match any allow rule"
+
+    def redact_bundle(self, bundle: dict[str, Any]) -> dict[str, Any]:
+        if not self.redact_fields:
+            return bundle
+        def _redact(obj: Any) -> Any:
+            if isinstance(obj, dict):
+                return {k: "***REDACTED***" if k in self.redact_fields else _redact(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_redact(i) for i in obj]
+            return obj
+        return _redact(bundle)
 
     def describe(self) -> dict[str, Any]:
         return {
@@ -200,6 +254,10 @@ class ACLPolicy:
             "allow_file_roots": [str(path) for path in self.allow_file_roots],
             "allowed_schemes": self.allowed_schemes,
             "deny_private_networks": self.deny_private_networks,
+            "deny_cidrs": self.deny_cidrs,
+            "allow_cidrs": self.allow_cidrs,
+            "endpoint_deny_patterns": self.endpoint_deny_patterns,
+            "redact_fields": self.redact_fields,
         }
 
 
@@ -516,6 +574,13 @@ async def describe_acl() -> dict[str, Any]:
     return STATE.acl.describe()
 
 
+@main_app.get("/metrics")
+async def metrics() -> Response:
+    if generate_latest is None:
+        raise HTTPException(status_code=501, detail="Prometheus client not installed")
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
 @main_app.post("/fetch")
 async def fetch_single(request: FetchRequest) -> dict[str, Any]:
     return await fetch_uri(request)
@@ -537,17 +602,24 @@ async def generate_bundle(request: GenerateBundleRequest) -> dict[str, Any]:
         file_path = None
         if request.write_file:
             file_path = str(await write_bundle(bundle))
+        safe_bundle = STATE.acl.redact_bundle(bundle)
+        if BUNDLE_GENERATIONS is not None:
+            BUNDLE_GENERATIONS.labels(kind=bundle.get("kind", "unknown"), status="success").inc()
+        if BUNDLE_GENERATION_DURATION is not None:
+            BUNDLE_GENERATION_DURATION.observe(_time.time() - t0)
         return {
-            "bundle": bundle,
-            "bundle_name": bundle.get("bundle", "unknown"),
-            "kind": bundle.get("kind", "SERVICE_BUNDLE"),
-            "targets": bundle.get("targets", []),
+            "bundle": safe_bundle,
+            "bundle_name": safe_bundle.get("bundle", "unknown"),
+            "kind": safe_bundle.get("kind", "SERVICE_BUNDLE"),
+            "targets": safe_bundle.get("targets", []),
             "file_path": file_path,
             "llm_used": llm_used,
             "context": context_items,
         }
     except Exception as exc:
         error_text = str(exc)
+        if BUNDLE_GENERATIONS is not None:
+            BUNDLE_GENERATIONS.labels(kind=bundle.get("kind", "unknown") if bundle else "unknown", status="error").inc()
         raise
     finally:
         if audit is not None:

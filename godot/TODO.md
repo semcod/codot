@@ -35,10 +35,10 @@
 
 ## P3 — Auth, Observability & DX
 - [ ] Auth layer (Caddy forward_auth + bundle `auth` field with scopes)
-- [ ] ACL for LLM: network CIDR, endpoint deny-lists, field redaction
-- [ ] Audit log table in Postgres for every LLM decision
-- [ ] Human-in-the-loop: `bundles/pending/` for WORKFLOW_BUNDLE approval
-- [ ] Prometheus + Grafana dashboards per runner
+- [x] ACL for LLM: network CIDR, endpoint deny-lists, field redaction (`llm/app.py`, `llm/acl.yaml`)
+- [x] Audit log table in Postgres for every LLM decision (`llm/audit.py`, `scripts/init-audit.sql`, `make test-audit`)
+- [x] Human-in-the-loop: `bundles/pending/` for WORKFLOW_BUNDLE approval (`scripts/approve-bundle.sh`, `scripts/test-human-in-the-loop.sh`, `make pending-bundle`)
+- [x] Prometheus + Grafana dashboards per runner (`prometheus.yml`, `grafana/provisioning/`, `llm/app.py` /metrics, `make test-prometheus`)
 - [ ] OpenTelemetry tracing through bundle execution
 - [ ] Go test coverage >80%, mutation testing
 - [ ] devcontainer.json + pre-commit hooks

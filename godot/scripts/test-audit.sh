@@ -2,7 +2,11 @@
 # Test audit log: generate a bundle via LLM and verify Postgres audit_log entry.
 set -e
 
-LLM_URL="http://localhost:18094"
+set -a
+source .env
+set +a
+
+LLM_URL="http://localhost:${LLM_PORT:-18094}"
 POSTGRES_CONTAINER="temporal-postgres"
 LLM_CONTAINER="godot-llm"
 

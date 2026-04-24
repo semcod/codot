@@ -48,7 +48,7 @@ services:
     image: temporalio/ui:latest
     container_name: temporal-ui
     ports:
-      - "8233:8080"
+      - "${TEMPORAL_UI_PORT:-8233}:8080"
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
     networks:
@@ -133,9 +133,40 @@ services:
     networks:
       - bundle-network
 
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: bundle-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - bundle-network
+    depends_on:
+      - llm
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: bundle-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    networks:
+      - bundle-network
+    depends_on:
+      - prometheus
+
 networks:
   bundle-network:
     driver: bridge
 
 volumes:
   postgres-data:
+  grafana-data:

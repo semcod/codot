@@ -58,7 +58,11 @@ func main() {
 		workflowID = fmt.Sprintf("deploy-%s", metadata.Bundle)
 	}
 
-	c, err := client.Dial(client.Options{})
+	hostPort := os.Getenv("TEMPORAL_HOST")
+	if hostPort == "" {
+		hostPort = "localhost:7233"
+	}
+	c, err := client.Dial(client.Options{HostPort: hostPort})
 	if err != nil {
 		log.Fatalf("dial temporal: %v", err)
 	}

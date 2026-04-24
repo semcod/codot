@@ -83,7 +83,7 @@ echo ""
 echo "Test 4: Fetch denied endpoint via ACL..."
 DENIED_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$LLM_BASE_URL/fetch" \
   -H "Content-Type: application/json" \
-  -d '{"uri":"http://localhost:5433"}')
+  -d '{"uri":"http://localhost:'"${POSTGRES_PORT:-5433}"'"}')
 if [ "$DENIED_STATUS" = "403" ]; then
     echo "✓ Local/private endpoint correctly denied"
 else

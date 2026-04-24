@@ -184,7 +184,11 @@ func CleanupActivity(ctx context.Context, resources []string) error {
 }
 
 func main() {
-	c, err := client.Dial(client.Options{})
+	hostPort := os.Getenv("TEMPORAL_HOST")
+	if hostPort == "" {
+		hostPort = "localhost:7233"
+	}
+	c, err := client.Dial(client.Options{HostPort: hostPort})
 	if err != nil {
 		log.Fatalln(err)
 	}

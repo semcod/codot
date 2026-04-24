@@ -1,0 +1,34 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Godot Bundle LLM Metrics",
+    "tags": ["godot", "bundle", "llm"],
+    "timezone": "utc",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Bundle Generations (per kind)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(llm_bundle_generations_total[5m])",
+            "legendFormat": "{{kind}} - {{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Generation Latency",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(llm_bundle_generation_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      }
+    ]
+  }
+}

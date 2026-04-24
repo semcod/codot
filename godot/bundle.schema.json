@@ -32,6 +32,11 @@
       "type": "string",
       "description": "Runner to execute the bundle (e.g., go_temporal, python_fastapi)"
     },
+    "approval_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, the bundle must be approved before deployment (WORKFLOW_BUNDLE only)"
+    },
     "targets": {
       "type": "array",
       "description": "Optional target platforms for application bundles",

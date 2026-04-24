@@ -6,3 +6,4 @@ jsonschema==4.23.0
 pydantic==2.10.4
 litellm==1.56.10
 psycopg2-binary>=2.9
+prometheus-client>=0.21

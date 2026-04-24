@@ -80,10 +80,10 @@ else
     echo "❌ Temporal gRPC frontend not accessible on port ${TEMPORAL_PORT:-7233}"
     exit 1
 fi
-if wait_for_http "http://localhost:8233" 30 2; then
-    echo "✓ Temporal Web UI accessible at http://localhost:8233"
+if wait_for_http "http://localhost:${TEMPORAL_UI_PORT:-8233}" 30 2; then
+    echo "✓ Temporal Web UI accessible at http://localhost:${TEMPORAL_UI_PORT:-8233}"
 else
-    echo "❌ Temporal Web UI not accessible at http://localhost:8233"
+    echo "❌ Temporal Web UI not accessible at http://localhost:${TEMPORAL_UI_PORT:-8233}"
     exit 1
 fi
 echo ""
@@ -133,7 +133,7 @@ echo "=== Service Testing Complete ==="
 echo ""
 echo "Service URLs:"
 echo "  Schema Server:  http://localhost:${SCHEMA_SERVER_PORT:-8084}/bundle.schema.json"
-echo "  Temporal Web:   http://localhost:8233"
+echo "  Temporal Web:   http://localhost:${TEMPORAL_UI_PORT:-8233}"
 echo "  PostgreSQL:     localhost:${POSTGRES_PORT:-5433}"
 echo ""
 echo "Next steps:"
