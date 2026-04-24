@@ -11,12 +11,13 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import os
 import sys
 
 import httpx
 
 
-DEFAULT_URL = "http://localhost:18080"
+DEFAULT_URL = os.environ.get("API_BASE_URL", "http://localhost:18080")
 DEFAULT_USER = "admin"
 DEFAULT_PASS = "admin"
 

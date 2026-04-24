@@ -30,7 +30,9 @@ with open(SCHEMA_PATH, "r") as f:
     WORKFLOW_SCHEMA = json.load(f)
 
 # Configuration
-CODOT_API_URL = os.environ.get("CODOT_API_URL", "http://localhost:18080")
+CODOT_API_URL = os.environ.get("CODOT_API_URL", os.environ.get("API_BASE_URL", "http://localhost:18080"))
+_DATA_PORT = os.environ.get("DATA_PORT", "18091")
+_SCHEMAS_PORT = os.environ.get("SCHEMAS_PORT", "18090")
 workflow_store: Dict[str, Dict[str, Any]] = {
     "example": {
         "version": "1.0",
@@ -39,7 +41,7 @@ workflow_store: Dict[str, Dict[str, Any]] = {
                 "id": "fetch1",
                 "label": "Fetch CSV",
                 "type": "fetch",
-                "uri": "http://localhost:18091/products.csv",
+                "uri": f"http://localhost:{_DATA_PORT}/products.csv",
                 "mime_type": "text/csv",
                 "description": "Get CSV from local data server"
             },
@@ -49,7 +51,7 @@ workflow_store: Dict[str, Dict[str, Any]] = {
                 "type": "command",
                 "command_type": "converttojson",
                 "input": "fetch1",
-                "schema_uri": "http://localhost:18090/public-products.json",
+                "schema_uri": f"http://localhost:{_SCHEMAS_PORT}/public-products.json",
                 "description": "Convert CSV to JSON table"
             },
             {
@@ -321,10 +323,10 @@ async def create_workflow(workflow: Workflow):
     """Create a new workflow"""
     workflow_dict = workflow.model_dump(exclude_none=True)
     validate_workflow(workflow_dict)
-    
+
     workflow_id = workflow_dict.get("id") or f"workflow_{len(workflow_store) + 1}"
     workflow_store[workflow_id] = workflow_dict
-    
+
     return {"id": workflow_id, "status": "created"}
 
 
@@ -333,10 +335,10 @@ async def update_workflow(workflow_id: str, workflow: Workflow):
     """Update an existing workflow"""
     if workflow_id not in workflow_store:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    
+
     workflow_dict = workflow.model_dump(exclude_none=True)
     validate_workflow(workflow_dict)
-    
+
     workflow_store[workflow_id] = workflow_dict
     return {"id": workflow_id, "status": "updated"}
 
@@ -346,7 +348,7 @@ async def delete_workflow(workflow_id: str):
     """Delete a workflow"""
     if workflow_id not in workflow_store:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    
+
     del workflow_store[workflow_id]
     return {"id": workflow_id, "status": "deleted"}
 
@@ -357,7 +359,7 @@ async def list_examples():
     examples_path = Path(__file__).parent / "examples"
     if not examples_path.exists():
         return {"files": []}
-    
+
     files = sorted([f.name for f in examples_path.glob("*.json") if f.is_file()])
     return {"files": files}
 
@@ -367,10 +369,10 @@ async def get_example(filename: str):
     """Get example workflow file content"""
     examples_path = Path(__file__).parent / "examples"
     file_path = examples_path / filename
-    
+
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="Example file not found")
-    
+
     with open(file_path, "r") as f:
         return json.load(f)
 
@@ -380,24 +382,24 @@ async def run_workflow(workflow_id: str, request: WorkflowExecutionRequest):
     """Execute a workflow"""
     if workflow_id not in workflow_store:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    
+
     workflow = workflow_store[workflow_id]
     node_results: Dict[str, Any] = {}
     trace: List[Dict[str, Any]] = []
-    
+
     try:
         async with httpx.AsyncClient() as client:
             # Execute nodes in order
             for node_data in workflow["nodes"]:
                 node = WorkflowNode(**node_data)
-                
+
                 trace_entry = {
                     "node_id": node.id,
                     "node_type": node.type,
                     "status": "running"
                 }
                 trace.append(trace_entry)
-                
+
                 try:
                     result = await execute_node(node, node_results, client, request.token)
                     node_results[node.id] = result
@@ -410,20 +412,20 @@ async def run_workflow(workflow_id: str, request: WorkflowExecutionRequest):
                         status_code=500,
                         detail=f"Node {node.id} failed: {str(e)}"
                     )
-        
+
         # Collect outputs
         outputs = {}
         for output_def in workflow.get("outputs", []):
             source_node = output_def.get("source")
             if source_node in node_results:
                 outputs[output_def["id"]] = node_results[source_node]
-        
+
         return WorkflowExecutionResponse(
             success=True,
             outputs=outputs,
             trace=trace
         )
-    
+
     except HTTPException:
         raise
     except Exception as e:

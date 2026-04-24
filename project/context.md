@@ -179,7 +179,7 @@ backend_config keys:
     - url: endpoint URL
     - method: HTTP method (default POST)
     - headers: dict
-  
+
 - **Calls**: cfg.get, cfg.get, cfg.get, cfg.get, AgentResponse, AgentResponse, httpx.AsyncClient, resp.raise_for_status
 
 ### cqrs-backend-workflows.server.run_workflow

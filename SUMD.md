@@ -82,11 +82,11 @@ workflow[name="up"] {
   step-1: run cmd=docker compose up -d;
   step-2: run cmd=echo "";
   step-3: run cmd=echo "Stack is starting up:";
-  step-4: run cmd=echo "  - Frontend:   http://localhost:18000";
-  step-5: run cmd=echo "  - API:        http://localhost:18080";
-  step-6: run cmd=echo "  - API docs:   http://localhost:18080/docs";
-  step-7: run cmd=echo "  - Schemas:    http://localhost:18090";
-  step-8: run cmd=echo "  - Sample data: http://localhost:18091";
+  step-4: run cmd=bash -c 'source .env && echo "  - Frontend:   http://localhost:$${FRONTEND_PORT:-18000}"';
+  step-5: run cmd=bash -c 'source .env && echo "  - API:        http://localhost:$${API_PORT:-18080}"';
+  step-6: run cmd=bash -c 'source .env && echo "  - API docs:   http://localhost:$${API_PORT:-18080}/docs"';
+  step-7: run cmd=bash -c 'source .env && echo "  - Schemas:    http://localhost:$${SCHEMAS_PORT:-18090}"';
+  step-8: run cmd=bash -c 'source .env && echo "  - Sample data: http://localhost:$${DATA_PORT:-18091}"';
 }
 
 workflow[name="down"] {
@@ -106,14 +106,14 @@ workflow[name="restart"] {
 
 workflow[name="token"] {
   trigger: manual;
-  step-1: run cmd=curl -s -X POST http://localhost:18080/auth/token \;
+  step-1: run cmd=bash -c 'source .env && curl -s -X POST http://localhost:$${API_PORT:-18080}/auth/token \';
   step-2: run cmd=-H "Content-Type: application/json" \;
   step-3: run cmd=-d '{"username":"admin","password":"admin"}' | python3 -m json.tool;
 }
 
 workflow[name="token-user"] {
   trigger: manual;
-  step-1: run cmd=curl -s -X POST http://localhost:18080/auth/token \;
+  step-1: run cmd=bash -c 'source .env && curl -s -X POST http://localhost:$${API_PORT:-18080}/auth/token \';
   step-2: run cmd=-H "Content-Type: application/json" \;
   step-3: run cmd=-d '{"username":"alice","password":"alice"}' | python3 -m json.tool;
 }
@@ -130,7 +130,7 @@ workflow[name="test-agent"] {
 
 workflow[name="workflow"] {
   trigger: manual;
-  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:28080;
+  step-1: run cmd=bash -c 'source .env && python3 codot_run.py examples/workflow_agent_mcp.json --url $${API_BASE_URL:-http://localhost:18080}';
 }
 
 workflow[name="clean"] {
@@ -395,7 +395,7 @@ D:
     e: MCPError,MCPClient,MCPStdioClient,MCPSseClient
     MCPError:
     MCPClient: __init__(0),_next_id(0),_send(1),initialize(2),list_tools(0),call_tool(2),close(0)  # Base MCP client (transport-agnostic).
-    MCPStdioClient: __init__(2),_read_message(0),_send(1),close(0)  # Spawn an MCP server as a subprocess and speak JSON-RPC over 
+    MCPStdioClient: __init__(2),_read_message(0),_send(1),close(0)  # Spawn an MCP server as a subprocess and speak JSON-RPC over
     MCPSseClient: __init__(2),_send(1),initialize(2),close(0)  # Connect to an MCP server via HTTP SSE transport.
   api/models.py:
     e: CommandRequest,CommandResponse,QueryRequest,QueryResponse,TokenRequest,TokenResponse,PipelineStep,PipelineRequest,ErrorResponse,AgentCommunicationBackend,AgentNode,AgentRequest,AgentResponse

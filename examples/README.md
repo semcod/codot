@@ -80,11 +80,11 @@ Shows Role-Based Access Control:
 
 ## Environment Variables
 
-- `API` - API base URL (default: `http://localhost:18080`)
+- `API` - API base URL (default reads from `API_BASE_URL` in `.env`, falls back to `http://localhost:18080`)
 
 Example:
 ```bash
-API=http://localhost:18080 ./01-fetch.sh
+API_BASE_URL=http://localhost:18080 ./01-fetch.sh
 ```
 
 ## Users

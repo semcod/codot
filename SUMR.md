@@ -77,11 +77,11 @@ workflow[name="up"] {
   step-1: run cmd=docker compose up -d;
   step-2: run cmd=echo "";
   step-3: run cmd=echo "Stack is starting up:";
-  step-4: run cmd=echo "  - Frontend:   http://localhost:18000";
-  step-5: run cmd=echo "  - API:        http://localhost:18080";
-  step-6: run cmd=echo "  - API docs:   http://localhost:18080/docs";
-  step-7: run cmd=echo "  - Schemas:    http://localhost:18090";
-  step-8: run cmd=echo "  - Sample data: http://localhost:18091";
+  step-4: run cmd=bash -c 'source .env && echo "  - Frontend:   http://localhost:$${FRONTEND_PORT:-18000}"';
+  step-5: run cmd=bash -c 'source .env && echo "  - API:        http://localhost:$${API_PORT:-18080}"';
+  step-6: run cmd=bash -c 'source .env && echo "  - API docs:   http://localhost:$${API_PORT:-18080}/docs"';
+  step-7: run cmd=bash -c 'source .env && echo "  - Schemas:    http://localhost:$${SCHEMAS_PORT:-18090}"';
+  step-8: run cmd=bash -c 'source .env && echo "  - Sample data: http://localhost:$${DATA_PORT:-18091}"';
 }
 
 workflow[name="down"] {
@@ -101,14 +101,14 @@ workflow[name="restart"] {
 
 workflow[name="token"] {
   trigger: manual;
-  step-1: run cmd=curl -s -X POST http://localhost:18080/auth/token \;
+  step-1: run cmd=bash -c 'source .env && curl -s -X POST http://localhost:$${API_PORT:-18080}/auth/token \';
   step-2: run cmd=-H "Content-Type: application/json" \;
   step-3: run cmd=-d '{"username":"admin","password":"admin"}' | python3 -m json.tool;
 }
 
 workflow[name="token-user"] {
   trigger: manual;
-  step-1: run cmd=curl -s -X POST http://localhost:18080/auth/token \;
+  step-1: run cmd=bash -c 'source .env && curl -s -X POST http://localhost:$${API_PORT:-18080}/auth/token \';
   step-2: run cmd=-H "Content-Type: application/json" \;
   step-3: run cmd=-d '{"username":"alice","password":"alice"}' | python3 -m json.tool;
 }
@@ -125,7 +125,7 @@ workflow[name="test-agent"] {
 
 workflow[name="workflow"] {
   trigger: manual;
-  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:28080;
+  step-1: run cmd=bash -c 'source .env && python3 codot_run.py examples/workflow_agent_mcp.json --url $${API_BASE_URL:-http://localhost:18080}';
 }
 
 workflow[name="clean"] {
@@ -818,9 +818,9 @@ COUPLING:
                                    service-factory             api.commands                      api  service-factory.factory              api.queries   cqrs-backend-workflows
           service-factory                       ──                      ←10                       ←2                       ←4                       ←1                       ←1  hub
              api.commands                       10                       ──                        3                                                                             !! fan-out
-                      api                        2                       ←3                       ──                                                                           
-  service-factory.factory                        4                                                                         ──                                                  
-              api.queries                        1                                                                                                  ──                         
+                      api                        2                       ←3                       ──
+  service-factory.factory                        4                                                                         ──
+              api.queries                        1                                                                                                  ──
    cqrs-backend-workflows                        1                                                                                                                           ──
   CYCLES: none
   HUB: service-factory/ (fan-in=18)

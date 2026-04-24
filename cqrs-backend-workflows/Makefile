@@ -1,6 +1,9 @@
 # codot Workflow System Makefile
 # Manages workflow API backend and frontend editor
 
+-include ../.env
+export
+
 .PHONY: help start stop status clean install dev
 
 # Default target
@@ -17,9 +20,9 @@ help:
 	@echo "Services:"
 	@echo "  - Workflow API (backend): http://localhost:8000"
 	@echo "  - Workflow Editor (frontend): http://localhost:3000"
-	@echo "  - codot API: http://localhost:18080"
-	@echo "  - codot Data: http://localhost:18091"
-	@echo "  - codot Schemas: http://localhost:18090"
+	@echo "  - codot API: $(API_BASE_URL)"
+	@echo "  - codot Data: http://localhost:$(DATA_PORT)"
+	@echo "  - codot Schemas: http://localhost:$(SCHEMAS_PORT)"
 
 # Install dependencies
 install:
@@ -124,22 +127,22 @@ status:
 		echo "  ✗ Not running"; \
 	fi
 	@echo ""
-	@echo "codot API (port 18080):"
-	@if curl -s http://localhost:18080/health > /dev/null 2>&1; then \
+	@echo "codot API (port $(API_PORT):"
+	@if curl -s $(API_BASE_URL)/health > /dev/null 2>&1; then \
 		echo "  ✓ Running"; \
 	else \
 		echo "  ✗ Not running"; \
 	fi
 	@echo ""
-	@echo "codot Data (port 18091):"
-	@if curl -s http://localhost:18091 > /dev/null 2>&1; then \
+	@echo "codot Data (port $(DATA_PORT):"
+	@if curl -s http://localhost:$(DATA_PORT) > /dev/null 2>&1; then \
 		echo "  ✓ Running"; \
 	else \
 		echo "  ✗ Not running"; \
 	fi
 	@echo ""
-	@echo "codot Schemas (port 18090):"
-	@if curl -s http://localhost:18090 > /dev/null 2>&1; then \
+	@echo "codot Schemas (port $(SCHEMAS_PORT):"
+	@if curl -s http://localhost:$(SCHEMAS_PORT) > /dev/null 2>&1; then \
 		echo "  ✓ Running"; \
 	else \
 		echo "  ✗ Not running"; \

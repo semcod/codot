@@ -18,7 +18,7 @@ services:
       - ./schemas:/schemas:ro
       - ./api/policy/rules.yaml:/app/policy/rules.yaml:ro
     ports:
-      - "18080:8080"
+      - "${API_PORT:-18080}:8080"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./schemas:/usr/share/nginx/html:ro
     ports:
-      - "18090:80"
+      - "${SCHEMAS_PORT:-18090}:80"
     restart: unless-stopped
 
   data:
@@ -41,7 +41,7 @@ services:
     volumes:
       - ./sample-data:/usr/share/nginx/html:ro
     ports:
-      - "18091:80"
+      - "${DATA_PORT:-18091}:80"
     restart: unless-stopped
 
   frontend:
@@ -50,7 +50,7 @@ services:
       dockerfile: Dockerfile
     container_name: cqrs-frontend
     ports:
-      - "18000:80"
+      - "${FRONTEND_PORT:-18000}:80"
     depends_on:
       - api
     restart: unless-stopped
@@ -63,7 +63,7 @@ services:
     environment:
       - CODOT_API_URL=http://api:8080
     ports:
-      - "18001:8000"
+      - "${WORKFLOW_API_PORT:-18001}:8000"
     depends_on:
       - api
     restart: unless-stopped
@@ -79,7 +79,7 @@ services:
       dockerfile: Dockerfile
     container_name: cqrs-workflow-editor
     ports:
-      - "18002:80"
+      - "${WORKFLOW_EDITOR_PORT:-18002}:80"
     depends_on:
       - workflow-api
     restart: unless-stopped

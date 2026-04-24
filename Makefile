@@ -1,5 +1,8 @@
 .PHONY: help build up down logs restart test clean token
 
+-include .env
+export
+
 help:
 	@echo "CQRS-URL Platform - available targets:"
 	@echo "  make build      - build all docker images"
@@ -21,11 +24,11 @@ up:
 	docker compose up -d
 	@echo ""
 	@echo "Stack is starting up:"
-	@echo "  - Frontend:   http://localhost:18000"
-	@echo "  - API:        http://localhost:18080"
-	@echo "  - API docs:   http://localhost:18080/docs"
-	@echo "  - Schemas:    http://localhost:18090"
-	@echo "  - Sample data: http://localhost:18091"
+	@echo "  - Frontend:   http://localhost:$(FRONTEND_PORT)"
+	@echo "  - API:        http://localhost:$(API_PORT)"
+	@echo "  - API docs:   http://localhost:$(API_PORT)/docs"
+	@echo "  - Schemas:    http://localhost:$(SCHEMAS_PORT)"
+	@echo "  - Sample data: http://localhost:$(DATA_PORT)"
 
 down:
 	docker compose down
@@ -37,12 +40,12 @@ restart:
 	docker compose up -d --build api
 
 token:
-	@curl -s -X POST http://localhost:18080/auth/token \
+	@curl -s -X POST http://localhost:$(API_PORT)/auth/token \
 		-H "Content-Type: application/json" \
 		-d '{"username":"admin","password":"admin"}' | python3 -m json.tool
 
 token-user:
-	@curl -s -X POST http://localhost:18080/auth/token \
+	@curl -s -X POST http://localhost:$(API_PORT)/auth/token \
 		-H "Content-Type: application/json" \
 		-d '{"username":"alice","password":"alice"}' | python3 -m json.tool
 
@@ -53,7 +56,7 @@ test-agent:
 	@cd api && python3 test_all_agents.py
 
 workflow:
-	@python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:28080
+	@python3 codot_run.py examples/workflow_agent_mcp.json --url $(API_BASE_URL)
 
 clean:
 	docker compose down -v --remove-orphans

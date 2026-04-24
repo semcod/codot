@@ -8,7 +8,7 @@ Backend API do zarządzania i wykonywania workflow dla systemu codot CQRS-URL Pl
 - **Walidacja JSON Schema**: Walidacja workflow przed zapisem
 - **Executor workflow**: Wykonywanie workflow przez wywoływanie codot API
 - **Obsługa agentów**: Wsparcie dla węzłów typu agent
-- **Integracja z codot**: Wykorzystuje istniejące API CQRS na porcie 18080
+- **Integracja z codot**: Wykorzystuje istniejące API CQRS (domyślnie port 18080, konfigurowany przez `API_PORT` / `API_BASE_URL`)
 
 ## Instalacja
 

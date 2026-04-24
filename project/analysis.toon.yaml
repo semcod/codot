@@ -188,9 +188,9 @@ COUPLING:
                                    service-factory             api.commands                      api  service-factory.factory              api.queries   cqrs-backend-workflows
           service-factory                       ──                      ←10                       ←2                       ←4                       ←1                       ←1  hub
              api.commands                       10                       ──                        3                                                                             !! fan-out
-                      api                        2                       ←3                       ──                                                                           
-  service-factory.factory                        4                                                                         ──                                                  
-              api.queries                        1                                                                                                  ──                         
+                      api                        2                       ←3                       ──
+  service-factory.factory                        4                                                                         ──
+              api.queries                        1                                                                                                  ──
    cqrs-backend-workflows                        1                                                                                                                           ──
   CYCLES: none
   HUB: service-factory/ (fan-in=18)

@@ -257,7 +257,7 @@ D:
     e: MCPError,MCPClient,MCPStdioClient,MCPSseClient
     MCPError:
     MCPClient: __init__(0),_next_id(0),_send(1),initialize(2),list_tools(0),call_tool(2),close(0)  # Base MCP client (transport-agnostic).
-    MCPStdioClient: __init__(2),_read_message(0),_send(1),close(0)  # Spawn an MCP server as a subprocess and speak JSON-RPC over 
+    MCPStdioClient: __init__(2),_read_message(0),_send(1),close(0)  # Spawn an MCP server as a subprocess and speak JSON-RPC over
     MCPSseClient: __init__(2),_send(1),initialize(2),close(0)  # Connect to an MCP server via HTTP SSE transport.
   models.py:
     e: CommandRequest,CommandResponse,QueryRequest,QueryResponse,TokenRequest,TokenResponse,PipelineStep,PipelineRequest,ErrorResponse,AgentCommunicationBackend,AgentNode,AgentRequest,AgentResponse

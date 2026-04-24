@@ -122,11 +122,11 @@ Agents can be invoked standalone (`POST /agents/{id}/run`) or embedded inside a 
 Run workflows and agents from shell without writing curl:
 
 ```bash
-# Standalone MCP agent
-python3 codot_run.py examples/agent_mcp.json --url http://localhost:18080 --agent
+# Standalone MCP agent (reads API_BASE_URL from .env by default)
+python3 codot_run.py examples/agent_mcp.json --agent
 
 # Workflow with an agent step
-python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080
+python3 codot_run.py examples/workflow_agent_mcp.json
 ```
 
 ## Protocols

@@ -71,7 +71,7 @@ const defaultWorkflow: Workflow = {
 };
 
 // Map workflow.nodes to ReactFlow nodes
-type RFNode = Node & { 
+type RFNode = Node & {
   data: WorkflowNode;
 };
 
@@ -623,7 +623,7 @@ export default function App() {
               ×
             </button>
           </div>
-          
+
           <div style={{ marginBottom: 12 }}>
             <label style={{ display: "block", fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>ID</label>
             <input

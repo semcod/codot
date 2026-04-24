@@ -2,7 +2,11 @@
 # Smoke test against a running stack. Exits non-zero on first failure.
 set -euo pipefail
 
-API="${API:-http://localhost:18080}"
+set -a
+source ../.env
+set +a
+
+API="${API:-${API_BASE_URL:-http://localhost:18080}}"
 say() { printf "\n\033[1;34m[test]\033[0m %s\n" "$*"; }
 ok()  { printf "  \033[32m✓\033[0m %s\n" "$*"; }
 die() { printf "  \033[31m✗ %s\033[0m\n" "$*"; exit 1; }

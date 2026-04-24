@@ -506,7 +506,7 @@ Twój DAG może teraz zawierać węzeł `type: "agent"` z backendem MCP:
 Wykonanie przez pipeline CQRS:
 
 ```bash
-curl -X PUT http://localhost:18080/commands/pipeline \
+curl -X PUT "${API_BASE_URL:-http://localhost:18080}/commands/pipeline" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -564,4 +564,3 @@ Jeśli chcesz, mogę teraz:
 [^11]: https://www.zenml.io/blog/prefect-vs-airflow
 
 [^12]: https://github.com/meirwah/awesome-workflow-engines
-

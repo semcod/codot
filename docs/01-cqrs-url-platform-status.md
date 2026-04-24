@@ -21,12 +21,12 @@ That's it. No proto regeneration, no frontend DTOs, no migrations.
 
 ## Status — April 2026
 
-The platform is **runnable end-to-end** and covers the full loop described in the design notes. A single `make up` brings up four containers (API, schema server, sample-data server, frontend playground) and a `make test` runs fourteen curl-level checks against the running stack, including path-traversal blocking, role-based denials, agent backends, and pipeline with agent nodes.
+The platform is **runnable end-to-end** and covers the full loop described in the design notes. A single `make up` brings up four containers (API, schema server, sample-data server, frontend playground) and a `make test` runs fifteen curl-level checks against the running stack, including path-traversal blocking, role-based denials, agent backends, pipeline with agent nodes, and service-factory code generation.
 
 What works today:
 
 - **Protocol registry** with `http://`, `https://`, `file://` (root-contained), and `data:` (RFC 2397). Adding a new scheme is one class with a `scheme` attribute and an async `fetch` method.
-- **Command registry** with seven built-ins: `fetch`, `converttojson`, `converttoxml`, `converttocsv`, `converttobase64`, `render` (Jinja2 → HTML), and `pipeline` (composes the others with `"$previous.output"` as a URI reference).
+- **Command registry** with eight built-ins: `fetch`, `converttojson`, `converttoxml`, `converttocsv`, `converttobase64`, `render` (Jinja2 → HTML), `pipeline` (composes the others with `"$previous.output"` as a URI reference), and `compile_service` (generates deployable artifacts from a bundle via the service-factory generator registry).
 - **Query registry** with `from-url` and `introspect`.
 - **Policy engine** — RBAC with shell-style glob patterns over command names, URIs, and schema URIs. Rules live in a YAML file that's mounted into the API container, so they can be changed without rebuilding the image.
 - **JWT auth** with three demo roles — `admin`, `analyst`, `user` — each mapped to a different slice of the policy space.
@@ -34,7 +34,7 @@ What works today:
 - **Agent execution layer** — multi-backend agent runtime with support for MCP (Model Context Protocol via JSON-RPC 2.0 over stdio/SSE), LiteLLM, Bash CLI, HTTP API, and WebSocket. Agents are defined by `role`, `goal`, `tools`, and `backend_config`.
 - **MCP client** — lightweight JSON-RPC 2.0 client (`api/mcp_client.py`) with `MCPStdioClient` and `MCPSseClient`, handling `initialize`, `tools/list`, and `tools/call`.
 - **Pipeline with agent nodes** — `PipelineStep` accepts an optional `agent_node`, so a workflow can mix deterministic commands and autonomous agents. The pipeline decodes `data:` URIs from `$previous.output` and injects them into the agent context automatically.
-- **CLI runner** — `codot_run.py` lets you execute workflows and agents from shell without writing curl: `python3 codot_run.py workflow.json --url http://localhost:18080`.
+- **CLI runner** — `codot_run.py` lets you execute workflows and agents from shell without writing curl: `python3 codot_run.py workflow.json` (reads `API_BASE_URL` from `.env`).
 
 What doesn't exist yet, and what would come next:
 
@@ -72,11 +72,11 @@ Sign in as `bob/bob` (role: user) and try to hit `file:///data/products.csv` —
 # Start the API server
 cd api && python3 -m uvicorn main:app --host 0.0.0.0 --port 18080
 
-# Run a standalone MCP agent
-python3 codot_run.py examples/agent_mcp.json --url http://localhost:18080 --agent
+# Run a standalone MCP agent (reads API_BASE_URL from .env)
+python3 codot_run.py examples/agent_mcp.json --agent
 
 # Run a workflow with an MCP agent step
-python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080
+python3 codot_run.py examples/workflow_agent_mcp.json
 ```
 
 The CLI (`codot_run.py`) reads a JSON workflow or agent definition, authenticates, and dispatches to the API. For workflows it converts the DAG JSON into a `pipeline` command with `$previous.output` wiring. For agents it hits `POST /agents/{id}/run`.

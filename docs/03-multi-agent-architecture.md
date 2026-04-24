@@ -142,11 +142,11 @@ Policy rules in `api/policy/rules.yaml` grant `agent_run` permission to `admin` 
 `codot_run.py` in the repo root lets you run workflows and agents from shell without writing curl:
 
 ```bash
-# Standalone MCP agent
-python3 codot_run.py examples/agent_mcp.json --url http://localhost:18080 --agent
+# Standalone MCP agent (reads API_BASE_URL from .env)
+python3 codot_run.py examples/agent_mcp.json --agent
 
 # Workflow with an agent step
-python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:18080
+python3 codot_run.py examples/workflow_agent_mcp.json
 ```
 
 The CLI authenticates, converts the JSON definition into the correct API payload, and prints a human-friendly trace.

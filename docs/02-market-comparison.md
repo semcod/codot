@@ -273,4 +273,3 @@ Jeśli chcesz, mogę teraz wyrzucić:
 [^9]: https://www.elasticpath.com/blog/mcp-magic-moments-ai-powered-integrations-and-workflows
 
 [^10]: https://palantir.com/docs/foundry/pipeline-builder/transforms-transform-data/
-

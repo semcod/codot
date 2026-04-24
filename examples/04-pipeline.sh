@@ -2,7 +2,11 @@
 # Example 4: Pipeline - chain multiple commands together
 set -euo pipefail
 
-API="${API:-http://localhost:18080}"
+set -a
+source ../.env
+set +a
+
+API="${API:-${API_BASE_URL:-http://localhost:18080}}"
 say() { printf "\n\033[1;36m[example]\033[0m %s\n" "$*"; }
 ok()  { printf "  \033[32m✓\033[0m %s\n" "$*"; }
 
