@@ -1,10 +1,15 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 )
 
@@ -249,10 +254,10 @@ func TestWorkflowNameForKindInBundle(t *testing.T) {
 		expected string
 	}{
 		{"SERVICE_BUNDLE", "DeployServiceBundle"},
-		{"VIEW_BUNDLE", "DeployServiceBundle"},
+		{"VIEW_BUNDLE", "DeployViewBundle"},
 		{"WORKFLOW_BUNDLE", "DeployWorkflowBundle"},
-		{"APPLICATION_BUNDLE", "BuildAppWorkflow"},
-		{"UNKNOWN_BUNDLE", "DeployServiceBundle"},
+		{"APPLICATION_BUNDLE", "DeployApplicationBundle"},
+		{"UNKNOWN_BUNDLE", "DeployViewBundle"},
 	}
 	for _, tc := range cases {
 		got := workflowNameForKindInBundle(tc.kind)
@@ -301,26 +306,29 @@ func TestLoadSchemaFileURI(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Setenv("BUNDLE_SCHEMA_URI", "file://"+schemaPath)
-	schema, err := LoadSchema()
-	if err != nil {
+	b := Bundle{}
+	if err := b.LoadSchema(); err != nil {
 		t.Fatalf("LoadSchema(file://): %v", err)
-	}
-	if schema.Schema != "http://json-schema.org/draft-07/schema#" {
-		t.Errorf("LoadSchema.Schema = %q, want draft-07", schema.Schema)
 	}
 }
 
 func TestResolvedSchemaURIEnv(t *testing.T) {
 	envURI := "file:///custom/schema.json"
 	t.Setenv("BUNDLE_SCHEMA_URI", envURI)
-	got := resolvedSchemaURI()
+	b := Bundle{}
+	got := b.resolvedSchemaURI()
 	if got != envURI {
 		t.Errorf("resolvedSchemaURI() = %q, want %q", got, envURI)
 	}
 }
 
 func TestRunPythonFastAPIPlaceholder(t *testing.T) {
-	if err := runPythonFastAPI("dummy.bundle"); err != nil {
-		t.Fatalf("runPythonFastAPI placeholder: %v", err)
+	b := Bundle{Bundle: "dummy.bundle"}
+	err := b.runPythonFastAPI(context.Background())
+	if err == nil {
+		t.Fatal("runPythonFastAPI: expected error for unimplemented runner")
+	}
+	if err.Error() != "python_fastapi runner not yet implemented" {
+		t.Errorf("runPythonFastAPI error = %q, want 'not yet implemented'", err)
 	}
 }

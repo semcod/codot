@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
@@ -96,10 +98,14 @@ func BuildAppWorkflow(ctx workflow.Context, bundleJSON []byte) (string, error) {
 }
 
 func GenerateCodeActivity(ctx context.Context, bundleJSON []byte) (string, error) {
+	ctx, span := otel.Tracer("godot-workflow").Start(ctx, "GenerateCodeActivity")
+	defer span.End()
 	var b Bundle
 	if err := json.Unmarshal(bundleJSON, &b); err != nil {
+		span.RecordError(err)
 		return "", err
 	}
+	span.SetAttributes(attribute.String("bundle.kind", b.Kind))
 	switch b.Kind {
 	case "SERVICE_BUNDLE":
 		return "/output/service.py", nil
@@ -117,12 +123,19 @@ func GenerateCodeActivity(ctx context.Context, bundleJSON []byte) (string, error
 	}
 }
 func DeployServiceActivity(ctx context.Context, codePath string, port int) (string, error) {
+	_, span := otel.Tracer("godot-workflow").Start(ctx, "DeployServiceActivity")
+	defer span.End()
+	span.SetAttributes(attribute.Int("port", port))
 	return fmt.Sprintf("http://localhost:%d", port), nil
 }
 
 // BuildDOQLActivity writes the bundle to a temp file, generates app.doql.css,
 // and invokes the DOQL CLI to produce build artifacts.
 func BuildDOQLActivity(ctx context.Context, bundleJSON []byte, bundleName string) (string, error) {
+	ctx, span := otel.Tracer("godot-workflow").Start(ctx, "BuildDOQLActivity")
+	defer span.End()
+	span.SetAttributes(attribute.String("bundle.name", bundleName))
+
 	// 1. Write bundle JSON to a temp file
 	tmpFile := fmt.Sprintf("/tmp/buildapp-%s.json", bundleName)
 	if err := os.WriteFile(tmpFile, bundleJSON, 0644); err != nil {
@@ -170,16 +183,22 @@ func BuildDOQLActivity(ctx context.Context, bundleJSON []byte, bundleName string
 	return buildDir, nil
 }
 func HealthcheckActivity(ctx context.Context, svcURL string, sources []Source) error {
+	ctx, span := otel.Tracer("godot-workflow").Start(ctx, "HealthcheckActivity")
+	defer span.End()
 	c := &http.Client{Timeout: 10 * time.Second}
 	for _, s := range sources {
 		resp, err := c.Get(s.URI)
 		if err != nil || resp.StatusCode != 200 {
+			span.RecordError(fmt.Errorf("source failed: %s", s.URI))
 			return fmt.Errorf("source failed: %s", s.URI)
 		}
 	}
 	return nil
 }
 func CleanupActivity(ctx context.Context, resources []string) error {
+	_, span := otel.Tracer("godot-workflow").Start(ctx, "CleanupActivity")
+	defer span.End()
+	span.SetAttributes(attribute.Int("resource.count", len(resources)))
 	return nil
 }
 

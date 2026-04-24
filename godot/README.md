@@ -5,12 +5,22 @@ Service Factory for bundle-driven services, views, workflows, and applications w
 ## Overview
 
 The Godot Bundle System provides:
-- **Bundle Validation**: JSON Schema validation with fallback schema resolution
-- **Multiple Bundle Kinds**: Service, view, workflow, and application bundles
-- **LLM + ACL Layer**: FastAPI LiteLLM service with `/fetch`, `/context`, and bundle generation endpoints
-- **Docker Orchestration**: Full stack with Temporal, PostgreSQL, Schema Server, LLM API, and Mock API
-- **Automated Testing**: Shell and Go tests for bundles, service readiness, ACL, and NLP generation
+- **Bundle Validation**: JSON Schema validation with fallback schema resolution, now with `auth` scopes
+- **Multiple Bundle Kinds**: Service, view, workflow, and application bundles with `targets` support
+- **LLM + ACL Layer**: FastAPI LiteLLM service with `/fetch`, `/context`, `/generate/bundle`, `/generate/bundles`, `/auth`, `/acl`, and `/metrics` endpoints
+- **Docker Orchestration**: Full stack with Temporal, PostgreSQL, Schema Server (Caddy), LLM API, Mock API, Jaeger (OTel), and MinIO (S3)
+- **Auth & Observability**: Caddy `forward_auth` proxy, OpenTelemetry tracing, Prometheus/Grafana dashboards
+- **Automated Testing**: Shell and Go unit tests (>80% coverage), pre-commit hooks, devcontainer, mutation testing
 - **Environment Configuration**: Root `.env` for stack ports and `llm/.env` for model/runtime settings
+
+## Project Status
+
+| Phase | Status | Scope |
+|-------|--------|-------|
+| **P0 — Infrastructure** | ✅ DONE | Docker stack, Temporal, PostgreSQL, Caddy schema server |
+| **P1 — Practical Bundles** | ✅ DONE | SERVICE, VIEW, WORKFLOW, APPLICATION bundles with DOQL bridge |
+| **P2 — DOQL Bridge** | ✅ DONE | Native app generation, multiple backends, bundle CLI |
+| **P3 — Auth, Observability & DX** | ✅ DONE | Auth layer, ACL, audit log, human-in-the-loop, Prometheus/Grafana, OTel tracing, Go coverage, devcontainer, pre-commit, MinIO |
 
 ## Directory Structure
 
@@ -22,7 +32,7 @@ The Godot Bundle System provides:
 | `generated/` | Runtime output: deployed apps |
 | `scripts/` | Bash helpers: validation, testing, Docker management |
 | `Makefile` | Convenience targets for build, start, test, and Docker operations |
-| `docker-compose.yml` | Docker services: godot, Temporal, PostgreSQL, Schema Server, LLM API, Mock API |
+| `docker-compose.yml` | Docker services: godot, Temporal, PostgreSQL, Schema Server (Caddy), LLM API, Mock API, Jaeger, MinIO |
 | `.env` | Root port and service configuration for the stack |
 
 ## Files
@@ -35,12 +45,26 @@ The Godot Bundle System provides:
 | `src/bundle.go` | Canonical Go bundle structs with schema resolution and runner dispatch |
 | `src/bundle_test.go` | Go tests for bundle validation |
 | `src/starter.go` | Temporal client for bundle execution |
+| `llm/audit.py` | Audit trail recorder for LLM requests, failures, and content |
 | `scripts/validate-bundle.sh` | Validate single bundle JSON |
 | `scripts/validate-all.sh` | Recursively validate all bundle JSON files |
 | `scripts/test-services.sh` | Verify stack readiness and bundle validation in Docker |
 | `scripts/test-llm.sh` | Verify LLM health, ACL enforcement, context fetch, and NLP bundle generation |
+| `scripts/test-auth.sh` | Test Caddy forward_auth + LLM `/auth` endpoint |
+| `scripts/test-temporal-ui.sh` | Verify Temporal Web UI, gRPC, and namespace API |
+| `scripts/test-buildapp-workflow.sh` | Deploy, run, and signal an APPLICATION_BUNDLE workflow |
+| `scripts/test-prometheus.sh` | Verify Prometheus metrics endpoint and `godot_bundle_total` counter |
+| `scripts/test-audit.sh` | Verify `llm/audit.log` is generated with successful LLM request |
+| `scripts/test-human-in-the-loop.sh` | Verify temporal workflow signaling with `bundle-approved` or `bundle-rejected` |
+| `scripts/test-otel.sh` | Verify Jaeger OTLP collector and trace UI |
+| `scripts/test-minio.sh` | Verify MinIO S3 artifact storage console and API |
+| `scripts/approve-bundle.sh` | Approve a pending bundle using Temporal `bundle-approved` signal |
 | `scripts/quickstart.sh` | Wrapper that delegates to `make start` |
 | `scripts/install.sh` | Install dependencies (Go, Python3, PHP, Docker) |
+| `caddy.conf` | Caddyfile with `forward_auth` proxy to LLM `/auth` for schema server |
+| `prometheus.yml` | Prometheus scrape config for godot bundle service metrics |
+| `.devcontainer/devcontainer.json` | VS Code devcontainer with Go, Python, Docker-in-Docker |
+| `.pre-commit-config.yaml` | Pre-commit hooks for Go, Python, JSON, YAML, and bundle schema validation |
 
 ## Architecture
 
@@ -90,6 +114,8 @@ bash scripts/test-llm.sh
 | postgres | PostgreSQL for Temporal | 5433 (host), 5432 (container) |
 | schema-server | Caddy server for bundle schema | 8084 (host), 80 (container) |
 | llm | LiteLLM + ACL FastAPI service | 18094 (host), 8000 (container) |
+| jaeger | OpenTelemetry collector & UI (all-in-one) | 16686, 4317, 4318 (host) |
+| minio | S3-compatible artifact storage | 9000, 9001 (host) |
 | mock-api | Mock API for ACL and NLP tests | 18095 (host), 8001 (container) |
 
 **Service URLs:**
@@ -99,6 +125,8 @@ bash scripts/test-llm.sh
 - PostgreSQL: localhost:5433
 - LLM API: http://localhost:18094/health
 - Mock API: http://localhost:18095/health
+- Jaeger UI: http://localhost:16686
+- MinIO Console: http://localhost:9001 (minioadmin / minioadmin)
 
 ## Configuration
 
@@ -114,6 +142,10 @@ GODOT_PORT_8082=9002
 GODOT_PORT_8083=9003
 LLM_PORT=18094
 MOCK_API_PORT=18095
+JAEGER_UI_PORT=16686
+JAEGER_OTLP_GRPC_PORT=4317
+MINIO_API_PORT=9000
+MINIO_CONSOLE_PORT=9001
 BUNDLE_SCHEMA_URI=http://schema-server:80/bundle.schema.json
 ```
 
@@ -150,6 +182,19 @@ make generate-doql   # Generate DOQL app.doql.css from a bundle
 make build-doql      # Build DOQL web/desktop/mobile app
 make render-report   # Render HTML report from bundle sources
 make test-practical  # Test LLM inference on all practical bundles
+make test-auth        # Test Caddy forward_auth + LLM /auth
+make test-temporal-ui # Verify Temporal Web UI and gRPC
+make test-prometheus  # Verify Prometheus metrics endpoint
+make test-buildapp    # Deploy, run and signal an APPLICATION_BUNDLE workflow
+make test-audit       # Verify audit.log generation
+make test-human-in-the-loop  # Verify bundle approval workflow
+make test-go          # Run Go tests with coverage report
+make test-mutation    # Run mutation testing on Go code
+make test-otel        # Verify Jaeger OTLP collector and trace UI
+make test-minio       # Verify MinIO S3 artifact storage
+make test-devcontainer # Verify devcontainer JSON
+make test-precommit   # Run pre-commit hooks
+make pending-bundle   # Deploy and signal a human-in-the-loop APPLICATION_BUNDLE
 ```
 
 ## Practical Bundles
@@ -423,6 +468,34 @@ python3 -m json.tool bundles/protocol-dashboard.json
 2. Implement `runNewRunner()` method
 3. Update schema validation if needed
 4. Add tests in `src/bundle_test.go`
+
+### Devcontainer & Pre-Commit
+
+The project includes a VS Code devcontainer (`.devcontainer/devcontainer.json`) with Go, Python, and Docker-in-Docker.
+
+Pre-commit hooks (`.pre-commit-config.yaml`) cover:
+- `go fmt`, `go vet`, `gofmt`
+- `black`, `isort`, `mypy`, `flake8` for Python
+- `check-json`, `pretty-format-json` for JSON
+- YAML and bundle schema validation
+
+Install hooks:
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+### Go Dependencies
+
+If adding new Go packages, run:
+```bash
+cd src && go mod tidy
+```
+
+Enable OpenTelemetry stdout traces:
+```bash
+export OTEL_EXPORTER=1
+```
 
 ## License
 

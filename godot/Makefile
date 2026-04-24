@@ -40,6 +40,8 @@ help:
 	@echo "  test-mutation  - run mutation testing on Go code"
 	@echo "  test-temporal-ui - verify Temporal Web UI, gRPC, and namespace API"
 	@echo "  test-auth      - verify Caddy forward_auth + LLM /auth endpoint"
+	@echo "  test-otel      - verify Jaeger OTLP collector and trace UI"
+	@echo "  test-minio     - verify MinIO S3 artifact storage console and API"
 	@echo "  test-devcontainer - verify .devcontainer/devcontainer.json valid"
 	@echo "  test-precommit - run pre-commit hooks on changed files"
 
@@ -213,6 +215,14 @@ test-temporal-ui:
 test-auth:
 	@echo "=== Testing Auth Layer (Caddy forward_auth + LLM /auth) ==="
 	@bash scripts/test-auth.sh
+
+test-otel:
+	@echo "=== Verifying OpenTelemetry / Jaeger traces ==="
+	@bash scripts/test-otel.sh
+
+test-minio:
+	@echo "=== Verifying MinIO S3 artifact storage ==="
+	@bash scripts/test-minio.sh
 
 test-devcontainer:
 	@echo "=== Verifying .devcontainer/devcontainer.json ==="

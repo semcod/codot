@@ -85,6 +85,19 @@ services:
     networks:
       - bundle-network
 
+  # Jaeger — OTel trace collector & UI
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "${JAEGER_UI_PORT:-16686}:16686"
+      - "${JAEGER_OTLP_GRPC_PORT:-4317}:4317"
+      - "${JAEGER_OTLP_HTTP_PORT:-4318}:4318"
+    networks:
+      - bundle-network
+
   # LiteLLM bundle generation + ACL service
   llm:
     build:
@@ -164,6 +177,22 @@ services:
     depends_on:
       - prometheus
 
+  # MinIO — S3-compatible artifact storage for generated apps
+  minio:
+    image: minio/minio:latest
+    container_name: bundle-minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    ports:
+      - "${MINIO_API_PORT:-9010}:9000"
+      - "${MINIO_CONSOLE_PORT:-9011}:9001"
+    networks:
+      - bundle-network
+
 networks:
   bundle-network:
     driver: bridge
@@ -171,3 +200,4 @@ networks:
 volumes:
   postgres-data:
   grafana-data:
+  minio-data:

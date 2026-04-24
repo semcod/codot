@@ -5,11 +5,11 @@ go 1.21
 require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.temporal.io/sdk v1.26.1
-	go.opentelemetry.io/otel v1.27.0
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.27.0
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.27.0
-	go.opentelemetry.io/otel/sdk v1.27.0
-	go.opentelemetry.io/otel/trace v1.27.0
+	go.opentelemetry.io/otel v1.21.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.21.0
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.21.0
+	go.opentelemetry.io/otel/sdk v1.21.0
+	go.opentelemetry.io/otel/trace v1.21.0
 )
 
 require (

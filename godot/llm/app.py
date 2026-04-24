@@ -13,6 +13,7 @@ from urllib.parse import unquote_to_bytes, urlparse
 
 import httpx
 import yaml
+import fastapi
 from fastapi import FastAPI, HTTPException, Response
 from jsonschema import Draft202012Validator
 from pydantic import BaseModel, Field

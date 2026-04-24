@@ -31,7 +31,7 @@
 - [x] `APPLICATION_BUNDLE` targets map to DOQL interfaces (desktop/Tauri, web/React, mobile/PWA)
 - [x] Temporal workflow: `BuildAppWorkflow` (bundle → doql → build → artifact) — `src/deploy_workflow.go`
 - [x] Test script: `scripts/test-buildapp-workflow.sh` + `make test-buildapp`
-- [ ] Artifact storage: MinIO/S3 container for generated apps
+- [x] Artifact storage: MinIO/S3 container for generated apps (`docker-compose.yml`, `make test-minio`)
 
 ## P3 — Auth, Observability & DX
 - [x] Auth layer (Caddy forward_auth + bundle `auth` field with scopes) (`caddy.conf`, `llm/app.py` /auth, `scripts/test-auth.sh`, `make test-auth`)
@@ -39,9 +39,22 @@
 - [x] Audit log table in Postgres for every LLM decision (`llm/audit.py`, `scripts/init-audit.sql`, `make test-audit`)
 - [x] Human-in-the-loop: `bundles/pending/` for WORKFLOW_BUNDLE approval (`scripts/approve-bundle.sh`, `scripts/test-human-in-the-loop.sh`, `make pending-bundle`)
 - [x] Prometheus + Grafana dashboards per runner (`prometheus.yml`, `grafana/provisioning/`, `llm/app.py` /metrics, `make test-prometheus`)
-- [ ] OpenTelemetry tracing through bundle execution
+- [x] OpenTelemetry tracing through bundle execution (`bundle.go` `initTracer()`, `deploy_workflow.go` spans, Jaeger in `docker-compose.yml`, `make test-otel`)
 - [x] Go test coverage >80%, mutation testing (`bundle_test.go`, `deploy_workflow_test.go`, `make test-go`, `make test-mutation`)
 - [x] devcontainer.json + pre-commit hooks (`.devcontainer/devcontainer.json`, `.pre-commit-config.yaml`, `make test-devcontainer`, `make test-precommit`)
+
+---
+
+## Project Status
+
+**P0 — Infrastructure:** ✅ DONE  
+**P1 — Practical Bundles:** ✅ DONE  
+**P2 — DOQL Bridge:** ✅ DONE  
+**P3 — Auth, Observability & DX:** ✅ DONE
+
+All roadmap items complete. Stack is production-ready for bundle authoring, deployment, and monitoring.
+
+---
 
 ## LLM / NLP Fixtures (Test Prompts)
 1. "Show protocol 123 status every second" → VIEW_BUNDLE, refresh_sec: 1

@@ -1,0 +1,48 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+        files: ^bundles/.*\.json$
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go fmt
+        entry: gofmt -w
+        language: system
+        types: [go]
+        pass_filenames: true
+
+      - id: go-vet
+        name: go vet
+        entry: go vet ./...
+        language: system
+        types: [go]
+        pass_filenames: false
+        always_run: true
+
+      - id: bundle-validate
+        name: validate bundle JSON schema
+        entry: bash -c 'for f in "$@"; do python scripts/validate_bundle.py "$f"; done'
+        language: system
+        files: ^bundles/.*\.json$
+        pass_filenames: true
+
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types: [python]
+        args: ['--check', '--diff']
+
+      - id: python-syntax
+        name: python syntax check
+        entry: python -m py_compile
+        language: system
+        types: [python]

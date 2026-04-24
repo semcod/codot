@@ -1,0 +1,44 @@
+{
+  "name": "Godot Bundle System",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "godot",
+  "workspaceFolder": "/app",
+  "shutdownAction": "none",
+  "features": {
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "1.21"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "redhat.vscode-yaml",
+        "dbaeumer.vscode-eslint"
+      ],
+      "settings": {
+        "go.toolsManagement.autoUpdate": true,
+        "go.useLanguageServer": true,
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "postCreateCommand": "cd /app && go mod tidy 2>/dev/null || true && pip install -r llm/requirements.txt 2>/dev/null || true && pre-commit install 2>/dev/null || true",
+  "forwardPorts": [9000, 9001, 9002, 9003, 18094, 18095, 5433, 7233, 8084, 3000, 9090, 8233],
+  "portsAttributes": {
+    "9000": { "label": "Godot main" },
+    "18094": { "label": "LLM service" },
+    "5433": { "label": "Postgres" },
+    "7233": { "label": "Temporal gRPC" },
+    "8233": { "label": "Temporal UI" },
+    "3000": { "label": "Grafana" },
+    "9090": { "label": "Prometheus" }
+  }
+}

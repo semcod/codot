@@ -1,5 +1,5 @@
 # Runtime stage with Go for building and running
-FROM golang:1.21-alpine
+FROM golang:1.25-alpine
 
 WORKDIR /app
 
