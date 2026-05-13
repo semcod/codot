@@ -1,4 +1,5 @@
 """Unit tests — run with `cd service-factory && pytest tests/`."""
+
 from __future__ import annotations
 
 import ast
@@ -33,6 +34,7 @@ def bundle() -> Bundle:
 
 
 # ---------- IR -------------------------------------------------------------
+
 
 def test_bundle_loads_with_contracts(bundle: Bundle):
     assert bundle.name == "connect-test-service"
@@ -91,19 +93,32 @@ def test_missing_contract_raises_clear_error():
 
 # ---------- Generators: structural checks ----------------------------------
 
+
 def test_all_generators_registered():
     reg = get_registry()
     targets = {e["target"] for e in reg.list()}
-    assert {"python-fastapi", "node-fastify", "docker", "kubernetes", "openapi"} <= targets
+    assert {
+        "python-fastapi",
+        "node-fastify",
+        "docker",
+        "kubernetes",
+        "openapi",
+    } <= targets
 
 
 def test_python_fastapi_generates_valid_python(bundle: Bundle, tmp_path: Path):
     gen = get_registry().get("python-fastapi")
     files = gen.generate(bundle)
-    assert set(files.keys()) == {"requirements.txt", "models.py", "events.py", "main.py"}
+    assert set(files.keys()) == {
+        "requirements.txt",
+        "models.py",
+        "events.py",
+        "main.py",
+    }
 
     # Each .py file must compile
     import py_compile
+
     for name in ("models.py", "events.py", "main.py"):
         p = tmp_path / name
         p.write_text(files[name])
@@ -128,6 +143,7 @@ def test_node_fastify_generates_valid_json(bundle: Bundle):
 
 def test_docker_generates_valid_yaml(bundle: Bundle):
     import yaml
+
     gen = get_registry().get("docker")
     files = gen.generate(bundle)
     assert set(files.keys()) == {"Dockerfile", "docker-compose.yml", ".dockerignore"}
@@ -172,7 +188,11 @@ def test_view_docker_fastapi_sse_generates_valid_yaml(view_bundle: ViewBundle):
 
 
 def test_view_docker_fastapi_sse_dockerfile_has_healthcheck(view_bundle: ViewBundle):
-    dockerfile = get_registry().get("view/docker-fastapi-sse").generate(view_bundle)["Dockerfile"]
+    dockerfile = (
+        get_registry()
+        .get("view/docker-fastapi-sse")
+        .generate(view_bundle)["Dockerfile"]
+    )
     assert "HEALTHCHECK" in dockerfile
     assert f"EXPOSE {view_bundle.exposure.port}" in dockerfile
     assert "uvicorn" in dockerfile
@@ -209,6 +229,7 @@ def test_view_kubernetes_fastapi_sse_generates_valid_yaml(view_bundle: ViewBundl
 
 def test_kubernetes_generates_valid_yaml(bundle: Bundle):
     import yaml
+
     gen = get_registry().get("kubernetes")
     files = gen.generate(bundle)
     assert set(files.keys()) == {
@@ -243,6 +264,7 @@ def test_openapi_generates_valid_json(bundle: Bundle):
 
 # ---------- Cross-target consistency --------------------------------------
 
+
 def test_same_bundle_compiles_to_different_languages(bundle: Bundle):
     """Same IR, two code generators → both produce a valid result."""
     py_files = get_registry().get("python-fastapi").generate(bundle)
@@ -271,7 +293,9 @@ VIEW_BUNDLE_PATH = ROOT / "bundles" / "device-status-dashboard.view.json"
 def view_bundle() -> ViewBundle:
     loader = BundleLoader(ROOT / "contracts")
     b = loader.load(VIEW_BUNDLE_PATH)
-    assert isinstance(b, ViewBundle), "loader must return ViewBundle for VIEW_BUNDLE kind"
+    assert isinstance(b, ViewBundle), (
+        "loader must return ViewBundle for VIEW_BUNDLE kind"
+    )
     return b
 
 
@@ -327,6 +351,7 @@ def test_service_bundle_still_loads_as_bundle():
 
 # ---------- View Bundle: generator -----------------------------------------
 
+
 def test_php_standalone_registered():
     reg = get_registry()
     targets = {e["target"] for e in reg.list()}
@@ -375,6 +400,7 @@ def test_php_standalone_passes_php_lint(view_bundle: ViewBundle, tmp_path: Path)
 
 # ---------- View Bundle: fastapi-sse generator -----------------------------
 
+
 def test_fastapi_sse_registered():
     reg = get_registry()
     targets = {e["target"] for e in reg.list()}
@@ -394,8 +420,8 @@ def test_fastapi_sse_emits_expected_files(view_bundle: ViewBundle):
     main_py = files["main.py"]
     assert "StreamingResponse" in main_py
     assert "text/event-stream" in main_py
-    assert "@app.get(\"/events\")" in main_py
-    assert "@app.get(\"/snapshot\")" in main_py
+    assert '@app.get("/events")' in main_py
+    assert '@app.get("/snapshot")' in main_py
     for s in view_bundle.sources:
         assert s.uri in main_py
     assert view_bundle.contract_hash() in files["README.md"]
@@ -444,7 +470,10 @@ def _python_has(*modules: str) -> bool:
     return all(importlib.util.find_spec(m) is not None for m in modules)
 
 
-@pytest.mark.skipif(not _python_has("fastapi", "uvicorn", "httpx"), reason="FastAPI runtime deps not installed")
+@pytest.mark.skipif(
+    not _python_has("fastapi", "uvicorn", "httpx"),
+    reason="FastAPI runtime deps not installed",
+)
 def test_fastapi_sse_runtime_emits_snapshot_events(tmp_path: Path):
     import textwrap
 
@@ -492,8 +521,16 @@ def test_fastapi_sse_runtime_emits_snapshot_events(tmp_path: Path):
             version="1.0.0",
             description="runtime test",
             sources=[
-                Source(name="catalog", uri=f"http://127.0.0.1:{stub_port}/catalog", refresh="200ms"),
-                Source(name="health", uri=f"http://127.0.0.1:{stub_port}/health", refresh="200ms"),
+                Source(
+                    name="catalog",
+                    uri=f"http://127.0.0.1:{stub_port}/catalog",
+                    refresh="200ms",
+                ),
+                Source(
+                    name="health",
+                    uri=f"http://127.0.0.1:{stub_port}/health",
+                    refresh="200ms",
+                ),
             ],
             transport="sse",
         )
@@ -512,18 +549,22 @@ def test_fastapi_sse_runtime_emits_snapshot_events(tmp_path: Path):
         try:
             _wait_for_http(f"http://127.0.0.1:{view_port}/health", timeout=8.0)
 
-            with urllib.request.urlopen(f"http://127.0.0.1:{view_port}/snapshot", timeout=3.0) as resp:
+            with urllib.request.urlopen(
+                f"http://127.0.0.1:{view_port}/snapshot", timeout=3.0
+            ) as resp:
                 snapshot = json.loads(resp.read().decode("utf-8"))
             assert set(snapshot["sources"].keys()) == {"catalog", "health"}
             assert snapshot["sources"]["catalog"]["ok"] is True
             assert snapshot["sources"]["health"]["ok"] is True
 
-            with urllib.request.urlopen(f"http://127.0.0.1:{view_port}/events", timeout=5.0) as resp:
+            with urllib.request.urlopen(
+                f"http://127.0.0.1:{view_port}/events", timeout=5.0
+            ) as resp:
                 event_line = resp.readline().decode("utf-8").strip()
                 data_line = resp.readline().decode("utf-8").strip()
             assert event_line == "event: snapshot"
             assert data_line.startswith("data: ")
-            payload = json.loads(data_line[len("data: "):])
+            payload = json.loads(data_line[len("data: ") :])
             assert set(payload["sources"].keys()) == {"catalog", "health"}
             assert payload["sources"]["catalog"]["ok"] is True
         finally:
@@ -562,6 +603,7 @@ def _wait_for_http(url: str, timeout: float = 5.0) -> None:
 
 # ---------- View Bundle: static-html generator ----------------------------
 
+
 def test_static_html_registered():
     reg = get_registry()
     targets = {e["target"] for e in reg.list()}
@@ -582,7 +624,9 @@ def test_static_html_emits_expected_files(view_bundle: ViewBundle):
 
 
 def test_static_html_embeds_every_source_uri(view_bundle: ViewBundle):
-    html_doc = get_registry().get("view/static-html").generate(view_bundle)["index.html"]
+    html_doc = (
+        get_registry().get("view/static-html").generate(view_bundle)["index.html"]
+    )
     for s in view_bundle.sources:
         assert s.uri in html_doc, f"source {s.name!r} uri missing from index.html"
         # refreshMs must surface for every source (per-source polling contract)
@@ -595,7 +639,9 @@ def test_static_html_parses_as_valid_html(view_bundle: ViewBundle):
     """Parse the generated document with html.parser and assert structure."""
     from html.parser import HTMLParser
 
-    html_doc = get_registry().get("view/static-html").generate(view_bundle)["index.html"]
+    html_doc = (
+        get_registry().get("view/static-html").generate(view_bundle)["index.html"]
+    )
 
     class Collector(HTMLParser):
         def __init__(self) -> None:
@@ -642,7 +688,9 @@ def test_static_html_readme_mentions_cors_and_serve(view_bundle: ViewBundle):
 def test_static_html_script_is_syntactically_valid(view_bundle: ViewBundle):
     """Best-effort syntax check: the embedded JSON literal must parse as JSON,
     and every source name from the bundle must appear in the SOURCES array."""
-    html_doc = get_registry().get("view/static-html").generate(view_bundle)["index.html"]
+    html_doc = (
+        get_registry().get("view/static-html").generate(view_bundle)["index.html"]
+    )
     start = html_doc.index("const SOURCES = ") + len("const SOURCES = ")
     end = html_doc.index(";", start)
     raw = html_doc[start:end].strip()
@@ -657,7 +705,10 @@ def test_static_html_script_is_syntactically_valid(view_bundle: ViewBundle):
 def test_static_html_inline_js_is_valid(view_bundle: ViewBundle, tmp_path: Path):
     """Extract the single <script> block and run `node --check` on it."""
     import re as _re
-    html_doc = get_registry().get("view/static-html").generate(view_bundle)["index.html"]
+
+    html_doc = (
+        get_registry().get("view/static-html").generate(view_bundle)["index.html"]
+    )
     m = _re.search(r"<script>(.*?)</script>", html_doc, _re.DOTALL)
     assert m, "generated HTML has no <script> block"
     js_path = tmp_path / "inline.mjs"
@@ -705,7 +756,9 @@ def test_php_standalone_health_endpoint_runs(view_bundle: ViewBundle, tmp_path: 
     )
     try:
         _wait_for_http(f"http://127.0.0.1:{port}/health", timeout=5.0)
-        with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=2.0) as resp:
+        with urllib.request.urlopen(
+            f"http://127.0.0.1:{port}/health", timeout=2.0
+        ) as resp:
             body = json.loads(resp.read().decode("utf-8"))
         assert body == {
             "status": "ok",

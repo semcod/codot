@@ -5,6 +5,7 @@ https://modelcontextprotocol.io/
 
 JSON-RPC 2.0 over stdio or Server-Sent Events.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -36,39 +37,49 @@ class MCPClient:
     async def _send(self, payload: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError
 
-    async def initialize(self, client_name: str = "codot", version: str = "2024-11-05") -> dict[str, Any]:
-        result = await self._send({
-            "jsonrpc": "2.0",
-            "id": self._next_id(),
-            "method": "initialize",
-            "params": {
-                "protocolVersion": "2024-11-05",
-                "capabilities": {"sampling": {}, "roots": {"listChanged": True}},
-                "clientInfo": {"name": client_name, "version": version},
-            },
-        })
-        await self._send({
-            "jsonrpc": "2.0",
-            "method": "notifications/initialized",
-        })
+    async def initialize(
+        self, client_name: str = "codot", version: str = "2024-11-05"
+    ) -> dict[str, Any]:
+        result = await self._send(
+            {
+                "jsonrpc": "2.0",
+                "id": self._next_id(),
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {"sampling": {}, "roots": {"listChanged": True}},
+                    "clientInfo": {"name": client_name, "version": version},
+                },
+            }
+        )
+        await self._send(
+            {
+                "jsonrpc": "2.0",
+                "method": "notifications/initialized",
+            }
+        )
         return result
 
     async def list_tools(self) -> list[dict[str, Any]]:
-        result = await self._send({
-            "jsonrpc": "2.0",
-            "id": self._next_id(),
-            "method": "tools/list",
-            "params": {},
-        })
+        result = await self._send(
+            {
+                "jsonrpc": "2.0",
+                "id": self._next_id(),
+                "method": "tools/list",
+                "params": {},
+            }
+        )
         return result.get("tools", [])
 
     async def call_tool(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
-        result = await self._send({
-            "jsonrpc": "2.0",
-            "id": self._next_id(),
-            "method": "tools/call",
-            "params": {"name": name, "arguments": arguments},
-        })
+        result = await self._send(
+            {
+                "jsonrpc": "2.0",
+                "id": self._next_id(),
+                "method": "tools/call",
+                "params": {"name": name, "arguments": arguments},
+            }
+        )
         return result
 
     async def close(self) -> None:
@@ -127,7 +138,9 @@ class MCPStdioClient(MCPClient):
         if self._proc is not None:
             try:
                 if self._proc.stdin and not self._proc.stdin.is_closing():
-                    self._proc.stdin.write(b'{"jsonrpc":"2.0","method":"notifications/initialized"}\n')
+                    self._proc.stdin.write(
+                        b'{"jsonrpc":"2.0","method":"notifications/initialized"}\n'
+                    )
                     await self._proc.stdin.drain()
             except (RuntimeError, BrokenPipeError):
                 pass
@@ -161,7 +174,9 @@ class MCPSseClient(MCPClient):
         resp.raise_for_status()
         return resp.json() if resp.text else {}
 
-    async def initialize(self, client_name: str = "codot", version: str = "0.1.0") -> dict[str, Any]:
+    async def initialize(
+        self, client_name: str = "codot", version: str = "0.1.0"
+    ) -> dict[str, Any]:
         if self._client is None:
             self._client = httpx.AsyncClient(timeout=60.0, headers=self.headers)
         result = await super().initialize(client_name, version)

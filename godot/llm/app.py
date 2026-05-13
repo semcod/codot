@@ -19,7 +19,12 @@ from jsonschema import Draft202012Validator
 from pydantic import BaseModel, Field
 
 try:
-    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Histogram
+    from prometheus_client import (
+        generate_latest,
+        CONTENT_TYPE_LATEST,
+        Counter,
+        Histogram,
+    )
 except Exception:  # pragma: no cover
     generate_latest = None  # type: ignore[assignment]
     CONTENT_TYPE_LATEST = "text/plain"  # type: ignore[assignment]
@@ -27,8 +32,12 @@ except Exception:  # pragma: no cover
     Histogram = None  # type: ignore[assignment,misc]
 
 if Counter:
-    BUNDLE_GENERATIONS = Counter("llm_bundle_generations_total", "Total bundle generations", ["kind", "status"])
-    BUNDLE_GENERATION_DURATION = Histogram("llm_bundle_generation_duration_seconds", "Bundle generation latency")
+    BUNDLE_GENERATIONS = Counter(
+        "llm_bundle_generations_total", "Total bundle generations", ["kind", "status"]
+    )
+    BUNDLE_GENERATION_DURATION = Histogram(
+        "llm_bundle_generation_duration_seconds", "Bundle generation latency"
+    )
 else:
     BUNDLE_GENERATIONS = None  # type: ignore[assignment]
     BUNDLE_GENERATION_DURATION = None  # type: ignore[assignment]
@@ -40,6 +49,7 @@ except Exception:  # pragma: no cover - optional dependency at runtime
 
 try:
     import audit
+
     audit.ensure_table()
 except Exception:  # pragma: no cover - optional at runtime (no postgres)
     audit = None  # type: ignore[assignment]
@@ -103,7 +113,11 @@ def dedupe(values: list[str]) -> list[str]:
 
 def compact(value: Any) -> Any:
     if isinstance(value, dict):
-        return {key: compact(item) for key, item in value.items() if item not in (None, [], {}, "")}
+        return {
+            key: compact(item)
+            for key, item in value.items()
+            if item not in (None, [], {}, "")
+        }
     if isinstance(value, list):
         return [compact(item) for item in value if item not in (None, [], {}, "")]
     return value
@@ -145,7 +159,9 @@ class Settings:
     max_fetch_bytes: int = env_int("LLM_MAX_FETCH_BYTES", 2_000_000)
     default_runner: str = os.getenv("LLM_DEFAULT_RUNNER", "go_temporal")
     default_runtime_lang: str = os.getenv("LLM_DEFAULT_RUNTIME_LANG", "go")
-    default_application_targets: list[str] = field(default_factory=lambda: ["web", "pwa"])
+    default_application_targets: list[str] = field(
+        default_factory=lambda: ["web", "pwa"]
+    )
 
 
 @dataclass(frozen=True)
@@ -153,12 +169,16 @@ class ACLPolicy:
     allow_patterns: list[str] = field(default_factory=list)
     deny_patterns: list[str] = field(default_factory=list)
     allow_file_roots: list[Path] = field(default_factory=list)
-    allowed_schemes: list[str] = field(default_factory=lambda: ["http", "https", "file", "data"])
+    allowed_schemes: list[str] = field(
+        default_factory=lambda: ["http", "https", "file", "data"]
+    )
     deny_private_networks: bool = True
     deny_cidrs: list[str] = field(default_factory=list)
     allow_cidrs: list[str] = field(default_factory=list)
     endpoint_deny_patterns: list[str] = field(default_factory=list)
-    redact_fields: list[str] = field(default_factory=lambda: ["password", "secret_key", "api_key", "token"])
+    redact_fields: list[str] = field(
+        default_factory=lambda: ["password", "secret_key", "api_key", "token"]
+    )
 
     @classmethod
     def from_file(cls, path: Path) -> "ACLPolicy":
@@ -169,12 +189,17 @@ class ACLPolicy:
             allow_patterns=list(raw.get("allow_patterns", []) or []),
             deny_patterns=list(raw.get("deny_patterns", []) or []),
             allow_file_roots=[Path(p) for p in raw.get("allow_file_roots", []) or []],
-            allowed_schemes=list(raw.get("allowed_schemes", ["http", "https", "file", "data"]) or []),
+            allowed_schemes=list(
+                raw.get("allowed_schemes", ["http", "https", "file", "data"]) or []
+            ),
             deny_private_networks=bool(raw.get("deny_private_networks", True)),
             deny_cidrs=list(raw.get("deny_cidrs", []) or []),
             allow_cidrs=list(raw.get("allow_cidrs", []) or []),
             endpoint_deny_patterns=list(raw.get("endpoint_deny_patterns", []) or []),
-            redact_fields=list(raw.get("redact_fields", ["password", "secret_key", "api_key", "token"]) or []),
+            redact_fields=list(
+                raw.get("redact_fields", ["password", "secret_key", "api_key", "token"])
+                or []
+            ),
         )
 
     def _matches_any(self, patterns: list[str], values: list[str]) -> bool:
@@ -212,7 +237,9 @@ class ACLPolicy:
             return False, f"uri '{uri}' matches endpoint deny policy"
 
         if scheme == "file":
-            fpath = Path(unquote_to_bytes(path).decode("utf-8", errors="ignore")).resolve()
+            fpath = Path(
+                unquote_to_bytes(path).decode("utf-8", errors="ignore")
+            ).resolve()
             for root in self.allow_file_roots:
                 try:
                     fpath.relative_to(root.resolve())
@@ -240,12 +267,17 @@ class ACLPolicy:
     def redact_bundle(self, bundle: dict[str, Any]) -> dict[str, Any]:
         if not self.redact_fields:
             return bundle
+
         def _redact(obj: Any) -> Any:
             if isinstance(obj, dict):
-                return {k: "***REDACTED***" if k in self.redact_fields else _redact(v) for k, v in obj.items()}
+                return {
+                    k: "***REDACTED***" if k in self.redact_fields else _redact(v)
+                    for k, v in obj.items()
+                }
             if isinstance(obj, list):
                 return [_redact(i) for i in obj]
             return obj
+
         return _redact(bundle)
 
     def describe(self) -> dict[str, Any]:
@@ -309,9 +341,15 @@ def infer_kind(prompt: str, explicit: str | None = None) -> str:
     lower = prompt.lower()
     if any(token in lower for token in ["workflow", "pipeline", "orchestrate", "dag"]):
         return "WORKFLOW_BUNDLE"
-    if any(token in lower for token in ["dashboard", "view", "ui", "frontend", "panel", "stream", "live"]):
+    if any(
+        token in lower
+        for token in ["dashboard", "view", "ui", "frontend", "panel", "stream", "live"]
+    ):
         return "VIEW_BUNDLE"
-    if any(token in lower for token in ["desktop", "mobile", "web", "pwa", "application", "app ", "app\n"]):
+    if any(
+        token in lower
+        for token in ["desktop", "mobile", "web", "pwa", "application", "app ", "app\n"]
+    ):
         return "APPLICATION_BUNDLE"
     return "SERVICE_BUNDLE"
 
@@ -400,8 +438,14 @@ def normalize_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
     raise ValueError("bundle normalization failed")
 
 
-async def maybe_refine_bundle(prompt: str, base_bundle: dict[str, Any]) -> tuple[dict[str, Any], bool]:
-    if STATE.settings.offline or not STATE.settings.api_key or litellm_completion is None:
+async def maybe_refine_bundle(
+    prompt: str, base_bundle: dict[str, Any]
+) -> tuple[dict[str, Any], bool]:
+    if (
+        STATE.settings.offline
+        or not STATE.settings.api_key
+        or litellm_completion is None
+    ):
         return base_bundle, False
 
     system_prompt = (
@@ -411,7 +455,12 @@ async def maybe_refine_bundle(prompt: str, base_bundle: dict[str, Any]) -> tuple
     )
     messages = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": json.dumps({"prompt": prompt, "bundle": base_bundle}, ensure_ascii=False)},
+        {
+            "role": "user",
+            "content": json.dumps(
+                {"prompt": prompt, "bundle": base_bundle}, ensure_ascii=False
+            ),
+        },
     ]
 
     try:
@@ -435,13 +484,18 @@ async def maybe_refine_bundle(prompt: str, base_bundle: dict[str, Any]) -> tuple
 
 
 def validate_bundle(bundle: dict[str, Any]) -> None:
-    errors = sorted(STATE.validator.iter_errors(bundle), key=lambda error: list(error.path))
+    errors = sorted(
+        STATE.validator.iter_errors(bundle), key=lambda error: list(error.path)
+    )
     if errors:
         details = []
         for error in errors:
             path = "/".join(str(item) for item in error.path)
             details.append({"path": path, "message": error.message})
-        raise HTTPException(status_code=422, detail={"message": "bundle validation failed", "errors": details})
+        raise HTTPException(
+            status_code=422,
+            detail={"message": "bundle validation failed", "errors": details},
+        )
 
 
 async def fetch_uri(request: FetchRequest) -> dict[str, Any]:
@@ -451,7 +505,9 @@ async def fetch_uri(request: FetchRequest) -> dict[str, Any]:
 
     parsed = urlparse(request.uri)
     if parsed.scheme == "file":
-        path = Path(unquote_to_bytes(parsed.path).decode("utf-8", errors="ignore")).resolve()
+        path = Path(
+            unquote_to_bytes(parsed.path).decode("utf-8", errors="ignore")
+        ).resolve()
         data = path.read_bytes()
         content_type = "application/octet-stream"
     elif parsed.scheme == "data":
@@ -461,16 +517,22 @@ async def fetch_uri(request: FetchRequest) -> dict[str, Any]:
         content_type = metadata.split(";")[0] or "text/plain;charset=US-ASCII"
         data = base64.b64decode(payload) if is_base64 else unquote_to_bytes(payload)
     else:
-        async with httpx.AsyncClient(timeout=STATE.settings.fetch_timeout_sec, follow_redirects=False) as client:
+        async with httpx.AsyncClient(
+            timeout=STATE.settings.fetch_timeout_sec, follow_redirects=False
+        ) as client:
             response = await client.request(
                 request.method.upper(),
                 request.uri,
                 headers=request.headers,
-                content=request.body.encode("utf-8") if request.body is not None else None,
+                content=request.body.encode("utf-8")
+                if request.body is not None
+                else None,
             )
             response.raise_for_status()
             data = response.content
-            content_type = response.headers.get("content-type", "application/octet-stream")
+            content_type = response.headers.get(
+                "content-type", "application/octet-stream"
+            )
 
     if len(data) > STATE.settings.max_fetch_bytes:
         raise HTTPException(status_code=413, detail="payload is too large")
@@ -496,18 +558,35 @@ async def fetch_many(uris: list[str]) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     for uri in uris:
         try:
-            items.append({"uri": uri, "ok": True, "result": await fetch_uri(FetchRequest(uri=uri))})
+            items.append(
+                {
+                    "uri": uri,
+                    "ok": True,
+                    "result": await fetch_uri(FetchRequest(uri=uri)),
+                }
+            )
         except HTTPException as exc:
-            items.append({"uri": uri, "ok": False, "status_code": exc.status_code, "detail": exc.detail})
+            items.append(
+                {
+                    "uri": uri,
+                    "ok": False,
+                    "status_code": exc.status_code,
+                    "detail": exc.detail,
+                }
+            )
     return items
 
 
-async def build_bundle_from_prompt(request: GenerateBundleRequest) -> tuple[dict[str, Any], bool, list[dict[str, Any]]]:
+async def build_bundle_from_prompt(
+    request: GenerateBundleRequest,
+) -> tuple[dict[str, Any], bool, list[dict[str, Any]]]:
     kind = infer_kind(request.prompt, request.bundle_kind)
     targets = infer_targets(request.prompt, request.targets, kind)
     bundle_name = request.bundle_name or slugify(request.prompt)
     runner = infer_runner(kind, targets, request.runner)
-    output_format = request.output_format or infer_output_format(kind, targets, request.prompt, runner)
+    output_format = request.output_format or infer_output_format(
+        kind, targets, request.prompt, runner
+    )
     sources = build_sources(request.source_uris)
 
     bundle: dict[str, Any] = {
@@ -566,7 +645,11 @@ async def list_bundles() -> dict[str, Any]:
     target_dir = STATE.settings.output_dir
     if not target_dir.exists():
         return {"count": 0, "files": []}
-    files = sorted(str(path.relative_to(target_dir)) for path in target_dir.rglob("*.json") if path.is_file())
+    files = sorted(
+        str(path.relative_to(target_dir))
+        for path in target_dir.rglob("*.json")
+        if path.is_file()
+    )
     return {"count": len(files), "files": files}
 
 
@@ -622,6 +705,7 @@ async def fetch_context(request: FetchManyRequest) -> dict[str, Any]:
 @main_app.post("/generate/bundle")
 async def generate_bundle(request: GenerateBundleRequest) -> dict[str, Any]:
     import time as _time
+
     t0 = _time.time()
     error_text: str | None = None
     bundle: dict[str, Any] = {}
@@ -632,7 +716,9 @@ async def generate_bundle(request: GenerateBundleRequest) -> dict[str, Any]:
             file_path = str(await write_bundle(bundle))
         safe_bundle = STATE.acl.redact_bundle(bundle)
         if BUNDLE_GENERATIONS is not None:
-            BUNDLE_GENERATIONS.labels(kind=bundle.get("kind", "unknown"), status="success").inc()
+            BUNDLE_GENERATIONS.labels(
+                kind=bundle.get("kind", "unknown"), status="success"
+            ).inc()
         if BUNDLE_GENERATION_DURATION is not None:
             BUNDLE_GENERATION_DURATION.observe(_time.time() - t0)
         return {
@@ -647,7 +733,10 @@ async def generate_bundle(request: GenerateBundleRequest) -> dict[str, Any]:
     except Exception as exc:
         error_text = str(exc)
         if BUNDLE_GENERATIONS is not None:
-            BUNDLE_GENERATIONS.labels(kind=bundle.get("kind", "unknown") if bundle else "unknown", status="error").inc()
+            BUNDLE_GENERATIONS.labels(
+                kind=bundle.get("kind", "unknown") if bundle else "unknown",
+                status="error",
+            ).inc()
         raise
     finally:
         if audit is not None:

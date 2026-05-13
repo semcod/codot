@@ -25,7 +25,9 @@ class KubernetesFastApiSseViewGenerator:
         host_local = uses_host_local_sources(bundle)
         host_network = "\n                  hostNetwork: true" if host_local else ""
         dns_policy = (
-            "\n                  dnsPolicy: ClusterFirstWithHostNet" if host_local else ""
+            "\n                  dnsPolicy: ClusterFirstWithHostNet"
+            if host_local
+            else ""
         )
         return dedent(
             f"""\

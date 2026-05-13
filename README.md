@@ -221,3 +221,20 @@ Copy `.env.example` → `.env` and adjust. Key variables:
 ## License
 
 Licensed under Apache-2.0.
+
+<!-- taskill:status:start -->
+
+## Status
+
+_Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:36 UTC_
+
+| Metric | Value |
+|---|---|
+| HEAD | `1cb5ec9` |
+| Coverage | — |
+| Failing tests | — |
+| Commits in last cycle | 25 |
+
+> Primarily documentation updates and widespread refactoring. Added a docs-oriented code analysis engine and CLI improvements, and fixed Markdown output in the docs pipeline.
+
+<!-- taskill:status:end -->

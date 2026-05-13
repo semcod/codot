@@ -47,5 +47,9 @@ class ConvertToXmlCommand(Command):
         return CommandResponse(
             payload_b64=base64.b64encode(payload_bytes).decode("ascii"),
             mime="application/xml",
-            meta={"source_uri": request.input_uri, "root": root, "bytes": len(payload_bytes)},
+            meta={
+                "source_uri": request.input_uri,
+                "root": root,
+                "bytes": len(payload_bytes),
+            },
         )

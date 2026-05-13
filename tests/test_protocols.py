@@ -1,4 +1,5 @@
 """Tests for the protocol layer."""
+
 import asyncio
 import base64
 import sys
@@ -18,6 +19,7 @@ os.environ["ALLOWED_LOCAL_ROOTS"] = TMP
 # Force reload of settings
 import importlib
 import config
+
 importlib.reload(config)
 
 from protocols.file_protocol import FileProtocol
@@ -45,16 +47,12 @@ def test_data_uri_base64():
 def test_file_protocol_rejects_outside_root():
     proto = FileProtocol()
     with pytest.raises(PermissionError):
-        asyncio.get_event_loop().run_until_complete(
-            proto.fetch("file:///etc/passwd")
-        )
+        asyncio.get_event_loop().run_until_complete(proto.fetch("file:///etc/passwd"))
 
 
 def test_file_protocol_reads_inside_root():
     f = Path(TMP) / "x.txt"
     f.write_text("hello")
     proto = FileProtocol()
-    r = asyncio.get_event_loop().run_until_complete(
-        proto.fetch(f"file://{f}")
-    )
+    r = asyncio.get_event_loop().run_until_complete(proto.fetch(f"file://{f}"))
     assert r.content == b"hello"

@@ -4,6 +4,7 @@ Kept in a private module (not ``__init__``) so that the ``view`` package
 itself remains side-effect free: importing ``factory.generators.view``
 pulls nothing beyond an empty namespace.
 """
+
 from __future__ import annotations
 
 import re

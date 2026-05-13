@@ -17,9 +17,15 @@ def infer_kind(prompt: str, explicit: str | None = None) -> str:
     lower = prompt.lower()
     if any(token in lower for token in ["workflow", "pipeline", "orchestrate", "dag"]):
         return "WORKFLOW_BUNDLE"
-    if any(token in lower for token in ["dashboard", "view", "ui", "frontend", "panel", "stream", "live"]):
+    if any(
+        token in lower
+        for token in ["dashboard", "view", "ui", "frontend", "panel", "stream", "live"]
+    ):
         return "VIEW_BUNDLE"
-    if any(token in lower for token in ["desktop", "mobile", "web", "pwa", "application", "app ", "app\n"]):
+    if any(
+        token in lower
+        for token in ["desktop", "mobile", "web", "pwa", "application", "app ", "app\n"]
+    ):
         return "APPLICATION_BUNDLE"
     return "SERVICE_BUNDLE"
 
@@ -110,10 +116,14 @@ def main() -> int:
 
         ok = True
         if inferred_kind != fx["expected_kind"]:
-            print(f"✗ {fx['file']}: kind mismatch: got {inferred_kind}, want {fx['expected_kind']}")
+            print(
+                f"✗ {fx['file']}: kind mismatch: got {inferred_kind}, want {fx['expected_kind']}"
+            )
             ok = False
         if inferred_runner != fx["expected_runner"]:
-            print(f"✗ {fx['file']}: runner mismatch: got {inferred_runner}, want {fx['expected_runner']}")
+            print(
+                f"✗ {fx['file']}: runner mismatch: got {inferred_runner}, want {fx['expected_runner']}"
+            )
             ok = False
 
         if ok:

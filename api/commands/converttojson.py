@@ -47,6 +47,7 @@ class ConvertToJsonCommand(Command):
             return json.loads(text)
         if mode == "xml":
             import xmltodict
+
             return xmltodict.parse(text)
         raise ValueError(f"Unknown mode: {mode}")
 
@@ -58,7 +59,9 @@ class ConvertToJsonCommand(Command):
         mime = (fetched.mime or "").split(";")[0].strip().lower()
         text = fetched.content.decode("utf-8", errors="replace")
 
-        mode = self._detect_mode(mime, request.input_uri, (request.meta or {}).get("mode", "auto"))
+        mode = self._detect_mode(
+            mime, request.input_uri, (request.meta or {}).get("mode", "auto")
+        )
         result = self._convert(text, mode)
 
         if request.schema_uri:

@@ -1,4 +1,5 @@
 """Application configuration loaded from environment variables."""
+
 from __future__ import annotations
 
 import os
@@ -22,7 +23,9 @@ def load_settings() -> Settings:
     return Settings(
         jwt_secret=os.environ.get("JWT_SECRET", "dev-secret-change-me-xyz"),
         jwt_algorithm=os.environ.get("JWT_ALGORITHM", "HS256"),
-        access_token_expire_minutes=int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "60")),
+        access_token_expire_minutes=int(
+            os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
+        ),
         policy_rules_path=os.environ.get("POLICY_RULES_PATH", "/app/policy/rules.yaml"),
         allowed_local_roots=tuple(p.strip() for p in roots.split(",") if p.strip()),
         log_level=os.environ.get("LOG_LEVEL", "INFO"),

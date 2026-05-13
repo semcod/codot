@@ -5,6 +5,7 @@ No I/O, no global state, no ordering requirements between generators.
 The CLI (or runtime) picks which generators to run per target and merges
 their outputs into a single output directory.
 """
+
 from __future__ import annotations
 
 from typing import Any, Protocol, runtime_checkable
@@ -14,8 +15,8 @@ from .ir import AnyBundle
 
 @runtime_checkable
 class Generator(Protocol):
-    target: str          # "python-fastapi", "docker", "openapi", "view/php-standalone", ...
-    category: str        # "code" | "infra" | "wire" | "view"
+    target: str  # "python-fastapi", "docker", "openapi", "view/php-standalone", ...
+    category: str  # "code" | "infra" | "wire" | "view"
 
     def generate(self, bundle: AnyBundle) -> dict[str, str]:
         """Return a map of {relative_path: file_content}.
@@ -50,7 +51,9 @@ class GeneratorRegistry:
         return [g for g in self._gens.values() if g.category == category]
 
     def list(self) -> list[dict[str, str]]:
-        return [{"target": g.target, "category": g.category} for g in self._gens.values()]
+        return [
+            {"target": g.target, "category": g.category} for g in self._gens.values()
+        ]
 
 
 _registry = GeneratorRegistry()
@@ -70,7 +73,9 @@ def register_default_generators() -> None:
     from .generators.view.php_standalone import PhpStandaloneViewGenerator
     from .generators.view.docker_fastapi_sse import DockerFastApiSseViewGenerator
     from .generators.view.fastapi_sse import FastApiSseViewGenerator
-    from .generators.view.kubernetes_fastapi_sse import KubernetesFastApiSseViewGenerator
+    from .generators.view.kubernetes_fastapi_sse import (
+        KubernetesFastApiSseViewGenerator,
+    )
     from .generators.view.static_html import StaticHtmlViewGenerator
 
     reg = get_registry()

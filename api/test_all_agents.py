@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Full test suite: all agent backends + pipeline with agent."""
+
 from __future__ import annotations
 
 import asyncio
@@ -9,7 +10,9 @@ from pathlib import Path
 
 import pytest
 
-_SUMMARY_SERVER = str(Path(__file__).resolve().parent.parent / "mcp_servers" / "summary_server.py")
+_SUMMARY_SERVER = str(
+    Path(__file__).resolve().parent.parent / "mcp_servers" / "summary_server.py"
+)
 
 sys.path.insert(0, ".")
 
@@ -28,7 +31,10 @@ async def test_mcp() -> None:
         backend=AgentCommunicationBackend.MCP,
         backend_config={"stdio_command": ["python3", _SUMMARY_SERVER]},
     )
-    req = AgentRequest(agent_node=node, context={"text": "Quantum computing is revolutionizing cryptography."})
+    req = AgentRequest(
+        agent_node=node,
+        context={"text": "Quantum computing is revolutionizing cryptography."},
+    )
     resp = await execute_agent(req)
     assert resp.ok, f"MCP failed: {resp.reasoning_trace}"
     print("PASS — output:", resp.output["tool_result"]["content"][0]["text"])
@@ -64,10 +70,17 @@ async def test_litellm_mock() -> None:
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            body = json.dumps({
-                "choices": [{"message": {"content": "mock_llm_reply"}, "finish_reason": "stop"}],
-                "usage": {"prompt_tokens": 10, "completion_tokens": 5},
-            })
+            body = json.dumps(
+                {
+                    "choices": [
+                        {
+                            "message": {"content": "mock_llm_reply"},
+                            "finish_reason": "stop",
+                        }
+                    ],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+                }
+            )
             self.wfile.write(body.encode())
 
         def log_message(self, fmt, *args):
@@ -84,7 +97,10 @@ async def test_litellm_mock() -> None:
             role="writer",
             goal="write poem",
             backend=AgentCommunicationBackend.LITELLM,
-            backend_config={"api_base": f"http://localhost:{port}", "model": "mock-model"},
+            backend_config={
+                "api_base": f"http://localhost:{port}",
+                "model": "mock-model",
+            },
         )
         req = AgentRequest(agent_node=node, context={"topic": "stars"})
         resp = await execute_agent(req)
@@ -102,25 +118,32 @@ async def test_pipeline_with_agent() -> None:
     from models import CommandRequest
 
     cmd = PipelineCommand()
-    request = CommandRequest(meta={
-        "steps": [
-            {"command": "fetch", "request": {"input_uri": "data:text/plain;base64,cXVhbnR1bSBjb21wdXRpbmc="}},
-            {
-                "command": "agent",
-                "request": {"meta": {"input": "$previous.output"}},
-                "agent_node": {
-                    "id": "pipe-agent",
-                    "role": "summarizer",
-                    "goal": "Summarize base64-decoded text",
-                    "tools": ["summarize"],
-                    "backend": "mcp",
-                    "backend_config": {
-                        "stdio_command": ["python3", _SUMMARY_SERVER],
+    request = CommandRequest(
+        meta={
+            "steps": [
+                {
+                    "command": "fetch",
+                    "request": {
+                        "input_uri": "data:text/plain;base64,cXVhbnR1bSBjb21wdXRpbmc="
                     },
                 },
-            },
-        ]
-    })
+                {
+                    "command": "agent",
+                    "request": {"meta": {"input": "$previous.output"}},
+                    "agent_node": {
+                        "id": "pipe-agent",
+                        "role": "summarizer",
+                        "goal": "Summarize base64-decoded text",
+                        "tools": ["summarize"],
+                        "backend": "mcp",
+                        "backend_config": {
+                            "stdio_command": ["python3", _SUMMARY_SERVER],
+                        },
+                    },
+                },
+            ]
+        }
+    )
     resp = await cmd.execute(request)
     assert resp.ok
     trace = resp.meta.get("pipeline_trace", [])

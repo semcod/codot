@@ -4,7 +4,6 @@ Provides CRUD endpoints for workflows and execution engine
 """
 
 from typing import Dict, List, Any, Optional
-from dataclasses import dataclass
 import json
 import httpx
 from fastapi import FastAPI, HTTPException
@@ -30,7 +29,9 @@ with open(SCHEMA_PATH, "r") as f:
     WORKFLOW_SCHEMA = json.load(f)
 
 # Configuration
-CODOT_API_URL = os.environ.get("CODOT_API_URL", os.environ.get("API_BASE_URL", "http://localhost:18080"))
+CODOT_API_URL = os.environ.get(
+    "CODOT_API_URL", os.environ.get("API_BASE_URL", "http://localhost:18080")
+)
 _DATA_PORT = os.environ.get("DATA_PORT", "18091")
 _SCHEMAS_PORT = os.environ.get("SCHEMAS_PORT", "18090")
 workflow_store: Dict[str, Dict[str, Any]] = {
@@ -43,7 +44,7 @@ workflow_store: Dict[str, Dict[str, Any]] = {
                 "type": "fetch",
                 "uri": f"http://localhost:{_DATA_PORT}/products.csv",
                 "mime_type": "text/csv",
-                "description": "Get CSV from local data server"
+                "description": "Get CSV from local data server",
             },
             {
                 "id": "convert1",
@@ -52,7 +53,7 @@ workflow_store: Dict[str, Dict[str, Any]] = {
                 "command_type": "converttojson",
                 "input": "fetch1",
                 "schema_uri": f"http://localhost:{_SCHEMAS_PORT}/public-products.json",
-                "description": "Convert CSV to JSON table"
+                "description": "Convert CSV to JSON table",
             },
             {
                 "id": "render_table1",
@@ -62,12 +63,10 @@ workflow_store: Dict[str, Dict[str, Any]] = {
                 "input": "convert1",
                 "mime_type": "text/html",
                 "description": "Generate HTML table",
-                "meta": {"title": "Products Table"}
-            }
+                "meta": {"title": "Products Table"},
+            },
         ],
-        "outputs": [
-            {"id": "csv_view", "label": "CSV View", "source": "render_table1"}
-        ]
+        "outputs": [{"id": "csv_view", "label": "CSV View", "source": "render_table1"}],
     }
 }
 
@@ -128,7 +127,9 @@ def validate_workflow(workflow: Dict[str, Any]) -> bool:
         jsonschema.validate(instance=workflow, schema=WORKFLOW_SCHEMA)
         return True
     except jsonschema.ValidationError as e:
-        raise HTTPException(status_code=400, detail=f"Invalid workflow schema: {e.message}")
+        raise HTTPException(
+            status_code=400, detail=f"Invalid workflow schema: {e.message}"
+        )
 
 
 def _result_to_data_uri(prev_result: Dict[str, Any]) -> str | None:
@@ -210,6 +211,7 @@ def _decode_payload_b64(payload_b64: str) -> str | None:
     if not payload_b64:
         return None
     import base64
+
     try:
         return base64.b64decode(payload_b64).decode("utf-8", errors="replace")
     except Exception:
@@ -229,9 +231,7 @@ def _build_agent_context(
     return {"previous_result": prev}
 
 
-def _build_agent_body(
-    node: WorkflowNode, context: Dict[str, Any]
-) -> Dict[str, Any]:
+def _build_agent_body(node: WorkflowNode, context: Dict[str, Any]) -> Dict[str, Any]:
     """Build the JSON body sent to /agents/{id}/run."""
     return {
         "agent_node": {
@@ -295,7 +295,7 @@ async def root():
     return {
         "service": "codot Workflow API",
         "version": "1.0.0",
-        "codot_api": CODOT_API_URL
+        "codot_api": CODOT_API_URL,
     }
 
 
@@ -396,12 +396,14 @@ async def run_workflow(workflow_id: str, request: WorkflowExecutionRequest):
                 trace_entry = {
                     "node_id": node.id,
                     "node_type": node.type,
-                    "status": "running"
+                    "status": "running",
                 }
                 trace.append(trace_entry)
 
                 try:
-                    result = await execute_node(node, node_results, client, request.token)
+                    result = await execute_node(
+                        node, node_results, client, request.token
+                    )
                     node_results[node.id] = result
                     trace_entry["status"] = "completed"
                     trace_entry["mime"] = result.get("mime")
@@ -409,8 +411,7 @@ async def run_workflow(workflow_id: str, request: WorkflowExecutionRequest):
                     trace_entry["status"] = "failed"
                     trace_entry["error"] = str(e)
                     raise HTTPException(
-                        status_code=500,
-                        detail=f"Node {node.id} failed: {str(e)}"
+                        status_code=500, detail=f"Node {node.id} failed: {str(e)}"
                     )
 
         # Collect outputs
@@ -420,23 +421,17 @@ async def run_workflow(workflow_id: str, request: WorkflowExecutionRequest):
             if source_node in node_results:
                 outputs[output_def["id"]] = node_results[source_node]
 
-        return WorkflowExecutionResponse(
-            success=True,
-            outputs=outputs,
-            trace=trace
-        )
+        return WorkflowExecutionResponse(success=True, outputs=outputs, trace=trace)
 
     except HTTPException:
         raise
     except Exception as e:
         return WorkflowExecutionResponse(
-            success=False,
-            outputs={},
-            trace=trace,
-            error=str(e)
+            success=False, outputs={}, trace=trace, error=str(e)
         )
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,8 +1,8 @@
 """Unit tests for the policy engine. Run with `cd api && pytest ../tests`."""
+
 import sys
 from pathlib import Path
 
-import pytest
 
 # Allow import of the api package when running from the project root
 ROOT = Path(__file__).resolve().parent.parent
@@ -41,9 +41,7 @@ def test_user_allowed_public_path():
 
 
 def test_unknown_role_denied():
-    d = _engine().can_execute_command(
-        _user("stranger"), "fetch", "http://data/x", None
-    )
+    d = _engine().can_execute_command(_user("stranger"), "fetch", "http://data/x", None)
     assert not d.allowed
 
 

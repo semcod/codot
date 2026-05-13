@@ -8,6 +8,7 @@ The generated handlers are stubs by design — the factory produces runnable
 skeletons, not business logic. The business logic comes from the handler
 referenced in the contract's `layers.handler`, which is imported if present.
 """
+
 from __future__ import annotations
 
 from textwrap import dedent
@@ -32,7 +33,7 @@ def _model_field_line(field_name: str, meta: dict) -> str:
     default = "" if required else " = None"
     desc = meta.get("description", "").replace('"', '\\"')
     if desc:
-        return f'    {field_name}: {t}{default}  # {desc}'
+        return f"    {field_name}: {t}{default}  # {desc}"
     return f"    {field_name}: {t}{default}"
 
 
@@ -121,7 +122,7 @@ class PythonFastApiGenerator:
         parts = [
             '"""Auto-generated request/response models.',
             "",
-            'Do not edit — regenerate from contracts.',
+            "Do not edit — regenerate from contracts.",
             '"""',
             "from __future__ import annotations",
             "",

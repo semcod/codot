@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Integration test: Agent MCP backend talking to a local stdio MCP server."""
+
 from __future__ import annotations
 
 import asyncio
@@ -24,7 +25,9 @@ async def main() -> None:
     )
     req = AgentRequest(
         agent_node=node,
-        context={"text": "This is a long article about quantum computing and its applications in cryptography and drug discovery."},
+        context={
+            "text": "This is a long article about quantum computing and its applications in cryptography and drug discovery."
+        },
     )
     print("=== Calling MCP agent ===")
     resp = await execute_agent(req)

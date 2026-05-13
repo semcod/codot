@@ -1,4 +1,5 @@
 """Command that wraps the service-factory generator."""
+
 from __future__ import annotations
 
 import base64
@@ -28,7 +29,6 @@ class CompileServiceCommand(Command):
     }
 
     async def execute(self, request: CommandRequest) -> CommandResponse:
-        import httpx
 
         sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "service-factory"))
         from factory import register_default_generators, get_registry
@@ -48,7 +48,11 @@ class CompileServiceCommand(Command):
             targets = [t.strip() for t in targets_str.split(",") if t.strip()]
 
         # Resolve contracts dir (for SERVICE_BUNDLE)
-        bundle_path = Path(request.input_uri.replace("file://", "")) if request.input_uri and request.input_uri.startswith("file://") else Path.cwd() / "bundle.json"
+        bundle_path = (
+            Path(request.input_uri.replace("file://", ""))
+            if request.input_uri and request.input_uri.startswith("file://")
+            else Path.cwd() / "bundle.json"
+        )
         contracts_dir = Path(meta.get("contracts_dir", bundle_path.parent))
 
         # Generate
@@ -88,13 +92,16 @@ class CompileServiceCommand(Command):
 
     async def _load_bundle_text(self, input_uri: str | None) -> str:
         if not input_uri:
-            raise ValueError("compile_service requires input_uri pointing to bundle JSON")
+            raise ValueError(
+                "compile_service requires input_uri pointing to bundle JSON"
+            )
         if input_uri.startswith("file://"):
             path = Path(input_uri.replace("file://", ""))
             if not path.exists():
                 raise FileNotFoundError(f"Bundle not found: {path}")
             return path.read_text()
         import httpx
+
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.get(input_uri)
             resp.raise_for_status()

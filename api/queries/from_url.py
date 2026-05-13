@@ -37,12 +37,14 @@ class FromUrlQuery(Query):
         for uri in request.source_uris:
             fetched = await registry.fetch(uri)
             body, encoding = _decode_body(fetched.content, fetched.mime or "")
-            parts.append({
-                "uri": uri,
-                "mime": fetched.mime,
-                "size": len(fetched.content),
-                "encoding": encoding,
-                "content": body,
-                "extra": fetched.extra,
-            })
+            parts.append(
+                {
+                    "uri": uri,
+                    "mime": fetched.mime,
+                    "size": len(fetched.content),
+                    "encoding": encoding,
+                    "content": body,
+                    "extra": fetched.extra,
+                }
+            )
         return QueryResponse(data=parts, meta={"count": len(parts)})

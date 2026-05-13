@@ -17,6 +17,7 @@ Design choices:
   the bundle is emitted as a README note; the default card layout is used.
   (This keeps the generator pure and avoids template-injection footguns.)
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -39,7 +40,9 @@ def _php_array(data: Any, indent: int = 0) -> str:
             return "[]"
         parts = ["["]
         for k, v in data.items():
-            parts.append(f"{pad_inner}{_php_quote(str(k))} => {_php_array(v, indent + 1)},")
+            parts.append(
+                f"{pad_inner}{_php_quote(str(k))} => {_php_array(v, indent + 1)},"
+            )
         parts.append(pad + "]")
         return "\n".join(parts)
     if isinstance(data, list):
@@ -152,7 +155,7 @@ class PhpStandaloneViewGenerator:
             "",
             "- `GET /`               — HTML page with embedded polling client.",
             "- `GET /?format=json`   — fresh aggregate of every source as JSON.",
-            "- `GET /health`         — liveness probe returning `{ \"status\": \"ok\" }`.",
+            '- `GET /health`         — liveness probe returning `{ "status": "ok" }`.',
             tmpl_note.rstrip() if tmpl_note else "",
             "## Notes",
             "",

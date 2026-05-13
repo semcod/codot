@@ -7,6 +7,7 @@ https://modelcontextprotocol.io/
 Tools:
     - summarize: takes {"text": str} returns {"summary": str}
 """
+
 from __future__ import annotations
 
 import json
@@ -62,15 +63,13 @@ def _handle(req: dict) -> dict | None:
         args = params.get("arguments", {})
         if name == "summarize":
             text = args.get("text", "")
-            summary = f"Summary: {text[:50]}..." if len(text) > 50 else f"Summary: {text}"
+            summary = (
+                f"Summary: {text[:50]}..." if len(text) > 50 else f"Summary: {text}"
+            )
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
-                "result": {
-                    "content": [
-                        {"type": "text", "text": summary}
-                    ]
-                },
+                "result": {"content": [{"type": "text", "text": summary}]},
             }
         return {
             "jsonrpc": "2.0",
@@ -95,10 +94,12 @@ def main() -> None:
         try:
             req = json.loads(line)
         except json.JSONDecodeError:
-            _send({
-                "jsonrpc": "2.0",
-                "error": {"code": -32700, "message": "Parse error"},
-            })
+            _send(
+                {
+                    "jsonrpc": "2.0",
+                    "error": {"code": -32700, "message": "Parse error"},
+                }
+            )
             continue
         resp = _handle(req)
         if resp is not None:

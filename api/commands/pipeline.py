@@ -5,6 +5,7 @@ Each step may reference the previous step's result via the special URI
 URI containing the previous command's payload. This is exactly the DSL sketched
 in the design doc and makes command composition protocol-agnostic.
 """
+
 from __future__ import annotations
 
 import base64
@@ -59,7 +60,6 @@ def _extract_text_from_data_uri(data_uri: str) -> str | None:
     if not data_uri.startswith("data:"):
         return None
     try:
-        from urllib.parse import unquote
         after_colon = data_uri.split(":", 1)[1]
         if ";" in after_colon:
             mime_b64 = after_colon.split(";", 1)
@@ -107,12 +107,14 @@ class PipelineCommand(Command):
                 resp = await command.execute(req)
 
             previous = resp
-            trace.append({
-                "step": idx,
-                "command": cmd_name,
-                "mime": resp.mime,
-                "meta": resp.meta,
-            })
+            trace.append(
+                {
+                    "step": idx,
+                    "command": cmd_name,
+                    "mime": resp.mime,
+                    "meta": resp.meta,
+                }
+            )
 
         assert previous is not None
         return CommandResponse(

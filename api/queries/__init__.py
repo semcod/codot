@@ -1,4 +1,5 @@
 """Query registry. Same idea as commands, but for reads."""
+
 from __future__ import annotations
 
 import abc

@@ -7,6 +7,7 @@
 The CLI is the only stateful thing in the factory — it decides what to run
 and where to write the output. Generators themselves remain pure.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -23,7 +24,9 @@ def _load_bundle(args: argparse.Namespace):
     return loader.load(Path(args.bundle))
 
 
-def _write_target_files(files: dict[str, str], out_root: Path, target: str, verbose: bool) -> int:
+def _write_target_files(
+    files: dict[str, str], out_root: Path, target: str, verbose: bool
+) -> int:
     count = 0
     for rel_path, content in files.items():
         dest = out_root / rel_path

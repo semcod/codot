@@ -20,6 +20,7 @@ Design choices:
 - No framework, no build step. Just an HTML file you can ``file://`` open
   (modulo CORS) or serve with any static file server.
 """
+
 from __future__ import annotations
 
 import json
@@ -67,7 +68,7 @@ class StaticHtmlViewGenerator:
         )
         initial_cards = "\n".join(
             f'      <section class="source" data-name="{escape(s.name)}">'
-            f'<h2>{escape(s.name)}</h2><pre>loading…</pre></section>'
+            f"<h2>{escape(s.name)}</h2><pre>loading…</pre></section>"
             for s in bundle.sources
         )
         return _HTML_TEMPLATE.format(

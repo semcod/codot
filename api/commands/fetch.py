@@ -9,7 +9,9 @@ from . import Command
 
 class FetchCommand(Command):
     name = "fetch"
-    description = "Fetch a resource from any supported protocol and return its raw bytes."
+    description = (
+        "Fetch a resource from any supported protocol and return its raw bytes."
+    )
     input_hint = {"input_uri": "http://... | https://... | file:///data/... | data:..."}
 
     async def execute(self, request: CommandRequest) -> CommandResponse:

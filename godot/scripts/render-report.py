@@ -18,6 +18,7 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 def _cache_path(uri: str) -> Path:
     import hashlib
+
     key = hashlib.sha256(uri.encode()).hexdigest()[:16]
     return CACHE_DIR / f"{key}.json"
 
@@ -76,8 +77,8 @@ def render_html(bundle: dict, source_data: dict) -> str:
 <body>
   <h1>{title}</h1>
   <div class="meta">
-    <span class="badge">{bundle['kind']}</span>
-    <span>Bundle: <code>{bundle['bundle']}</code></span>
+    <span class="badge">{bundle["kind"]}</span>
+    <span>Bundle: <code>{bundle["bundle"]}</code></span>
     <span> | Generated: {now}</span>
   </div>
   <table>
@@ -85,7 +86,7 @@ def render_html(bundle: dict, source_data: dict) -> str:
       <tr><th>Source</th><th>Data</th></tr>
     </thead>
     <tbody>
-      {''.join(rows)}
+      {"".join(rows)}
     </tbody>
   </table>
 </body>

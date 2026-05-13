@@ -22,28 +22,30 @@ class DockerFastApiSseViewGenerator:
     def _dockerfile(self, bundle: ViewBundle) -> str:
         port = bundle.exposure.port
         hp = bundle.exposure.health_path
-        return "\n".join([
-            f"FROM python:3.12-slim",
-            "",
-            "ENV PYTHONDONTWRITEBYTECODE=1 \\",
-            "    PYTHONUNBUFFERED=1 \\",
-            "    PIP_NO_CACHE_DIR=1",
-            "",
-            "WORKDIR /app",
-            "",
-            "COPY requirements.txt .",
-            "RUN pip install --no-cache-dir -r requirements.txt",
-            "",
-            "COPY . .",
-            "",
-            f"EXPOSE {port}",
-            "",
-            "HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \\",
-            f"    CMD python -c \"import urllib.request; urllib.request.urlopen('http://localhost:{port}{hp}')\"",
-            "",
-            f'CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "{port}"]',
-            "",
-        ])
+        return "\n".join(
+            [
+                "FROM python:3.12-slim",
+                "",
+                "ENV PYTHONDONTWRITEBYTECODE=1 \\",
+                "    PYTHONUNBUFFERED=1 \\",
+                "    PIP_NO_CACHE_DIR=1",
+                "",
+                "WORKDIR /app",
+                "",
+                "COPY requirements.txt .",
+                "RUN pip install --no-cache-dir -r requirements.txt",
+                "",
+                "COPY . .",
+                "",
+                f"EXPOSE {port}",
+                "",
+                "HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \\",
+                f"    CMD python -c \"import urllib.request; urllib.request.urlopen('http://localhost:{port}{hp}')\"",
+                "",
+                f'CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "{port}"]',
+                "",
+            ]
+        )
 
     def _compose(self, bundle: ViewBundle) -> str:
         port = bundle.exposure.port
@@ -78,12 +80,14 @@ class DockerFastApiSseViewGenerator:
         return "\n".join(lines)
 
     def _dockerignore(self) -> str:
-        return "\n".join([
-            "__pycache__",
-            "*.pyc",
-            ".venv",
-            ".git",
-            "*.md",
-            "tests/",
-            "",
-        ])
+        return "\n".join(
+            [
+                "__pycache__",
+                "*.pyc",
+                ".venv",
+                ".git",
+                "*.md",
+                "tests/",
+                "",
+            ]
+        )

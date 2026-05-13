@@ -27,7 +27,9 @@ class FileProtocol:
 
         path = Path(raw).resolve()
         allowed = [Path(r).resolve() for r in settings.allowed_local_roots]
-        if not any(str(path).startswith(str(root) + "/") or path == root for root in allowed):
+        if not any(
+            str(path).startswith(str(root) + "/") or path == root for root in allowed
+        ):
             raise PermissionError(
                 f"Path {path} is outside allowed roots {[str(r) for r in allowed]}"
             )

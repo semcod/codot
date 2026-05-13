@@ -6,6 +6,7 @@ Usage:
     python codot_run.py --agent agent.json
     python codot_run.py --url http://localhost:18080 workflow.json
 """
+
 from __future__ import annotations
 
 import argparse
@@ -23,7 +24,9 @@ DEFAULT_PASS = "admin"
 
 
 def _get_token(base: str, username: str, password: str) -> str:
-    r = httpx.post(f"{base}/auth/token", json={"username": username, "password": password})
+    r = httpx.post(
+        f"{base}/auth/token", json={"username": username, "password": password}
+    )
     r.raise_for_status()
     return r.json()["access_token"]
 
@@ -46,33 +49,40 @@ def run_pipeline(base: str, token: str, workflow_path: str) -> dict:
             req["input_uri"] = node.get("uri")
 
         if node.get("type") == "agent":
-            steps.append({
-                "command": "agent",
-                "request": req,
-                "agent_node": {
-                    "id": node["id"],
-                    "role": node.get("role", "agent"),
-                    "goal": node.get("goal", ""),
-                    "tools": node.get("tools", []),
-                    "backend": node.get("backend", "mcp"),
-                    "backend_config": node.get("backend_config", {}),
+            steps.append(
+                {
+                    "command": "agent",
+                    "request": req,
+                    "agent_node": {
+                        "id": node["id"],
+                        "role": node.get("role", "agent"),
+                        "goal": node.get("goal", ""),
+                        "tools": node.get("tools", []),
+                        "backend": node.get("backend", "mcp"),
+                        "backend_config": node.get("backend_config", {}),
+                    },
                 }
-            })
+            )
         else:
             req["meta"] = req.get("meta", {})
             if node.get("command_type"):
                 req["meta"]["command_type"] = node["command_type"]
             if node.get("schema_uri"):
                 req["schema_uri"] = node["schema_uri"]
-            steps.append({
-                "command": node.get("type", "fetch"),
-                "request": req,
-            })
+            steps.append(
+                {
+                    "command": node.get("type", "fetch"),
+                    "request": req,
+                }
+            )
 
     payload = {"meta": {"steps": steps}}
     r = httpx.put(
         f"{base}/commands/pipeline",
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        },
         json=payload,
     )
     r.raise_for_status()
@@ -84,7 +94,10 @@ def run_agent(base: str, token: str, agent_path: str) -> dict:
         node = json.load(f)
     r = httpx.post(
         f"{base}/agents/{node.get('id', 'cli')}/run",
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        },
         json={
             "agent_node": node,
             "context": node.get("context", {}),
@@ -125,7 +138,9 @@ def main() -> int:
     parser.add_argument("--url", default=DEFAULT_URL, help="API base URL")
     parser.add_argument("--user", default=DEFAULT_USER, help="Username")
     parser.add_argument("--password", default=DEFAULT_PASS, help="Password")
-    parser.add_argument("--agent", action="store_true", help="Run as agent instead of pipeline")
+    parser.add_argument(
+        "--agent", action="store_true", help="Run as agent instead of pipeline"
+    )
     parser.add_argument("--raw", action="store_true", help="Print raw JSON")
     args = parser.parse_args()
 

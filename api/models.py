@@ -2,6 +2,7 @@
 Commands/Queries operate on arbitrary bytes + meta (Struct-like dicts),
 matching the 'URL-addressable resources' pattern described in the design docs.
 """
+
 from __future__ import annotations
 
 from enum import Enum
@@ -21,7 +22,9 @@ class CommandRequest(BaseModel):
     """
 
     input_uri: str | None = Field(default=None, description="Source resource URI")
-    schema_uri: str | None = Field(default=None, description="JSON Schema URI for validation")
+    schema_uri: str | None = Field(
+        default=None, description="JSON Schema URI for validation"
+    )
     output_mime: str | None = Field(default=None)
     meta: dict[str, Any] = Field(default_factory=dict)
     payload_b64: str | None = Field(default=None)
@@ -76,8 +79,10 @@ class ErrorResponse(BaseModel):
 
 # ---------- Agent formula -----------------------------------------------------
 
+
 class AgentCommunicationBackend(str, Enum):
     """Supported communication backends for Agent formula."""
+
     MCP = "mcp"
     LITELLM = "litellm"
     BASH_CLI = "bash_cli"
@@ -91,6 +96,7 @@ class AgentNode(BaseModel):
     An Agent node replaces the traditional command executor with an autonomous
     worker that may use memory, reasoning traces, and delegated tools.
     """
+
     id: str = Field(..., pattern=r"^[a-zA-Z0-9_-]+$")
     role: str
     goal: str
@@ -113,6 +119,7 @@ class AgentRequest(BaseModel):
         http_api:   {"url": "...", "method": "POST", "headers": {...}}
         websocket:  {"uri": "ws://...", "subprotocol": "..."}
     """
+
     agent_node: AgentNode
     context: dict[str, Any] = Field(default_factory=dict)
     shared_state_uri: str | None = None

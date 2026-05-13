@@ -8,6 +8,7 @@ Each Command is a self-contained unit with:
 Adding a new command means: (1) write a class, (2) register it at import time.
 No proto regeneration, no DTOs, nothing else changes.
 """
+
 from __future__ import annotations
 
 import abc

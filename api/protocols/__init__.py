@@ -4,6 +4,7 @@ Every Command/Query that needs to read a resource goes through this registry.
 New protocols (s3, ftp, sqlite, redis, kafka) can be added by registering a
 Protocol implementation against a scheme prefix.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

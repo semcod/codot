@@ -1,4 +1,5 @@
 """Tests for cqrs-backend-workflows server."""
+
 import sys
 import os
 
@@ -38,7 +39,9 @@ def test_workflow_schema_validation():
     import json
     from server import validate_workflow
 
-    path = os.path.join(os.path.dirname(__file__), "..", "examples", "04-agent-research-pipeline.json")
+    path = os.path.join(
+        os.path.dirname(__file__), "..", "examples", "04-agent-research-pipeline.json"
+    )
     with open(path) as f:
         wf = json.load(f)
     validate_workflow(wf)  # should not raise

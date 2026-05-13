@@ -1,4 +1,5 @@
 """Dynamic schema validation - schema fetched at runtime from a URI."""
+
 from __future__ import annotations
 
 import json

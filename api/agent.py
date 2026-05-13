@@ -7,6 +7,7 @@ Backends:
 - http_api: Generic HTTP REST calls
 - websocket: WebSocket client
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -14,7 +15,6 @@ import json
 import logging
 import os
 import shlex
-import subprocess
 from typing import Any
 
 import httpx
@@ -40,6 +40,7 @@ def register_backend(
 # ---------------------------------------------------------------------------
 # MCP backend  (real MCP client via mcp_client module)
 # ---------------------------------------------------------------------------
+
 
 async def _mcp_execute(node: AgentNode, request: AgentRequest) -> AgentResponse:
     """Execute agent via a real MCP server.
@@ -78,7 +79,9 @@ async def _mcp_execute(node: AgentNode, request: AgentRequest) -> AgentResponse:
             )
 
         init_result = await client.initialize(client_name="codot")
-        trace.append(f"mcp_init_ok: {init_result.get('serverInfo', {}).get('name', '?')}")
+        trace.append(
+            f"mcp_init_ok: {init_result.get('serverInfo', {}).get('name', '?')}"
+        )
 
         available = await client.list_tools()
         tool_names = [t.get("name") for t in available]
@@ -93,10 +96,14 @@ async def _mcp_execute(node: AgentNode, request: AgentRequest) -> AgentResponse:
         trace.append("mcp_call_ok")
     except MCPError as exc:
         trace.append(f"mcp_error: {exc}")
-        return AgentResponse(ok=False, output=output, reasoning_trace=trace, meta={"error": str(exc)})
+        return AgentResponse(
+            ok=False, output=output, reasoning_trace=trace, meta={"error": str(exc)}
+        )
     except Exception as exc:
         trace.append(f"mcp_exc: {exc}")
-        return AgentResponse(ok=False, output=output, reasoning_trace=trace, meta={"error": str(exc)})
+        return AgentResponse(
+            ok=False, output=output, reasoning_trace=trace, meta={"error": str(exc)}
+        )
     finally:
         if client is not None:
             await client.close()
@@ -111,6 +118,7 @@ register_backend(AgentCommunicationBackend.MCP, _mcp_execute)
 # LiteLLM backend
 # ---------------------------------------------------------------------------
 
+
 async def _litellm_execute(node: AgentNode, request: AgentRequest) -> AgentResponse:
     """Execute agent via LiteLLM proxy.
 
@@ -123,7 +131,9 @@ async def _litellm_execute(node: AgentNode, request: AgentRequest) -> AgentRespo
     """
     cfg = node.backend_config
     model = cfg.get("model", "gpt-4")
-    api_base = cfg.get("api_base", os.environ.get("LITELLM_API_BASE", "http://localhost:4000"))
+    api_base = cfg.get(
+        "api_base", os.environ.get("LITELLM_API_BASE", "http://localhost:4000")
+    )
     api_key = cfg.get("api_key", os.environ.get("LITELLM_API_KEY", ""))
     temperature = cfg.get("temperature", 0.7)
     max_tokens = cfg.get("max_tokens", 1024)
@@ -131,7 +141,10 @@ async def _litellm_execute(node: AgentNode, request: AgentRequest) -> AgentRespo
     trace: list[str] = [f"litellm backend model={model!r} role={node.role!r}"]
 
     messages = [
-        {"role": "system", "content": f"You are a {node.role}. Goal: {node.goal}. Available tools: {node.tools}"},
+        {
+            "role": "system",
+            "content": f"You are a {node.role}. Goal: {node.goal}. Available tools: {node.tools}",
+        },
         {"role": "user", "content": json.dumps(request.context, ensure_ascii=False)},
     ]
 
@@ -166,7 +179,9 @@ async def _litellm_execute(node: AgentNode, request: AgentRequest) -> AgentRespo
             }
     except Exception as exc:
         trace.append(f"litellm_err: {exc}")
-        return AgentResponse(ok=False, output={}, reasoning_trace=trace, meta={"error": str(exc)})
+        return AgentResponse(
+            ok=False, output={}, reasoning_trace=trace, meta={"error": str(exc)}
+        )
 
     return AgentResponse(ok=True, output=output, reasoning_trace=trace)
 
@@ -177,6 +192,7 @@ register_backend(AgentCommunicationBackend.LITELLM, _litellm_execute)
 # ---------------------------------------------------------------------------
 # Bash CLI backend
 # ---------------------------------------------------------------------------
+
 
 async def _bash_cli_execute(node: AgentNode, request: AgentRequest) -> AgentResponse:
     """Execute agent via shell / CLI.
@@ -195,7 +211,9 @@ async def _bash_cli_execute(node: AgentNode, request: AgentRequest) -> AgentResp
 
     command_template = cfg.get("command_template")
     if command_template:
-        command = command_template.replace("{context_json}", shlex.quote(json.dumps(request.context))).replace("{goal}", shlex.quote(node.goal))
+        command = command_template.replace(
+            "{context_json}", shlex.quote(json.dumps(request.context))
+        ).replace("{goal}", shlex.quote(node.goal))
     else:
         command = request.context.get("command", "echo 'no command provided'")
 
@@ -203,12 +221,16 @@ async def _bash_cli_execute(node: AgentNode, request: AgentRequest) -> AgentResp
 
     try:
         proc = await asyncio.create_subprocess_exec(
-            shell, "-c", command,
+            shell,
+            "-c",
+            command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             cwd=working_dir,
         )
-        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=float(timeout))
+        stdout, stderr = await asyncio.wait_for(
+            proc.communicate(), timeout=float(timeout)
+        )
         stdout_text = stdout.decode("utf-8", errors="replace")
         stderr_text = stderr.decode("utf-8", errors="replace")
         trace.append(f"exit_code={proc.returncode}")
@@ -240,6 +262,7 @@ register_backend(AgentCommunicationBackend.BASH_CLI, _bash_cli_execute)
 # HTTP API backend
 # ---------------------------------------------------------------------------
 
+
 async def _http_api_execute(node: AgentNode, request: AgentRequest) -> AgentResponse:
     """Execute agent via generic HTTP REST API.
 
@@ -258,7 +281,11 @@ async def _http_api_execute(node: AgentNode, request: AgentRequest) -> AgentResp
     trace: list[str] = [f"http_api backend role={node.role!r} {method} {url}"]
 
     if not url:
-        return AgentResponse(ok=False, output={}, reasoning_trace=[*trace, "missing url in backend_config"])
+        return AgentResponse(
+            ok=False,
+            output={},
+            reasoning_trace=[*trace, "missing url in backend_config"],
+        )
 
     payload = {
         "role": node.role,
@@ -269,7 +296,9 @@ async def _http_api_execute(node: AgentNode, request: AgentRequest) -> AgentResp
 
     try:
         async with httpx.AsyncClient(timeout=float(timeout)) as client:
-            resp = await client.request(method.upper(), url, headers=headers, json=payload)
+            resp = await client.request(
+                method.upper(), url, headers=headers, json=payload
+            )
             resp.raise_for_status()
             try:
                 output = resp.json()
@@ -278,7 +307,9 @@ async def _http_api_execute(node: AgentNode, request: AgentRequest) -> AgentResp
             trace.append("http_api_ok")
     except Exception as exc:
         trace.append(f"http_api_err: {exc}")
-        return AgentResponse(ok=False, output={}, reasoning_trace=trace, meta={"error": str(exc)})
+        return AgentResponse(
+            ok=False, output={}, reasoning_trace=trace, meta={"error": str(exc)}
+        )
 
     return AgentResponse(ok=True, output=output, reasoning_trace=trace)
 
@@ -289,6 +320,7 @@ register_backend(AgentCommunicationBackend.HTTP_API, _http_api_execute)
 # ---------------------------------------------------------------------------
 # WebSocket backend
 # ---------------------------------------------------------------------------
+
 
 async def _websocket_execute(node: AgentNode, request: AgentRequest) -> AgentResponse:
     """Execute agent via WebSocket (sends JSON, waits for first text message).
@@ -306,20 +338,31 @@ async def _websocket_execute(node: AgentNode, request: AgentRequest) -> AgentRes
     trace: list[str] = [f"websocket backend role={node.role!r} uri={uri}"]
 
     if not uri:
-        return AgentResponse(ok=False, output={}, reasoning_trace=[*trace, "missing uri in backend_config"])
+        return AgentResponse(
+            ok=False,
+            output={},
+            reasoning_trace=[*trace, "missing uri in backend_config"],
+        )
 
     try:
         import websockets
     except ImportError as exc:
         trace.append(f"websockets not installed: {exc}")
-        return AgentResponse(ok=False, output={}, reasoning_trace=trace, meta={"error": "websockets package required"})
+        return AgentResponse(
+            ok=False,
+            output={},
+            reasoning_trace=trace,
+            meta={"error": "websockets package required"},
+        )
 
-    payload = json.dumps({
-        "role": node.role,
-        "goal": node.goal,
-        "tools": node.tools,
-        "context": request.context,
-    })
+    payload = json.dumps(
+        {
+            "role": node.role,
+            "goal": node.goal,
+            "tools": node.tools,
+            "context": request.context,
+        }
+    )
 
     try:
         kwargs = {"subprotocols": [subprotocol]} if subprotocol else {}
@@ -333,7 +376,9 @@ async def _websocket_execute(node: AgentNode, request: AgentRequest) -> AgentRes
             trace.append("websocket_ok")
     except Exception as exc:
         trace.append(f"websocket_err: {exc}")
-        return AgentResponse(ok=False, output={}, reasoning_trace=trace, meta={"error": str(exc)})
+        return AgentResponse(
+            ok=False, output={}, reasoning_trace=trace, meta={"error": str(exc)}
+        )
 
     return AgentResponse(ok=True, output=output, reasoning_trace=trace)
 
@@ -344,6 +389,7 @@ register_backend(AgentCommunicationBackend.WEBSOCKET, _websocket_execute)
 # ---------------------------------------------------------------------------
 # Public executor
 # ---------------------------------------------------------------------------
+
 
 async def execute_agent(request: AgentRequest) -> AgentResponse:
     """Dispatch to the registered backend executor."""

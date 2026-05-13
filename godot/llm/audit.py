@@ -1,8 +1,6 @@
 """Postgres audit logger for LLM decisions."""
 
-import json
 import os
-import time
 from contextlib import contextmanager
 from typing import Any
 

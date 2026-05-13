@@ -7,7 +7,6 @@ Usage:
 
 import json
 import sys
-from pathlib import Path
 
 
 def bundle_to_doql(bundle_path: str) -> str:

@@ -56,5 +56,9 @@ class ConvertToCsvCommand(Command):
         return CommandResponse(
             payload_b64=base64.b64encode(payload_bytes).decode("ascii"),
             mime="text/csv",
-            meta={"source_uri": request.input_uri, "rows": len(rows), "columns": columns},
+            meta={
+                "source_uri": request.input_uri,
+                "rows": len(rows),
+                "columns": columns,
+            },
         )

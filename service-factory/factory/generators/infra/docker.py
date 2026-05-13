@@ -4,6 +4,7 @@ Produces a Dockerfile tailored to the bundle's runtime, plus a
 docker-compose.yml that wires the service with its companions. No reverse
 proxy — each service exposes a single host port directly.
 """
+
 from __future__ import annotations
 
 from textwrap import dedent
@@ -13,9 +14,9 @@ from ...ir import Bundle, Companion
 
 _COMPANION_DEFAULTS = {
     "litellm": {"image": "ghcr.io/berriai/litellm:main-latest", "port": 4000},
-    "mcp":     {"image": "node:20-alpine", "port": 3000},
-    "redis":   {"image": "redis:7-alpine", "port": 6379},
-    "postgres":{"image": "postgres:16-alpine", "port": 5432},
+    "mcp": {"image": "node:20-alpine", "port": 3000},
+    "redis": {"image": "redis:7-alpine", "port": 6379},
+    "postgres": {"image": "postgres:16-alpine", "port": 5432},
 }
 
 
@@ -91,16 +92,18 @@ class DockerGenerator:
         """)
 
     def _dockerignore(self) -> str:
-        return "\n".join([
-            "__pycache__",
-            "*.pyc",
-            ".venv",
-            "node_modules",
-            ".git",
-            "*.md",
-            "tests/",
-            "",
-        ])
+        return "\n".join(
+            [
+                "__pycache__",
+                "*.pyc",
+                ".venv",
+                "node_modules",
+                ".git",
+                "*.md",
+                "tests/",
+                "",
+            ]
+        )
 
     def _compose(self, bundle: Bundle) -> str:
         port = bundle.exposure.port

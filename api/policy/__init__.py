@@ -4,6 +4,7 @@ Decides whether a given user can execute a given command/query on a given
 resource URI. Rules are loaded from YAML so they can be changed without
 rebuilding the image.
 """
+
 from __future__ import annotations
 
 import fnmatch

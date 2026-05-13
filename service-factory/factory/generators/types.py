@@ -3,6 +3,7 @@
 Contract JSON uses a small set of type names: string, integer, boolean,
 object, array, datetime. Each generator maps these to its own target.
 """
+
 from __future__ import annotations
 
 
@@ -37,7 +38,9 @@ OPENAPI_TYPES = {
 }
 
 
-def _map_type(t: str, mapping: dict[str, str], fallback: str, none_suffix: str, required: bool) -> str:
+def _map_type(
+    t: str, mapping: dict[str, str], fallback: str, none_suffix: str, required: bool
+) -> str:
     base = mapping.get(t, fallback)
     return base if required else f"{base} | {none_suffix}"
 

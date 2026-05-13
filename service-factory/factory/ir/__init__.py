@@ -14,6 +14,7 @@ object. This is what lets the same IR be emitted to wildly different targets
 (Python/FastAPI vs Node/Fastify, Docker vs k8s, PHP standalone vs FastAPI SSE)
 without touching the IR itself.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -24,6 +25,7 @@ from typing import Any, Union
 
 
 # ---------- Contract wrappers ------------------------------------------------
+
 
 @dataclass(frozen=True)
 class Contract:
@@ -104,16 +106,17 @@ class Contract:
 
 # ---------- Bundle -----------------------------------------------------------
 
+
 @dataclass
 class Runtime:
-    language: str = "python"     # python | node | go | rust
+    language: str = "python"  # python | node | go | rust
     version: str = "3.12"
-    framework: str = "fastapi"   # fastapi | fastify | chi | actix
+    framework: str = "fastapi"  # fastapi | fastify | chi | actix
 
 
 @dataclass
 class Storage:
-    kind: str = "none"           # none | postgres | sqlite | mongodb
+    kind: str = "none"  # none | postgres | sqlite | mongodb
     database: str = ""
     tables: list[str] = field(default_factory=list)
 
@@ -121,9 +124,9 @@ class Storage:
 @dataclass
 class Companion:
     name: str
-    kind: str                    # litellm | mcp | redis | postgres | nginx
+    kind: str  # litellm | mcp | redis | postgres | nginx
     config: dict[str, Any] = field(default_factory=dict)
-    image: str = ""              # explicit image overrides derived default
+    image: str = ""  # explicit image overrides derived default
 
 
 @dataclass
@@ -182,11 +185,14 @@ class Bundle:
             "exposure": self.exposure.__dict__,
             "contracts": [c.raw for c in self.contracts],
         }
-        h.update(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8"))
+        h.update(
+            json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
+        )
         return h.hexdigest()[:16]
 
 
 # ---------- View Bundle ------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class Source:
@@ -195,7 +201,7 @@ class Source:
 
     name: str
     uri: str
-    refresh: str = "5s"        # e.g. "500ms", "1s", "1m", "never"
+    refresh: str = "5s"  # e.g. "500ms", "1s", "1m", "never"
     depends_on: list[str] = field(default_factory=list)
     method: str = "GET"
     headers: dict[str, str] = field(default_factory=dict)
@@ -207,9 +213,9 @@ class Template:
     each generator is free to ignore engines it cannot honour (e.g. the
     php-standalone generator always uses PHP itself for templating)."""
 
-    engine: str = "inline"     # inline | jinja2 | mustache
-    source: str = ""           # inline template body
-    source_uri: str = ""       # file:// or http:// reference
+    engine: str = "inline"  # inline | jinja2 | mustache
+    source: str = ""  # inline template body
+    source_uri: str = ""  # file:// or http:// reference
 
 
 @dataclass
@@ -233,7 +239,9 @@ class ViewBundle:
             "transport": self.transport,
             "exposure": self.exposure.__dict__,
         }
-        h.update(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8"))
+        h.update(
+            json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
+        )
         return h.hexdigest()[:16]
 
 
@@ -241,6 +249,7 @@ AnyBundle = Union[Bundle, ViewBundle]
 
 
 # ---------- Loader -----------------------------------------------------------
+
 
 class BundleLoader:
     """Reads a bundle.json from disk.
@@ -293,7 +302,9 @@ class BundleLoader:
             return self._load_view(raw, path)
         if kind == "SERVICE_BUNDLE":
             return self._load_service(raw, path)
-        raise ValueError(f"unknown kind {kind!r} (expected SERVICE_BUNDLE or VIEW_BUNDLE)")
+        raise ValueError(
+            f"unknown kind {kind!r} (expected SERVICE_BUNDLE or VIEW_BUNDLE)"
+        )
 
     def _load_view(self, raw: dict, bundle_path: Path) -> ViewBundle:
         self._validate_view(raw, bundle_path)
@@ -327,7 +338,9 @@ class BundleLoader:
         required = ["bundle", "contracts"]
         missing = [k for k in required if k not in raw]
         if missing:
-            raise ValueError(f"{path}: service bundle missing required fields: {missing}")
+            raise ValueError(
+                f"{path}: service bundle missing required fields: {missing}"
+            )
 
     @staticmethod
     def _validate_view(raw: dict, path: Path) -> None:

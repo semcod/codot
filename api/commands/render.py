@@ -81,7 +81,9 @@ class RenderCommand(Command):
         else:
             data = meta.get("data", {})
 
-        env = Environment(loader=BaseLoader(), autoescape=select_autoescape(["html", "xml"]))
+        env = Environment(
+            loader=BaseLoader(), autoescape=select_autoescape(["html", "xml"])
+        )
         template = env.from_string(template_src)
         html = template.render(data=data, title=meta.get("title", "View"), meta=meta)
 

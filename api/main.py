@@ -7,6 +7,7 @@ Commands and Queries are URL-addressable resources exactly as described in
 the design docs - the URL is the identifier of the action, the body carries
 input_uri / schema_uri / meta. No DTOs per command.
 """
+
 from __future__ import annotations
 
 import logging
@@ -17,13 +18,11 @@ from fastapi.responses import JSONResponse
 
 from config import settings
 from models import (
-    AgentNode,
     AgentRequest,
     AgentResponse,
     CommandRequest,
     CommandResponse,
     ErrorResponse,
-    PipelineRequest,
     QueryRequest,
     QueryResponse,
     TokenRequest,
@@ -62,27 +61,37 @@ app.add_middleware(
 
 # ---------- Error mapping -----------------------------------------------------
 
+
 @app.exception_handler(ValueError)
 async def _value_error(_: Request, exc: ValueError) -> JSONResponse:
-    return JSONResponse(status_code=400, content=ErrorResponse(error=str(exc)).model_dump())
+    return JSONResponse(
+        status_code=400, content=ErrorResponse(error=str(exc)).model_dump()
+    )
 
 
 @app.exception_handler(PermissionError)
 async def _perm_error(_: Request, exc: PermissionError) -> JSONResponse:
-    return JSONResponse(status_code=403, content=ErrorResponse(error=str(exc)).model_dump())
+    return JSONResponse(
+        status_code=403, content=ErrorResponse(error=str(exc)).model_dump()
+    )
 
 
 @app.exception_handler(FileNotFoundError)
 async def _nf_error(_: Request, exc: FileNotFoundError) -> JSONResponse:
-    return JSONResponse(status_code=404, content=ErrorResponse(error=str(exc)).model_dump())
+    return JSONResponse(
+        status_code=404, content=ErrorResponse(error=str(exc)).model_dump()
+    )
 
 
 @app.exception_handler(KeyError)
 async def _key_error(_: Request, exc: KeyError) -> JSONResponse:
-    return JSONResponse(status_code=404, content=ErrorResponse(error=str(exc)).model_dump())
+    return JSONResponse(
+        status_code=404, content=ErrorResponse(error=str(exc)).model_dump()
+    )
 
 
 # ---------- Health & auth -----------------------------------------------------
+
 
 @app.get("/health")
 async def health() -> dict:
@@ -107,6 +116,7 @@ async def me(user: User = Depends(current_user)) -> dict:
 
 # ---------- Commands ----------------------------------------------------------
 
+
 @app.get("/commands")
 async def list_commands(user: User = Depends(current_user)) -> dict:
     return {"commands": cmd_registry().list()}
@@ -126,7 +136,9 @@ async def execute_command(
         schema_uri=body.schema_uri,
     )
     if not decision.allowed:
-        log.info("DENY command=%s user=%s reason=%s", name, user.username, decision.reason)
+        log.info(
+            "DENY command=%s user=%s reason=%s", name, user.username, decision.reason
+        )
         raise HTTPException(status_code=403, detail=decision.reason)
 
     # 2. Dispatch
@@ -140,6 +152,7 @@ async def execute_command(
 
 
 # ---------- Queries -----------------------------------------------------------
+
 
 @app.get("/queries")
 async def list_queries(user: User = Depends(current_user)) -> dict:
@@ -180,11 +193,13 @@ async def execute_query_get(
 
 # ---------- Introspection (no auth - catalog is public) -----------------------
 
+
 @app.get("/catalog")
 async def catalog() -> dict:
     """Public catalog, handy for the frontend to render the command list."""
     from protocols import get_registry as proto_reg
     from models import AgentCommunicationBackend
+
     return {
         "commands": cmd_registry().list(),
         "queries": qry_registry().list(),
@@ -194,6 +209,7 @@ async def catalog() -> dict:
 
 
 # ---------- Agents ------------------------------------------------------------
+
 
 @app.post("/agents/{agent_id}/run", response_model=AgentResponse)
 async def run_agent(
@@ -210,13 +226,19 @@ async def run_agent(
     if not decision.allowed:
         raise HTTPException(status_code=403, detail=decision.reason)
 
-    log.info("AGENT role=%s backend=%s user=%s", body.agent_node.role, body.agent_node.backend.value, user.username)
+    log.info(
+        "AGENT role=%s backend=%s user=%s",
+        body.agent_node.role,
+        body.agent_node.backend.value,
+        user.username,
+    )
     return await execute_agent(body)
 
 
 @app.get("/agents/backends")
 async def list_agent_backends() -> dict:
     from models import AgentCommunicationBackend
+
     return {
         "backends": [
             {

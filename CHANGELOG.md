@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+- refactor: widespread code refactoring
+- docs: multiple documentation updates
+- feat(docs): add code analysis engine
+- refactor(docs): CLI interface improvements
+- fix(docs): add markdown output
+- build(docs): update docs build
+- test(docs): update docs tests
+
 ## [0.1.13] - 2026-04-23
 
 ### Docs

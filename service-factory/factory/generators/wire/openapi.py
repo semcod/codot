@@ -4,6 +4,7 @@ Emits an OpenAPI 3.1 document covering all commands and queries. The same
 Bundle can later drive AsyncAPI (for events/ws) and Proto (for gRPC) with
 separate generators — none of them duplicate IR logic.
 """
+
 from __future__ import annotations
 
 import json

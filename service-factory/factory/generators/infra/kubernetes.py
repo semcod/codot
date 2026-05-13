@@ -6,6 +6,7 @@ that the IR can target multiple infra backends.
 No Ingress, no Istio — just Deployment + ClusterIP Service. Teams that
 want ingress wire their own.
 """
+
 from __future__ import annotations
 
 from textwrap import dedent

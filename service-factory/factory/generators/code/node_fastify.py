@@ -3,6 +3,7 @@
 Parallel to python-fastapi: same bundle, different runtime. Demonstrates
 that the IR is language-agnostic.
 """
+
 from __future__ import annotations
 
 from ...ir import Bundle, Contract
@@ -34,7 +35,9 @@ def _schema_object(fields: dict[str, dict], indent: int = 4) -> str:
     props_pad = " " * (indent + 4)
 
     required = [name for name, meta in fields.items() if meta.get("required")]
-    props_lines = [_schema_property_line(name, meta, props_pad) for name, meta in fields.items()]
+    props_lines = [
+        _schema_property_line(name, meta, props_pad) for name, meta in fields.items()
+    ]
 
     lines = [
         "{",
