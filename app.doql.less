@@ -2,7 +2,13 @@
 
 app {
   name: codot;
-  version: 0.1.8;
+  version: 0.1.13;
+  description: "CQRS-URL Platform - Commands and Queries as URL-addressable resources";
+  license: Apache-2.0;
+  authors: "codot contributors, Tom Sapletta <tom@sapletta.com>";
+  keywords: "cqrs, url, commands, queries, api, fastapi";
+  homepage: https://github.com/semcod/codot;
+  repository: https://github.com/semcod/codot;
 }
 
 dependencies {
@@ -29,9 +35,15 @@ entity[name="AgentNode"] {
   description: str | None;
 }
 
+entity[name="AuditLog"] {
+  id: serial;
+  ts: datetime;
+}
+
 interface[type="api"] {
   type: rest;
   framework: fastapi;
+  auth-type: jwt;
 }
 
 workflow[name="build"] {
@@ -44,11 +56,11 @@ workflow[name="up"] {
   step-1: run cmd=docker compose up -d;
   step-2: run cmd=echo "";
   step-3: run cmd=echo "Stack is starting up:";
-  step-4: run cmd=echo "  - Frontend:   http://localhost:18000";
-  step-5: run cmd=echo "  - API:        http://localhost:18080";
-  step-6: run cmd=echo "  - API docs:   http://localhost:18080/docs";
-  step-7: run cmd=echo "  - Schemas:    http://localhost:18090";
-  step-8: run cmd=echo "  - Sample data: http://localhost:18091";
+  step-4: run cmd=echo "  - Frontend:   http://localhost:$(FRONTEND_PORT)";
+  step-5: run cmd=echo "  - API:        http://localhost:$(API_PORT)";
+  step-6: run cmd=echo "  - API docs:   http://localhost:$(API_PORT)/docs";
+  step-7: run cmd=echo "  - Schemas:    http://localhost:$(SCHEMAS_PORT)";
+  step-8: run cmd=echo "  - Sample data: http://localhost:$(DATA_PORT)";
 }
 
 workflow[name="down"] {
@@ -68,14 +80,14 @@ workflow[name="restart"] {
 
 workflow[name="token"] {
   trigger: manual;
-  step-1: run cmd=curl -s -X POST http://localhost:18080/auth/token \;
+  step-1: run cmd=curl -s -X POST http://localhost:$(API_PORT)/auth/token \;
   step-2: run cmd=-H "Content-Type: application/json" \;
   step-3: run cmd=-d '{"username":"admin","password":"admin"}' | python3 -m json.tool;
 }
 
 workflow[name="token-user"] {
   trigger: manual;
-  step-1: run cmd=curl -s -X POST http://localhost:18080/auth/token \;
+  step-1: run cmd=curl -s -X POST http://localhost:$(API_PORT)/auth/token \;
   step-2: run cmd=-H "Content-Type: application/json" \;
   step-3: run cmd=-d '{"username":"alice","password":"alice"}' | python3 -m json.tool;
 }
@@ -92,12 +104,16 @@ workflow[name="test-agent"] {
 
 workflow[name="workflow"] {
   trigger: manual;
-  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url http://localhost:28080;
+  step-1: run cmd=python3 codot_run.py examples/workflow_agent_mcp.json --url $(API_BASE_URL);
 }
 
 workflow[name="clean"] {
   trigger: manual;
   step-1: run cmd=docker compose down -v --remove-orphans;
+}
+
+env_vars {
+  keys: OPENROUTER_API_KEY, LLM_MODEL, PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_MAX_RETRIES, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_CREATE_BACKUPS, API_PORT, FRONTEND_PORT, SCHEMAS_PORT, DATA_PORT, WORKFLOW_API_PORT, WORKFLOW_EDITOR_PORT, API_BASE_URL, JWT_SECRET, JWT_ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, LOG_LEVEL;
 }
 
 deploy {
@@ -109,5 +125,9 @@ deploy {
 environment[name="local"] {
   runtime: docker-compose;
   env_file: .env;
+  template_file: .env.example;
   python_version: >=3.8;
+  vars: ACCESS_TOKEN_EXPIRE_MINUTES, API_BASE_URL, API_PORT, DATA_PORT, FRONTEND_PORT, JWT_ALGORITHM, JWT_SECRET, LLM_MODEL, LOG_LEVEL, OPENROUTER_API_KEY, PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_CREATE_BACKUPS, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_MAX_RETRIES, SCHEMAS_PORT, WORKFLOW_API_PORT, WORKFLOW_EDITOR_PORT;
+  runtime_llm: OPENROUTER_API_KEY;
+  runtime_pfix: PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_CREATE_BACKUPS, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_MAX_RETRIES;
 }
