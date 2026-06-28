@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - build(docs): update docs build
 - test(docs): update docs tests
 
+## [0.1.14] - 2026-06-29
+
+### Docs
+- Update README.md
+
 ## [0.1.13] - 2026-04-23
 
 ### Docs
