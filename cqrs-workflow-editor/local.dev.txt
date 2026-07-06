@@ -1,0 +1,8 @@
+# local.dev.txt — locally developed dependencies of this project (generated 2026-07-04)
+# by ~/github/local.dev.sh — DO NOT EDIT; see ~/github/local.dev.md
+# project: cqrs-workflow-editor 0.1.0 (js) at /home/tom/github/semcod/codot/cqrs-workflow-editor
+# deps declared: 10 | with local source: 0
+
+## LOCAL DEPS: none — all dependencies are external
+
+## EXTERNAL DEPS (no local source, 10): @types/react, @types/react-dom, @types/react-syntax-highlighter, @vitejs/plugin-react, @xyflow/react, react, react-dom, react-syntax-highlighter, typescript, vite
