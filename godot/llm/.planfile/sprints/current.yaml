@@ -1,0 +1,49 @@
+sprint:
+  id: current
+  name: Current
+  status: active
+  tickets:
+    PLF-001:
+      id: PLF-001
+      name: Split godot llm app module
+      status: open
+      priority: normal
+      sprint: current
+      source:
+        tool: koru-cli-nl
+        timestamp: '2026-09-01T09:21:55.118071+00:00'
+        context:
+          input: 'STARTER-003: extract llm_* submodules from app.py'
+      description: 'STARTER-003: extract llm_* submodules from app.py'
+      labels:
+      - koru
+      - nl-task
+      - llm-ready
+      blocked_by: []
+      blocks: []
+      files: []
+      executor:
+        kind: human
+        mode: interactive
+      execution:
+        queue: default
+        state: ready
+        attempt: 0
+        max_attempts: 1
+      inputs:
+        prompt: 'STARTER-003: extract llm_* submodules from app.py'
+        env_keys: []
+        api_method: GET
+        api_headers: {}
+        api_timeout_seconds: 30.0
+      outputs:
+        artifacts: []
+        notes: []
+      sync: {}
+      history:
+      - timestamp: '2026-09-01T09:21:55.118071+00:00'
+        action: created
+        source: koru task
+        message: 'STARTER-003: extract llm_* submodules from app.py'
+      created_at: '2026-09-01T09:21:55.118071+00:00'
+      updated_at: '2026-09-01T09:21:55.118071+00:00'
